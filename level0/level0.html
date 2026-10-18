@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CyberKnight — Level 0: Hộp Quà Bí Ẩn ("Máy Soi Kim Cương")</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+
+    <!-- Canvas Confetti CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <!-- GSAP Animation Library CDN (with safe vanilla fallback) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+    <!-- Level 0 Stylesheet -->
+    <link rel="stylesheet" href="level0.css">
+</head>
+<body>
+
+    <div id="app-container">
+
+        <!-- ===================================================================
+             START OVERLAY (Mở khóa AudioContext & Khởi động Level 0)
+             =================================================================== -->
+        <div id="start-overlay">
+            <!-- Floating Sparkle Decorations -->
+            <div class="floating-sparkle star" style="left:10%;animation-duration:13s;animation-delay:0s;"></div>
+            <div class="floating-sparkle circle" style="left:30%;animation-duration:16s;animation-delay:1s;"></div>
+            <div class="floating-sparkle diamond" style="left:50%;animation-duration:11s;animation-delay:3s;"></div>
+            <div class="floating-sparkle star" style="left:70%;animation-duration:14s;animation-delay:2s;"></div>
+            <div class="floating-sparkle circle" style="left:88%;animation-duration:15s;animation-delay:4s;"></div>
+
+            <!-- CyberKnight Logo -->
+            <img src="../image/z8014995224177_069f99816bf77dda5fed3feb153a6c0e-removebg-preview.png" alt="CyberKnight Logo" style="width: clamp(160px, 30vw, 300px); margin-bottom: -10px; animation: gift-icon-bounce 3s ease-in-out infinite; filter: drop-shadow(0 8px 24px rgba(0, 102, 255, 0.2));">
+
+            <div class="cyber-badge">LEVEL 0 • AN TOÀN TRỰC TUYẾN</div>
+            <h1 class="cyber-title">HỘP QUÀ BÍ ẨN</h1>
+            <p class="cyber-subtitle">
+                Trải nghiệm tình huống tương tác thực tế: Cảnh giác trước những món quà miễn phí bất ngờ trên không gian mạng!
+            </p>
+            <button id="btn-start-level" class="btn-cyber-primary">
+                <span>▶ BẮT ĐẦU LEVEL 0</span>
+            </button>
+        </div>
+
+        <!-- ===================================================================
+             STAGE 1: VIDEO MỞ ĐẦU
+             =================================================================== -->
+        <div id="stage-intro" class="stage">
+            <video id="video-intro" class="video-player" playsinline preload="auto"></video>
+            <button id="btn-skip-intro" class="video-skip-btn" aria-label="Bỏ qua video">
+                Bỏ qua ⏭
+            </button>
+        </div>
+
+        <!-- ===================================================================
+             STAGE 2: MINI-GAME "MÁY SOI KIM CƯƠNG"
+             =================================================================== -->
+        <div id="stage-game" class="stage">
+            <div class="cyber-grid"></div>
+
+            <!-- Floating Sparkle Decorations (more dense) -->
+            <div class="floating-sparkle star" style="left:3%;animation-duration:12s;animation-delay:0s;"></div>
+            <div class="floating-sparkle circle" style="left:10%;animation-duration:15s;animation-delay:2s;"></div>
+            <div class="floating-sparkle diamond" style="left:18%;animation-duration:18s;animation-delay:4s;"></div>
+            <div class="floating-sparkle star" style="left:28%;animation-duration:14s;animation-delay:1s;"></div>
+            <div class="floating-sparkle circle" style="left:38%;animation-duration:16s;animation-delay:3s;"></div>
+            <div class="floating-sparkle diamond" style="left:48%;animation-duration:11s;animation-delay:5s;"></div>
+            <div class="floating-sparkle star" style="left:58%;animation-duration:17s;animation-delay:2.5s;"></div>
+            <div class="floating-sparkle circle" style="left:68%;animation-duration:13s;animation-delay:0.5s;"></div>
+            <div class="floating-sparkle diamond" style="left:78%;animation-duration:15s;animation-delay:1.5s;"></div>
+            <div class="floating-sparkle star" style="left:88%;animation-duration:12s;animation-delay:3.5s;"></div>
+            <div class="floating-sparkle circle" style="left:95%;animation-duration:16s;animation-delay:4.5s;"></div>
+
+            <!-- Decorative gradient blobs (background depth) -->
+            <div class="deco-blob deco-blob-1"></div>
+            <div class="deco-blob deco-blob-2"></div>
+            <div class="deco-blob deco-blob-3"></div>
+
+            <!-- Decorative shield icons floating -->
+            <div class="deco-shield deco-shield-1">🛡️</div>
+            <div class="deco-shield deco-shield-2">🔒</div>
+            <div class="deco-shield deco-shield-3">⭐</div>
+            <div class="deco-shield deco-shield-4">💎</div>
+
+            <!-- CyberKnight Logo (Left) — transparent PNG with both characters -->
+            <img src="../image/z8014995224177_069f99816bf77dda5fed3feb153a6c0e-removebg-preview.png" alt="CyberKnight" class="character-logo-left">
+
+            <!-- SigmaBloom Logo (Right corner) -->
+            <img src="../image/z8014995365895_a3eb178f5f7a17a45925b55e43e202be-removebg-preview.png" alt="SigmaBloom" class="brand-logo-right">
+
+            <!-- Thanh thông số đầu game -->
+            <div class="game-header">
+                <!-- Tiến độ soi hộp quà -->
+                <div class="scan-progress-box">
+                    <div class="scan-progress-label">
+                        <span>🔍 TIẾN ĐỘ SOI</span>
+                        <span id="scan-progress-text">0%</span>
+                    </div>
+                    <div class="scan-progress-bar-bg">
+                        <div id="scan-progress-bar" class="scan-progress-bar-fill"></div>
+                    </div>
+                </div>
+
+                <!-- Đồng hồ đếm ngược gấp gáp mô phỏng clickbait -->
+                <div class="countdown-box" title="Thời gian còn lại">
+                    <svg class="countdown-svg" viewBox="0 0 72 72">
+                        <circle class="countdown-bg" cx="36" cy="36" r="32" />
+                        <circle id="countdown-circle" class="countdown-circle" cx="36" cy="36" r="32" />
+                    </svg>
+                    <div id="countdown-text" class="countdown-text">15</div>
+                </div>
+            </div>
+
+            <!-- Khu vực trung tâm: Hộp quà & Máy quét -->
+            <div class="game-arena">
+                <!-- Hiệu ứng hạt kim cương lơ lửng -->
+                <canvas id="particle-canvas"></canvas>
+
+                <!-- Thẻ hộp quà tương tác -->
+                <div id="gift-card-wrapper" class="gift-card-wrapper">
+
+                    <!-- Lớp ẩn phía dưới: Con Virus gian xảo -->
+                    <div class="gift-inner-hidden">
+                        <svg class="virus-character" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Thân virus tròn màu đỏ tím -->
+                            <circle cx="50" cy="50" r="34" fill="#ff1744" stroke="#ffffff" stroke-width="3" />
+                            <!-- Gai virus nhọn xung quanh -->
+                            <path d="M50 10 L54 18 L46 18 Z" fill="#ff1744" />
+                            <path d="M50 90 L54 82 L46 82 Z" fill="#ff1744" />
+                            <path d="M10 50 L18 54 L18 46 Z" fill="#ff1744" />
+                            <path d="M90 50 L82 54 L82 46 Z" fill="#ff1744" />
+                            <path d="M22 22 L30 27 L26 31 Z" fill="#ff1744" />
+                            <path d="M78 78 L70 73 L74 69 Z" fill="#ff1744" />
+                            <path d="M78 22 L69 26 L73 30 Z" fill="#ff1744" />
+                            <path d="M22 78 L31 74 L27 70 Z" fill="#ff1744" />
+                            <!-- Mắt ác quỷ -->
+                            <ellipse cx="40" cy="44" rx="6" ry="8" fill="#ffffff" />
+                            <circle cx="42" cy="44" r="3.5" fill="#11052C" />
+                            <ellipse cx="60" cy="44" rx="6" ry="8" fill="#ffffff" />
+                            <circle cx="58" cy="44" r="3.5" fill="#11052C" />
+                            <!-- Lông mày hung dữ -->
+                            <path d="M33 36 L47 40" stroke="#11052C" stroke-width="2.5" stroke-linecap="round" />
+                            <path d="M67 36 L53 40" stroke="#11052C" stroke-width="2.5" stroke-linecap="round" />
+                            <!-- Miệng cười nham hiểm có răng nhọn -->
+                            <path d="M36 60 Q50 72 64 60 Z" fill="#11052C" />
+                            <polygon points="42,60 45,65 48,60" fill="#ffffff" />
+                            <polygon points="52,60 55,65 58,60" fill="#ffffff" />
+                        </svg>
+                        <div class="virus-danger-tag">
+                            <span>⚠️ MÃ ĐỘC PHÁT HIỆN!</span>
+                        </div>
+                    </div>
+
+                    <!-- Lớp mặt trước: Hộp quà vàng hào nhoáng -->
+                    <div class="gift-inner-front">
+                        <svg class="gift-icon-svg" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Nơ quà trên đầu -->
+                            <path d="M60 30 C50 14 32 18 36 28 C40 36 56 34 60 38" fill="#ff0055" stroke="#ffffff" stroke-width="2" />
+                            <path d="M60 30 C70 14 88 18 84 28 C80 36 64 34 60 38" fill="#ff0055" stroke="#ffffff" stroke-width="2" />
+                            <circle cx="60" cy="36" r="6" fill="#ffd700" stroke="#ffffff" stroke-width="1.5" />
+                            <!-- Nắp hộp quà -->
+                            <rect x="22" y="36" width="76" height="18" rx="4" fill="#ffd700" stroke="#ffffff" stroke-width="3" />
+                            <rect x="54" y="36" width="12" height="18" fill="#ff0055" />
+                            <!-- Thân hộp quà -->
+                            <rect x="28" y="54" width="64" height="52" rx="4" fill="#ffb703" stroke="#ffffff" stroke-width="3" />
+                            <rect x="54" y="54" width="12" height="52" fill="#ff0055" />
+                            <line x1="28" y1="80" x2="92" y2="80" stroke="#ff0055" stroke-width="10" />
+                        </svg>
+                        <div class="gift-label-bait">
+                            💎 1.000 KIM CƯƠNG!
+                        </div>
+                    </div>
+
+                    <!-- Canvas cạo lớp phủ (Scratch & Spotlight Mask) -->
+                    <canvas id="scratch-canvas"></canvas>
+                </div>
+
+                <!-- Nút hành động chính: Mồi nhử ban đầu -> Song song 2 lựa chọn bình đẳng khi soi ra mã độc -->
+                <div class="action-btn-container" id="action-btn-container">
+                    <!-- Trạng thái 1: Chưa soi ra virus (Clickbait ban đầu) -->
+                    <button id="btn-action" class="btn-game-action bait-state" type="button" aria-label="Nhận quà ngay">
+                        <span class="flex items-center gap-2">
+                            🎁 NHẬN NGAY!
+                        </span>
+                    </button>
+
+                    <!-- Trạng thái 2: Đã soi 100% phát hiện mã độc (2 lựa chọn bình đẳng, không thiên vị) -->
+                    <div id="dual-decision-container" class="dual-decision-container hidden" aria-label="Lựa chọn sau khi phát hiện mã độc">
+                        <button id="btn-decision-bad" class="btn-decision btn-decision-bad" type="button" aria-label="Nhận quà này">
+                            <span>🟥 NHẬN QUÀ NÀY</span>
+                        </button>
+                        <button id="btn-decision-good" class="btn-decision btn-decision-good" type="button" aria-label="Không nhận quà này">
+                            <span>🟢 KHÔNG NHẬN QUÀ NÀY</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Công cụ Kính Lúp (Trẻ chạm và kéo lên hộp quà) -->
+            <div id="magnifier-tool" role="button" aria-label="Kính lúp kiểm tra">
+                <div class="magnifier-body">
+                    <div class="magnifier-lens-outer">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3B8EFF" stroke-width="2.5" stroke-linecap="round">
+                            <circle cx="11" cy="11" r="8" />
+                            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                        </svg>
+                    </div>
+                    <div class="magnifier-handle"></div>
+                </div>
+                <div class="magnifier-hint-label">🔍 KÉO ĐỂ SOI</div>
+            </div>
+
+            <!-- Vệt sáng theo sau kính lúp -->
+            <div id="scanner-light-beam" class="scanner-light-beam"></div>
+
+            <!-- Bong bóng gợi ý cho trẻ nhỏ -->
+            <div id="hint-speech-bubble" class="hint-speech-bubble">
+                💡 <b>Khoan đã!</b> Con hãy dùng <b>kính lúp 🔍</b> ở góc dưới để kiểm tra hộp quà trước nhé!
+            </div>
+        </div>
+
+        <!-- ===================================================================
+             STAGE 3: VIDEO HẬU QUẢ (Rẽ nhánh)
+             =================================================================== -->
+        <div id="stage-outro" class="stage">
+            <video id="video-outro" class="video-player" playsinline></video>
+            <button id="btn-skip-outro" class="video-skip-btn" aria-label="Bỏ qua video">
+                Bỏ qua ⏭
+            </button>
+        </div>
+
+        <!-- ===================================================================
+             STAGE 4: SUMMARY & BÀI HỌC AN TOÀN MẠNG
+             =================================================================== -->
+        <div id="stage-summary" class="stage">
+            <!-- Floating Sparkle Decorations -->
+            <div class="floating-sparkle star" style="left:5%;animation-duration:14s;animation-delay:0.5s;"></div>
+            <div class="floating-sparkle circle" style="left:15%;animation-duration:16s;animation-delay:1.5s;"></div>
+            <div class="floating-sparkle diamond" style="left:30%;animation-duration:12s;animation-delay:3s;"></div>
+            <div class="floating-sparkle star" style="left:45%;animation-duration:15s;animation-delay:2s;"></div>
+            <div class="floating-sparkle circle" style="left:60%;animation-duration:13s;animation-delay:4s;"></div>
+            <div class="floating-sparkle diamond" style="left:75%;animation-duration:17s;animation-delay:1s;"></div>
+            <div class="floating-sparkle star" style="left:90%;animation-duration:14s;animation-delay:3.5s;"></div>
+
+            <!-- Decorative gradient blobs -->
+            <div class="deco-blob deco-blob-1"></div>
+            <div class="deco-blob deco-blob-2"></div>
+            <div class="deco-blob deco-blob-3"></div>
+
+            <!-- Decorative floating icons -->
+            <div class="deco-shield deco-shield-1">🛡️</div>
+            <div class="deco-shield deco-shield-3">⭐</div>
+            <div class="deco-shield deco-shield-4">💎</div>
+
+            <div id="summary-card-container" class="summary-card good-branch">
+                <!-- Nội dung card sẽ được populate động qua SummaryScene.render() -->
+            </div>
+        </div>
+
+        <!-- ===================================================================
+             FREEZE FRAME OVERLAY (Đảm bảo 100% không bao giờ có màn hình đen)
+             =================================================================== -->
+        <canvas id="freeze-canvas"></canvas>
+
+        <!-- Preload 2 video hậu quả ngầm để chuyển cảnh tức thì -->
+        <video id="preload-bad" preload="auto" style="display:none;"></video>
+        <video id="preload-good" preload="auto" style="display:none;"></video>
+
+    </div>
+
+    <!-- Script điều khiển Level 0 -->
+    <script src="level0.js"></script>
+</body>
+</html>

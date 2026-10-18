@@ -1,0 +1,2034 @@
+/* ==========================================================================
+   CYBERKNIGHT — LEVEL 2: "KẾT BẠN ONLINE — NGƯỜI BẠN MỚI" (GHÉP CỬA BẢO VỆ CĂN CỨ)
+   Design System: Child-Friendly CyberKnight Theme — Bright, Cute & Animated
+   ========================================================================== */
+
+:root {
+    /* ===== CHILD-FRIENDLY COLOR PALETTE (COPY 100% TỪ LEVEL 1) ===== */
+    --ck-blue-50: #EBF5FF;
+    --ck-blue-100: #D0E8FF;
+    --ck-blue-200: #A3D1FF;
+    --ck-blue-300: #5BA8FF;
+    --ck-blue-400: #3B8EFF;
+    --ck-blue-500: #0066FF;
+    --ck-blue-600: #0052CC;
+    --ck-blue-700: #003D99;
+    --ck-sky: #00D4FF;
+    --ck-mint: #4ECDC4;
+    --ck-green: #22C55E;
+    --ck-green-light: #A7F3D0;
+    --ck-yellow: #FFD700;
+    --ck-yellow-light: #FFF3B0;
+    --ck-orange: #FF9F43;
+    --ck-red: #FF4757;
+    --ck-red-light: #FECDD3;
+    --ck-pink: #FF6B9D;
+    --ck-purple: #8B5CF6;
+    --ck-white: #FFFFFF;
+    --ck-bg-gradient-start: #E8F4FD;
+    --ck-bg-gradient-mid: #D0E8FF;
+    --ck-bg-gradient-end: #C3DDFF;
+    --ck-text-primary: #1E3A5F;
+    --ck-text-secondary: #4A6FA5;
+    --ck-text-muted: #7B9CC0;
+
+    /* ===== SHADOWS ===== */
+    --ck-shadow-soft: 0 4px 20px rgba(0, 102, 255, 0.12);
+    --ck-shadow-card: 0 8px 32px rgba(0, 102, 255, 0.15), 0 2px 8px rgba(0, 0, 0, 0.06);
+    --ck-shadow-button: 0 4px 16px rgba(0, 102, 255, 0.3);
+    --ck-shadow-glow-blue: 0 0 30px rgba(0, 102, 255, 0.25);
+    --ck-shadow-glow-green: 0 0 30px rgba(34, 197, 94, 0.3);
+    --ck-shadow-glow-yellow: 0 0 30px rgba(255, 215, 0, 0.35);
+    --ck-shadow-glow-red: 0 0 30px rgba(255, 71, 87, 0.3);
+
+    /* ===== FONTS ===== */
+    --font-heading: 'Poppins', 'Space Grotesk', sans-serif;
+    --font-body: 'Poppins', 'Inter', -apple-system, sans-serif;
+
+    /* ===== LEGACY COMPATIBILITY ===== */
+    --cyber-bg: #0a0e27;
+    --cyber-card-bg: rgba(16, 23, 53, 0.85);
+    --cyber-accent: #00f0ff;
+    --cyber-secondary: #8b5cf6;
+    --cyber-pink: #ff00aa;
+    --cyber-yellow: #ffd700;
+    --cyber-good: #00ff88;
+    --cyber-bad: #ff3366;
+    --cyber-warning: #ffaa00;
+    --brutal-border: 3px solid #ffffff;
+    --brutal-shadow: 6px 6px 0px 0px #000000;
+    --brutal-shadow-hover: 3px 3px 0px 0px #000000;
+    --brutal-shadow-good: 0 0 30px rgba(0, 255, 136, 0.4), 6px 6px 0px #000;
+    --brutal-shadow-bad: 0 0 30px rgba(255, 51, 102, 0.5), 6px 6px 0px #000;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+html, body {
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    position: fixed;
+    inset: 0;
+    background-color: var(--ck-bg-gradient-start);
+    color: var(--ck-text-primary);
+    font-family: var(--font-body);
+    touch-action: manipulation;
+}
+
+/* ==========================================================================
+   CONTAINER & STAGES (Full Viewport Management)
+   ========================================================================== */
+
+#app-container {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background: linear-gradient(180deg, var(--ck-bg-gradient-start) 0%, var(--ck-bg-gradient-mid) 50%, var(--ck-bg-gradient-end) 100%);
+}
+
+.stage {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 10;
+}
+
+.stage.active {
+    opacity: 1;
+    pointer-events: auto;
+    z-index: 20;
+}
+
+/* Freeze Frame Canvas Overlay for 100% seamless crossfade */
+#freeze-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 50;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.4s ease-in-out;
+}
+
+/* particle-canvas đã lược bỏ — chỉ dùng canvas-confetti CDN ở level2.js */
+
+/* ==========================================================================
+   TOP BAR (Thanh điều khiển góc trên bên phải — Flexbox chống đè nút)
+   ========================================================================== */
+
+.level2-top-bar {
+    position: fixed;
+    top: 18px;
+    right: 22px;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    pointer-events: auto;
+}
+
+.btn-level2-skip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 18px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 2px solid var(--ck-blue-300);
+    border-radius: 999px;
+    color: var(--ck-blue-600);
+    font-family: var(--font-heading);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: var(--ck-shadow-soft);
+    backdrop-filter: blur(8px);
+    transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    /* Tách riêng ra góc dưới bên phải - không nằm chung top bar */
+    position: fixed;
+    bottom: 22px;
+    right: 22px;
+    z-index: 9999;
+}
+
+.btn-level2-skip:hover {
+    transform: translateY(-2px);
+    background: #ffffff;
+    box-shadow: 0 6px 20px rgba(0, 102, 255, 0.2);
+    border-color: var(--ck-blue-400);
+}
+
+.btn-level2-skip:active {
+    transform: translateY(1px);
+}
+
+.btn-level2-skip.hidden {
+    display: none !important;
+}
+
+.btn-level2-exit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 18px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 2px solid var(--ck-red);
+    border-radius: 999px;
+    color: var(--ck-red);
+    font-family: var(--font-heading);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: var(--ck-shadow-soft);
+    backdrop-filter: blur(8px);
+    transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.btn-level2-exit:hover {
+    transform: translateY(-2px);
+    background: var(--ck-red);
+    color: #ffffff;
+    box-shadow: 0 6px 20px rgba(255, 71, 87, 0.35);
+}
+
+.btn-level2-exit:active {
+    transform: translateY(1px);
+}
+
+/* ==========================================================================
+   VIDEO STAGES (Chống vỡ nét 720p: 16:9 Letterbox Ambient Backdrop)
+   ========================================================================== */
+
+.video-stage-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background-color: #050816;
+}
+
+.video-ambient-backdrop {
+    position: absolute;
+    inset: -20px;
+    background: radial-gradient(circle at center, rgba(16, 26, 68, 0.8) 0%, rgba(5, 8, 22, 0.98) 85%);
+    filter: blur(30px);
+    z-index: 1;
+    pointer-events: none;
+}
+
+.video-container {
+    position: relative;
+    width: 100%;
+    max-width: 1280px;
+    max-height: 720px;
+    aspect-ratio: 16 / 9;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.6);
+    border-radius: 12px;
+    overflow: hidden;
+    background: #000;
+}
+
+.video-player {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: #000;
+}
+
+/* ==========================================================================
+   OUTRO FALLBACK PANEL (Hiển thị khi video hậu quả không load được)
+   ========================================================================== */
+.outro-fallback-panel {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0a0e27 100%);
+    padding: 40px;
+    animation: outro-fallback-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.outro-fallback-panel.hidden {
+    display: none !important;
+}
+
+@keyframes outro-fallback-in {
+    from { opacity: 0; transform: scale(0.92); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.outro-fallback-content {
+    max-width: 720px;
+    text-align: center;
+    color: #fff;
+}
+
+.outro-fallback-icon {
+    font-size: 96px;
+    margin-bottom: 16px;
+    animation: icon-pulse 2s ease-in-out infinite;
+    display: inline-block;
+}
+
+@keyframes icon-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+}
+
+.outro-fallback-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 42px;
+    font-weight: 800;
+    margin: 0 0 16px;
+    background: linear-gradient(135deg, #5BA8FF, #FFD700);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.2;
+}
+
+.outro-fallback-message {
+    font-family: 'Inter', sans-serif;
+    font-size: 18px;
+    line-height: 1.6;
+    margin: 0 0 28px;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.outro-fallback-lessons {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin: 24px 0 32px;
+    text-align: left;
+}
+
+.outro-fallback-lesson-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 16px 20px;
+    background: rgba(91, 168, 255, 0.08);
+    border: 1px solid rgba(91, 168, 255, 0.25);
+    border-radius: 12px;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.95);
+    animation: lesson-slide-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+}
+
+.outro-fallback-lesson-item:nth-child(1) { animation-delay: 0.2s; }
+.outro-fallback-lesson-item:nth-child(2) { animation-delay: 0.4s; }
+.outro-fallback-lesson-item:nth-child(3) { animation-delay: 0.6s; }
+.outro-fallback-lesson-item:nth-child(4) { animation-delay: 0.8s; }
+
+@keyframes lesson-slide-in {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.outro-fallback-lesson-icon {
+    font-size: 24px;
+    flex-shrink: 0;
+}
+
+.outro-fallback-lesson-text b {
+    color: #FFD700;
+    font-weight: 700;
+}
+
+.outro-fallback-cta {
+    margin-top: 16px;
+    padding: 18px 48px;
+    background: linear-gradient(135deg, #0066FF, #5BA8FF);
+    color: #fff;
+    border: none;
+    border-radius: 50px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    box-shadow: 0 8px 24px rgba(0, 102, 255, 0.4);
+    transition: all 0.3s ease;
+    animation: cta-glow 2s ease-in-out infinite;
+}
+
+.outro-fallback-cta:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 32px rgba(0, 102, 255, 0.6);
+}
+
+@keyframes cta-glow {
+    0%, 100% { box-shadow: 0 8px 24px rgba(0, 102, 255, 0.4); }
+    50% { box-shadow: 0 8px 32px rgba(91, 168, 255, 0.7); }
+}
+
+/* Branch-specific colors cho fallback */
+.outro-fallback-panel.branch-open {
+    background: linear-gradient(135deg, #2d0a0a 0%, #4a1818 50%, #2d0a0a 100%);
+}
+.outro-fallback-panel.branch-open .outro-fallback-title {
+    background: linear-gradient(135deg, #FF4757, #FF6B9D);
+    -webkit-background-clip: text;
+    background-clip: text;
+}
+.outro-fallback-panel.branch-open .outro-fallback-lesson-item {
+    background: rgba(255, 71, 87, 0.08);
+    border-color: rgba(255, 71, 87, 0.25);
+}
+
+.outro-fallback-panel.branch-closed {
+    background: linear-gradient(135deg, #0a2d1a 0%, #184a2c 50%, #0a2d1a 100%);
+}
+.outro-fallback-panel.branch-closed .outro-fallback-title {
+    background: linear-gradient(135deg, #22C55E, #4ECDC4);
+    -webkit-background-clip: text;
+    background-clip: text;
+}
+.outro-fallback-panel.branch-closed .outro-fallback-lesson-item {
+    background: rgba(34, 197, 94, 0.08);
+    border-color: rgba(34, 197, 94, 0.25);
+}
+
+/* ==========================================================================
+   START OVERLAY (Mở khóa AudioContext)
+   ========================================================================== */
+
+#start-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(180deg, rgba(232, 244, 253, 0.97) 0%, rgba(208, 232, 255, 0.98) 100%);
+    backdrop-filter: blur(20px);
+    text-align: center;
+    padding: 24px;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+#start-overlay.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.overlay-brand-logo {
+    width: clamp(160px, 30vw, 300px);
+    margin-bottom: -10px;
+    animation: gift-icon-bounce 3s ease-in-out infinite;
+    filter: drop-shadow(0 8px 24px rgba(0, 102, 255, 0.2));
+}
+
+@keyframes gift-icon-bounce {
+    0%, 100% { transform: translateY(0) rotate(-3deg); }
+    50% { transform: translateY(-12px) rotate(3deg); }
+}
+
+.cyber-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 18px;
+    background: linear-gradient(135deg, var(--ck-blue-50), var(--ck-blue-100));
+    border: 2px solid var(--ck-blue-300);
+    border-radius: 999px;
+    color: var(--ck-blue-600);
+    font-family: var(--font-heading);
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    margin-bottom: 16px;
+    box-shadow: var(--ck-shadow-soft);
+}
+
+.cyber-title {
+    font-family: var(--font-heading);
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 800;
+    line-height: 1.15;
+    background: linear-gradient(135deg, var(--ck-blue-600) 0%, var(--ck-blue-400) 50%, var(--ck-sky) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 16px;
+    text-shadow: 0 4px 12px rgba(0, 102, 255, 0.15);
+}
+
+.cyber-subtitle {
+    font-size: clamp(14px, 2vw, 17px);
+    color: var(--ck-text-secondary);
+    max-width: 520px;
+    line-height: 1.6;
+    margin-bottom: 32px;
+}
+
+.btn-cyber-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 18px 42px;
+    background: linear-gradient(135deg, var(--ck-blue-500) 0%, var(--ck-blue-400) 100%);
+    color: #ffffff;
+    font-family: var(--font-heading);
+    font-size: 16px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    border-radius: 50px;
+    border: none;
+    cursor: pointer;
+    box-shadow: var(--ck-shadow-button), 0 4px 0 0 var(--ck-blue-700);
+    transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.btn-cyber-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 30px rgba(0, 102, 255, 0.45), 0 4px 0 0 var(--ck-blue-700);
+}
+
+.btn-cyber-primary:active {
+    transform: translateY(2px);
+    box-shadow: 0 2px 10px rgba(0, 102, 255, 0.3), 0 1px 0 0 var(--ck-blue-700);
+}
+
+/* ==========================================================================
+   STAGE 2: GAME ARENA & HEADER
+   ========================================================================== */
+
+#stage-game {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px 24px;
+    overflow: hidden;
+}
+
+/* Decorative background grid */
+.cyber-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+        radial-gradient(circle, rgba(0, 102, 255, 0.08) 1.5px, transparent 1.5px);
+    background-size: 32px 32px;
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Decorative blobs & floating shields */
+.deco-blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.35;
+}
+
+.deco-blob-1 {
+    width: 320px;
+    height: 320px;
+    background: var(--ck-blue-300);
+    top: -80px;
+    left: -80px;
+}
+
+.deco-blob-2 {
+    width: 280px;
+    height: 280px;
+    background: var(--ck-sky);
+    bottom: -60px;
+    right: -60px;
+}
+
+.deco-blob-3 {
+    width: 240px;
+    height: 240px;
+    background: var(--ck-purple);
+    top: 40%;
+    right: 15%;
+}
+
+.deco-shield {
+    position: absolute;
+    font-size: 26px;
+    opacity: 0.35;
+    pointer-events: none;
+    z-index: 2;
+    animation: float-shield 6s ease-in-out infinite;
+}
+
+.deco-shield-1 { top: 12%; left: 8%; animation-delay: 0s; }
+.deco-shield-2 { top: 22%; right: 10%; animation-delay: 1.5s; }
+.deco-shield-3 { bottom: 18%; left: 12%; animation-delay: 3s; }
+.deco-shield-4 { bottom: 25%; right: 14%; animation-delay: 4.5s; }
+
+@keyframes float-shield {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-12px) rotate(8deg); }
+}
+
+/* Brand Logos in Stage 2 */
+.character-logo-left {
+    position: absolute;
+    top: 14px;
+    left: 20px;
+    width: clamp(100px, 12vw, 160px);
+    filter: drop-shadow(0 4px 12px rgba(0, 102, 255, 0.15));
+    pointer-events: none;
+    z-index: 25;
+}
+
+.brand-logo-right {
+    position: absolute;
+    top: 18px;
+    left: calc(20px + clamp(100px, 12vw, 160px) + 12px);
+    width: clamp(38px, 4vw, 55px);
+    filter: drop-shadow(0 4px 12px rgba(0, 102, 255, 0.15));
+    pointer-events: none;
+    z-index: 25;
+}
+
+/* ==========================================================================
+   STAGE 2 MINI-GAME: "GHÉP CỬA BẢO VỆ CĂN CỨ" (DOOR PUZZLE ENGINE)
+   ========================================================================== */
+
+.door-puzzle-arena {
+    width: 100%;
+    max-width: 760px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 20;
+    margin: auto 0;
+}
+
+.door-puzzle-wrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+}
+
+/* Header HUD: Tiêu đề mini-game & progress */
+.dp-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 720px;
+    padding: 0 4px;
+    z-index: 25;
+}
+
+.dp-header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.dp-badge-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 2px solid var(--ck-blue-200);
+    border-radius: 999px;
+    padding: 6px 14px;
+    box-shadow: var(--ck-shadow-soft);
+}
+
+.dp-badge-icon {
+    font-size: 16px;
+}
+
+.dp-badge-text {
+    font-family: var(--font-heading);
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--ck-blue-600);
+    letter-spacing: 0.5px;
+}
+
+.dp-progress-tracker {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #ffffff;
+    border: 2px solid var(--ck-blue-200);
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-family: var(--font-heading);
+    box-shadow: var(--ck-shadow-soft);
+}
+
+.dp-progress-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--ck-text-muted);
+}
+
+.dp-progress-val {
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--ck-blue-500);
+}
+
+.dp-header-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dp-info-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    border-radius: 50%;
+    box-shadow: var(--ck-shadow-soft);
+    padding: 12px 16px;
+}
+
+.dp-info-icon {
+    font-size: 22px;
+}
+
+/* ==========================================================================
+   DOOR PUZZLE ARENA: KHUNG CHƠI GHÉP CỬA
+   ========================================================================== */
+
+.dp-arena {
+    position: relative;
+    width: 100%;
+    max-width: 720px;
+    height: clamp(420px, 58vh, 500px);
+    background: linear-gradient(180deg, #FFFFFF 0%, #F5F9FE 100%);
+    border: 3px solid var(--ck-blue-200);
+    border-radius: 28px;
+    box-shadow: var(--ck-shadow-card), 0 0 0 6px rgba(0, 102, 255, 0.06);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+}
+
+/* ==========================================================================
+   3 LOCK SLOTS (Ổ khóa trên cửa căn cứ)
+   Bộ class này KHỚP với HTML sinh ra bởi door-puzzle.js:
+   <div class="dp-door-frame">
+     <div class="dp-slot" id="dp-slot-N" data-slot="N" data-shape="lock|shield|key">
+       <div class="dp-slot-glow"></div>
+       <div class="dp-slot-outline">
+         <div class="dp-slot-shape dp-shape-lock|dp-shape-shield|dp-shape-key">
+           <span class="dp-slot-preview-icon">🔒</span>
+         </div>
+       </div>
+       <div class="dp-slot-label">Ổ khóa riêng tư</div>
+       <div class="dp-slot-status"></div>
+     </div>
+   </div>
+   ========================================================================== */
+
+.dp-door-frame {
+    position: relative;
+    width: clamp(280px, 50vw, 400px);
+    height: clamp(240px, 40vh, 320px);
+    background: linear-gradient(180deg, #1a1f3a 0%, #0a0e27 100%);
+    border: 4px solid var(--ck-blue-400);
+    border-radius: 16px 16px 8px 8px;
+    box-shadow:
+        0 0 30px rgba(0, 102, 255, 0.2),
+        inset 0 0 40px rgba(0, 102, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    padding: 18px;
+    z-index: 2;
+    transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.dp-door-frame::before {
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: -6px;
+    right: -6px;
+    bottom: -6px;
+    border: 2px dashed rgba(0, 102, 255, 0.3);
+    border-radius: 18px 18px 10px 10px;
+    pointer-events: none;
+    animation: door-glow-pulse 2s ease-in-out infinite;
+}
+
+@keyframes door-glow-pulse {
+    0%, 100% { border-color: rgba(0, 102, 255, 0.3); }
+    50% { border-color: rgba(0, 102, 255, 0.6); }
+}
+
+/* Slot chính — ô khóa */
+.dp-slot {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    flex-shrink: 0;
+    border-radius: 16px;
+    cursor: default;
+    transition: transform 0.3s ease;
+}
+
+/* Lớp glow phía sau (ẩn mặc định) */
+.dp-slot-glow {
+    position: absolute;
+    inset: -10px;
+    border-radius: 22px;
+    background: radial-gradient(circle, rgba(0, 212, 255, 0.35) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Khung outline (viền nét đứt) */
+.dp-slot-outline {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border: 3px dashed rgba(91, 168, 255, 0.7);
+    border-radius: 16px;
+    /* Nền trong suốt để .dp-slot-shape bên trong hiện rõ border-radius /
+       clip-path riêng biệt. Hình dạng slot (khóa/khiên/chìa) do đó
+       nổi bật trên khung outline chung. */
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
+    z-index: 1;
+}
+
+/* Hình dạng slot (không có hiệu ứng, chỉ để neo icon) */
+.dp-slot-shape {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ==========================================================================
+   3 HÌNH DẠNG SLOT — Phân biệt trực quan 3 ô khóa theo tên gọi
+   (gắn thêm bởi door-puzzle.js: dp-shape-lock / dp-shape-shield / dp-shape-key)
+   ========================================================================== */
+
+/* Mặc định: tất cả slot shape đều có viền trong suốt để icon căn giữa đẹp */
+.dp-slot-shape {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    border: 2px solid rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.04);
+    transition: all 0.3s ease;
+    z-index: 2;        /* nổi trên .dp-slot-outline */
+    position: relative;
+}
+
+/* .dp-shape-lock — bo góc đối xứng như ổ khóa vuông-tròn */
+.dp-shape-lock {
+    border-radius: 50% / 35%;      /* bo cong dạng capsule ngang */
+    border: 2.5px solid rgba(91, 168, 255, 0.55);
+    background: linear-gradient(135deg, rgba(91, 168, 255, 0.18) 0%, rgba(0, 212, 255, 0.12) 100%);
+    box-shadow: inset 0 0 12px rgba(91, 168, 255, 0.18);
+}
+
+/* .dp-shape-shield — khiên: đáy nhọn, đỉnh bo tròn */
+.dp-shape-shield {
+    border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+    clip-path: polygon(50% 0%, 100% 22%, 100% 65%, 50% 100%, 0% 65%, 0% 22%);
+    border: 2.5px solid rgba(34, 197, 94, 0.55);
+    background: linear-gradient(180deg, rgba(34, 197, 94, 0.18) 0%, rgba(0, 102, 255, 0.12) 100%);
+    box-shadow: inset 0 0 12px rgba(34, 197, 94, 0.2);
+    width: 60px;
+    height: 60px;
+}
+
+/* .dp-shape-key — chìa khóa: tròn 1 bên, vuông bên kia */
+.dp-shape-key {
+    border-radius: 50% 8px 8px 50% / 50% 30% 30% 50%;
+    border: 2.5px solid rgba(255, 215, 0, 0.55);
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.18) 0%, rgba(255, 159, 67, 0.12) 100%);
+    box-shadow: inset 0 0 12px rgba(255, 215, 0, 0.2);
+    transform: rotate(-15deg);
+}
+
+/* Khi slot ở trạng thái near/locked: làm nổi hình shape tương ứng */
+.dp-slot.near .dp-shape-lock {
+    border-color: var(--ck-sky);
+    background: linear-gradient(135deg, rgba(0, 212, 255, 0.4) 0%, rgba(0, 102, 255, 0.3) 100%);
+    box-shadow: 0 0 16px rgba(0, 212, 255, 0.5), inset 0 0 14px rgba(0, 212, 255, 0.3);
+}
+.dp-slot.near .dp-shape-shield {
+    border-color: var(--ck-sky);
+    background: linear-gradient(180deg, rgba(0, 212, 255, 0.4) 0%, rgba(0, 102, 255, 0.3) 100%);
+    box-shadow: 0 0 16px rgba(0, 212, 255, 0.5), inset 0 0 14px rgba(0, 212, 255, 0.3);
+}
+.dp-slot.near .dp-shape-key {
+    border-color: var(--ck-sky);
+    background: linear-gradient(135deg, rgba(0, 212, 255, 0.4) 0%, rgba(255, 215, 0, 0.3) 100%);
+    box-shadow: 0 0 16px rgba(0, 212, 255, 0.5), inset 0 0 14px rgba(0, 212, 255, 0.3);
+}
+
+.dp-slot.locked .dp-shape-lock {
+    border-color: var(--ck-green);
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.4) 0%, rgba(0, 212, 255, 0.25) 100%);
+    box-shadow: 0 0 18px rgba(34, 197, 94, 0.6), inset 0 0 14px rgba(34, 197, 94, 0.4);
+}
+.dp-slot.locked .dp-shape-shield {
+    border-color: var(--ck-green);
+    background: linear-gradient(180deg, rgba(34, 197, 94, 0.45) 0%, rgba(0, 102, 255, 0.25) 100%);
+    box-shadow: 0 0 18px rgba(34, 197, 94, 0.6), inset 0 0 14px rgba(34, 197, 94, 0.4);
+}
+.dp-slot.locked .dp-shape-key {
+    border-color: var(--ck-green);
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.45) 0%, rgba(255, 215, 0, 0.25) 100%);
+    box-shadow: 0 0 18px rgba(34, 197, 94, 0.6), inset 0 0 14px rgba(34, 197, 94, 0.4);
+}
+
+/* Icon preview bên trong slot */
+.dp-slot-preview-icon {
+    font-size: 30px;
+    opacity: 0.55;
+    transition: opacity 0.3s ease, filter 0.3s ease, transform 0.3s ease;
+    display: block;
+    line-height: 1;
+}
+
+/* Label (chữ "Ổ khóa riêng tư"...) */
+.dp-slot-label {
+    position: absolute;
+    bottom: -22px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: var(--font-heading);
+    font-size: 10px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.7);
+    text-align: center;
+    line-height: 1.2;
+    white-space: nowrap;
+    max-width: 100px;
+}
+
+/* Trạng thái NEAR — piece đang kéo tới gần */
+.dp-slot.near .dp-slot-glow {
+    opacity: 1;
+    background: radial-gradient(circle, rgba(0, 212, 255, 0.5) 0%, transparent 70%);
+}
+
+.dp-slot.near .dp-slot-outline {
+    border-style: solid;
+    border-color: var(--ck-sky);
+    background: rgba(0, 212, 255, 0.08);
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+    transform: scale(1.06);
+}
+
+.dp-slot.near .dp-slot-preview-icon {
+    opacity: 1;
+    transform: scale(1.12);
+}
+
+/* Trạng thái LOCKED — đã ghép xong */
+.dp-slot.locked .dp-slot-glow {
+    opacity: 1;
+    background: radial-gradient(circle, rgba(34, 197, 94, 0.6) 0%, transparent 70%);
+}
+
+.dp-slot.locked .dp-slot-outline {
+    border-style: solid;
+    border-color: var(--ck-green);
+    background: rgba(34, 197, 94, 0.18);
+    box-shadow: 0 0 24px rgba(34, 197, 94, 0.4);
+    animation: slot-locked-bounce 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.dp-slot.locked .dp-slot-preview-icon {
+    opacity: 1;
+    filter: drop-shadow(0 0 10px rgba(34, 197, 94, 0.7));
+}
+
+.dp-slot.locked .dp-slot-label {
+    color: rgba(167, 243, 208, 0.95);
+    font-weight: 800;
+}
+
+.dp-slot.locked::after {
+    content: '✓';
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 24px;
+    height: 24px;
+    background: var(--ck-green);
+    color: white;
+    border-radius: 50%;
+    font-size: 14px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(34, 197, 94, 0.5);
+    z-index: 4;
+}
+
+@keyframes slot-locked-bounce {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.18); }
+    100% { transform: scale(1); }
+}
+
+/* Trạng thái VICTORY (khi đủ 3/3) */
+.dp-slot.victory .dp-slot-outline {
+    box-shadow: 0 0 36px rgba(34, 197, 94, 0.7);
+}
+
+/* ==========================================================================
+   PUZZLE PIECES — Mảnh ghép kéo thả
+   Bộ class này KHỚP với HTML sinh ra bởi door-puzzle.js (default classes):
+   <div id="dp-piece-layer" class="dp-piece-layer">
+     <div class="dp-piece dp-piece-correct" data-id="p1" tabindex="0">
+       <div class="dp-piece-glow"></div>
+       <div class="dp-piece-icon">🔒</div>
+       <div class="dp-piece-text">Mật khẩu riêng tư</div>
+     </div>
+   </div>
+   ========================================================================== */
+
+.dp-piece-layer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;  /* để piece con tự nhận sự kiện (pointer-events: auto) */
+    z-index: 10;
+    overflow: visible;     /* KHÔNG cắt piece khi kéo gần biên arena */
+}
+
+/* Mảnh ghép chính — kích thước cố định 80x80px khớp với hard-code "-80" trong JS */
+.dp-piece {
+    position: absolute;       /* BẮT BUỘC để el.style.left/top có tác dụng */
+    width: 80px;
+    height: 80px;
+    left: 0;
+    top: 0;
+    box-sizing: border-box;
+    background: linear-gradient(135deg, #ffffff 0%, #f0f7ff 100%);
+    border: 2.5px solid var(--ck-blue-300);
+    border-radius: 16px;
+    box-shadow:
+        0 8px 20px rgba(0, 102, 255, 0.22),
+        0 2px 6px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding: 4px;
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    pointer-events: auto;     /* nhận sự kiện chuột/chạm dù layer cha là none */
+    z-index: 15;
+    overflow: visible;
+    transform-origin: center;
+    will-change: left, top, transform;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dp-piece:hover {
+    border-color: var(--ck-blue-400);
+    box-shadow: 0 12px 28px rgba(0, 102, 255, 0.28);
+}
+
+/* Glow layer — ẩn mặc định, sẽ hiện khi piece ở trạng thái near/locked */
+.dp-piece-glow {
+    position: absolute;
+    inset: -8px;
+    border-radius: 22px;
+    background: radial-gradient(circle, rgba(0, 212, 255, 0.4) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    z-index: -1;
+}
+
+/* Icon lớn ở trên */
+.dp-piece-icon {
+    font-size: 28px;
+    line-height: 1;
+    flex-shrink: 0;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.12));
+    transition: filter 0.3s ease;
+}
+
+/* Text nhỏ bên dưới */
+.dp-piece-text {
+    font-family: var(--font-heading);
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--ck-text-primary);
+    text-align: center;
+    line-height: 1.15;
+    max-width: 90%;
+    word-wrap: break-word;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+/* ===== CORRECT vs DECOY: GIỐNG nhau về mặt thị giác, chỉ khác nội dung icon/text =====
+   Trẻ em không nên đoán đúng/sai chỉ nhìn màu — chỉ khám phá qua kéo thả. */
+.dp-piece.dp-piece-correct,
+.dp-piece.dp-piece-decoy {
+    /* Cùng border, cùng gradient — không có dấu hiệu phân biệt "đúng/sai" */
+    border-color: var(--ck-blue-300);
+    background: linear-gradient(135deg, #ffffff 0%, #f0f7ff 100%);
+}
+
+.dp-piece.dp-piece-correct:hover,
+.dp-piece.dp-piece-decoy:hover {
+    border-color: var(--ck-blue-400);
+}
+
+/* ===== DRAGGING — đang kéo ===== */
+.dp-piece.dragging {
+    cursor: grabbing !important;
+    border-color: var(--ck-sky) !important;
+    background: linear-gradient(135deg, #f0fbff 0%, #e0f4ff 100%) !important;
+    box-shadow:
+        0 20px 40px rgba(0, 102, 255, 0.45),
+        0 0 0 4px rgba(0, 212, 255, 0.25) !important;
+    z-index: 30 !important;
+    transform: scale(1.1) rotate(2deg) !important;
+    animation: none !important;   /* tắt bobbing khi đang kéo */
+}
+
+.dp-piece.dragging .dp-piece-glow {
+    opacity: 1;
+    background: radial-gradient(circle, rgba(0, 212, 255, 0.55) 0%, transparent 70%);
+}
+
+.dp-piece.dragging .dp-piece-icon {
+    filter: drop-shadow(0 4px 12px rgba(0, 212, 255, 0.5));
+}
+
+/* ===== LOCKED — đã ghép đúng ô ===== */
+.dp-piece.locked {
+    cursor: default !important;
+    pointer-events: none;        /* không cho kéo lại */
+    opacity: 0.95;
+    border-color: var(--ck-green) !important;
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%) !important;
+    box-shadow:
+        0 0 24px rgba(34, 197, 94, 0.5),
+        0 4px 12px rgba(34, 197, 94, 0.2) !important;
+    animation: none !important;   /* dừng bobbing khi đã khóa */
+}
+
+.dp-piece.locked .dp-piece-glow {
+    opacity: 1;
+    background: radial-gradient(circle, rgba(34, 197, 94, 0.5) 0%, transparent 70%);
+}
+
+.dp-piece.locked .dp-piece-icon {
+    filter: drop-shadow(0 0 8px rgba(34, 197, 94, 0.6));
+}
+
+/* ===== SNAP-IN — animation nảy khi vừa ghép đúng ===== */
+.dp-piece.dp-snap {
+    animation: dp-snap-bounce 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    pointer-events: none;
+}
+
+@keyframes dp-snap-bounce {
+    0%   { transform: scale(1); }
+    40%  { transform: scale(1.2); }
+    70%  { transform: scale(0.94); }
+    100% { transform: scale(1); }
+}
+
+/* ===== SHAKE — rung khi ghép sai ô ===== */
+.dp-piece.shaking {
+    animation: dp-shake-error 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes dp-shake-error {
+    10%, 90% { transform: translateX(-4px); }
+    20%, 80% { transform: translateX(5px); }
+    30%, 50%, 70% { transform: translateX(-5px); }
+    40%, 60% { transform: translateX(4px); }
+}
+
+/* ===== RETURNING — bay mượt về vị trí ban đầu ===== */
+.dp-piece.returning {
+    transition:
+        left 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+        top 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+        transform 0.4s ease !important;
+    z-index: 20 !important;
+}
+
+/* ===== Bobbing animation — chỉ chạy khi piece chưa locked, chưa dragging ===== */
+@keyframes dp-piece-bob {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50%      { transform: translateY(-6px) rotate(0.5deg); }
+}
+
+.dp-piece {
+    animation: dp-piece-bob 3s ease-in-out infinite;
+}
+
+/* Stagger để 8 mảnh không bob đồng pha */
+.dp-piece:nth-child(1)  { animation-delay: 0s; }
+.dp-piece:nth-child(2)  { animation-delay: 0.3s; }
+.dp-piece:nth-child(3)  { animation-delay: 0.6s; }
+.dp-piece:nth-child(4)  { animation-delay: 0.9s; }
+.dp-piece:nth-child(5)  { animation-delay: 1.2s; }
+.dp-piece:nth-child(6)  { animation-delay: 1.5s; }
+.dp-piece:nth-child(7)  { animation-delay: 1.8s; }
+.dp-piece:nth-child(8)  { animation-delay: 2.1s; }
+
+/* ==========================================================================
+   COMPLETE CARD — Thẻ hoàn thành hiện khi đủ 3/3
+   Bộ class này KHỚP với HTML sinh ra bởi door-puzzle.js:
+   <div class="dp-complete-card dp-card-hidden" id="dp-complete-card">
+     <div class="dp-complete-avatar">🎉</div>
+     <h3 class="dp-complete-title">CỬA ĐÃ MỞ!</h3>
+     <p class="dp-complete-desc">Con đã khóa cửa căn cứ thành công bằng 3 mảnh ghép đúng!</p>
+     <div class="dp-complete-transition-note">
+       <span>Đang chuyển sang màn tiếp theo...</span>
+     </div>
+   </div>
+   ========================================================================== */
+
+.dp-complete-card {
+    position: absolute;
+    inset: 0;
+    background: rgba(10, 14, 39, 0.75);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    z-index: 50;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+    padding: 20px;
+    text-align: center;
+}
+
+/* Engine-level hidden marker — opacity 0 + không nhận sự kiện.
+   Hỗ trợ cả class default 'hidden' (khi không override classes)
+   lẫn 'dp-card-hidden' (khi override cũ trong level2.js). */
+.dp-complete-card.hidden,
+.dp-complete-card.dp-card-hidden {
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+/* Khi engine gỡ class "hidden" + thêm class "pop" → card hiện ra với animation */
+.dp-complete-card.dp-card-pop {
+    opacity: 1;
+    pointer-events: auto;
+    animation: dp-card-pop-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes dp-card-pop-in {
+    0%   { transform: scale(0.7); opacity: 0; }
+    60%  { transform: scale(1.08); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* Background card "CỬA ĐÃ MỞ!" bên trong overlay */
+.dp-complete-card::before {
+    content: '';
+    position: absolute;
+    width: min(420px, 90%);
+    height: auto;
+    aspect-ratio: 1.4 / 1;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(240, 253, 244, 0.98) 100%);
+    border: 4px solid var(--ck-green);
+    border-radius: 28px;
+    box-shadow:
+        0 0 60px rgba(34, 197, 94, 0.5),
+        0 20px 60px rgba(0, 0, 0, 0.3);
+    z-index: -1;
+}
+
+.dp-complete-avatar {
+    font-size: 64px;
+    line-height: 1;
+    margin-bottom: 4px;
+    filter: drop-shadow(0 4px 12px rgba(34, 197, 94, 0.4));
+    animation: dp-avatar-bounce 1.2s ease-in-out infinite;
+}
+
+@keyframes dp-avatar-bounce {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50%      { transform: translateY(-8px) scale(1.05); }
+}
+
+.dp-complete-title {
+    font-family: var(--font-heading);
+    font-size: clamp(1.4rem, 3.5vw, 1.9rem);
+    font-weight: 900;
+    color: var(--ck-green);
+    margin: 0;
+    letter-spacing: 0.5px;
+    text-shadow: 0 2px 0 rgba(0, 0, 0, 0.08);
+}
+
+.dp-complete-desc {
+    font-family: var(--font-body);
+    font-size: clamp(13px, 1.6vw, 15px);
+    font-weight: 600;
+    color: var(--ck-text-secondary);
+    line-height: 1.5;
+    max-width: 360px;
+    margin: 0;
+}
+
+.dp-complete-transition-note {
+    margin-top: 12px;
+    font-family: var(--font-heading);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ck-blue-600);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    animation: dp-note-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes dp-note-pulse {
+    0%, 100% { opacity: 0.55; }
+    50%      { opacity: 1; }
+}
+
+/* ==========================================================================
+   CONFETTI CANVAS — Vẽ confetti đè lên trên các piece
+   ========================================================================== */
+
+.dp-confetti-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 40;       /* cao hơn piece (15) nhưng thấp hơn card (50) */
+}
+
+/* ==========================================================================
+   DECISION SCREEN WRAPPER (MÀN HÌNH 2 QUYẾT ĐỊNH MỞ CỬA / GIỮ CỬA ĐÓNG)
+   ========================================================================== */
+
+.decision-screen-wrapper {
+    width: 100%;
+    max-width: 720px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 30;
+    animation: fadeInDecisionCard 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.decision-screen-wrapper.hidden {
+    display: none !important;
+}
+
+@keyframes fadeInDecisionCard {
+    from { opacity: 0; transform: translateY(18px) scale(0.96); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.decision-card {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.96);
+    border: 3px solid var(--ck-blue-300);
+    border-radius: 28px;
+    box-shadow: var(--ck-shadow-card);
+    padding: 24px 28px;
+    text-align: center;
+    backdrop-filter: blur(12px);
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.decision-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.decision-badge {
+    display: inline-block;
+    padding: 4px 14px;
+    background: linear-gradient(135deg, var(--ck-blue-50), var(--ck-blue-100));
+    border: 1.5px solid var(--ck-blue-300);
+    border-radius: 999px;
+    font-family: var(--font-heading);
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--ck-blue-600);
+    letter-spacing: 1px;
+}
+
+.decision-title {
+    font-family: var(--font-heading);
+    font-size: clamp(1.2rem, 3.2vw, 1.7rem);
+    font-weight: 800;
+    color: var(--ck-text-primary);
+    line-height: 1.2;
+}
+
+.decision-subtitle {
+    font-size: 13px;
+    color: var(--ck-text-secondary);
+    max-width: 480px;
+    line-height: 1.5;
+}
+
+/* ==========================================================================
+   DUAL DECISION BUTTONS — 2 LỰA CHỌN CÂN BẰNG NGANG HÀNG TUYỆT ĐỐI
+
+   NGUYÊN TẮC QUYẾT ĐỊNH KHÔNG ĐỊNH HƯỚNG:
+   2 nút MỞ CỬA / GIỮ CỬA ĐÓNG có kích thước, font-size, padding, box-shadow
+   hoàn toàn bình đẳng. KHÔNG pulse/glow ưu tiên nút nào!
+   ========================================================================== */
+
+.dual-decision-container {
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    gap: 16px;
+    width: 100%;
+    max-width: 560px;
+    animation: fadeInDualDecision 0.4s ease-out;
+}
+
+.dual-decision-container.hidden {
+    display: none !important;
+}
+
+@keyframes fadeInDualDecision {
+    from {
+        opacity: 0;
+        transform: translateY(14px) scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.btn-decision {
+    flex: 1;
+    min-height: 64px;
+    padding: 16px 20px;
+    font-family: var(--font-heading);
+    font-size: 15px;
+    font-weight: 700;
+    border-radius: 50px;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    text-align: center;
+    line-height: 1.3;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.decision-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.decision-text {
+    flex: 1;
+}
+
+/* Nút MỞ CỬA (Red — cảnh báo: nguy hiểm) */
+.btn-decision-open {
+    background: linear-gradient(135deg, var(--ck-red) 0%, #E53E3E 100%);
+    color: #ffffff;
+    box-shadow: 0 4px 14px rgba(255, 71, 87, 0.3), 0 2px 0 0 #C53030;
+}
+
+.btn-decision-open:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 71, 87, 0.45);
+}
+
+.btn-decision-open:active {
+    transform: translateY(1px);
+}
+
+/* Nút GIỮ CỬA ĐÓNG (Green — an toàn) */
+.btn-decision-closed {
+    background: linear-gradient(135deg, var(--ck-green) 0%, #16A34A 100%);
+    color: #ffffff;
+    box-shadow: 0 4px 14px rgba(34, 197, 94, 0.3), 0 2px 0 0 #15803D;
+}
+
+.btn-decision-closed:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(34, 197, 94, 0.45);
+}
+
+.btn-decision-closed:active {
+    transform: translateY(1px);
+}
+
+/* ==========================================================================
+   STAGE 4: SUMMARY CARD (Phân biệt 2 nhánh OPEN / CLOSED)
+   ========================================================================== */
+
+#stage-summary {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(180deg, #E8F4FD 0%, #D0E8FF 50%, #C3DDFF 100%);
+    padding: 24px;
+    /* Padding đủ lớn để khi fallback flex-start, nội dung đầu/cuối card
+       không dính sát mép trên/dưới viewport. */
+    padding-top: 32px;
+    padding-bottom: 32px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* Flexbox căn giữa một khối tràn khung chứa sẽ đẩy phần tràn ra đều
+       về cả 2 phía ngoài vùng nhìn thấy, khiến nội dung trông như bị che.
+       `safe center` (CSS Box Alignment Level 3) tự động fallback về start
+       khi nội dung tràn, đảm bảo cuộn được tới toàn bộ nội dung.
+       Dòng flex-start bên dưới là fallback cho trình duyệt cũ/WebView
+       chưa hỗ trợ safe (CSS sẽ dùng dòng cuối cùng trình duyệt hiểu). */
+    justify-content: flex-start;
+    justify-content: safe center;
+}
+
+.summary-card {
+    width: 100%;
+    max-width: 600px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 3px solid var(--ck-blue-300);
+    box-shadow: var(--ck-shadow-card);
+    border-radius: 32px;
+    padding: 32px 28px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 16px;
+    backdrop-filter: blur(16px);
+    position: relative;
+    overflow: hidden;
+    z-index: 10;
+    animation: summary-enter 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes summary-enter {
+    from {
+        opacity: 0;
+        transform: translateY(24px) scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Nhánh OPEN (Xấu) */
+.summary-card.branch-open {
+    border-color: var(--ck-red);
+    box-shadow: var(--ck-shadow-glow-red), var(--ck-shadow-card);
+}
+
+.summary-card.branch-open::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--ck-red), var(--ck-orange), var(--ck-pink), var(--ck-red));
+    background-size: 300% 100%;
+    animation: gradient-slide 3s linear infinite;
+}
+
+/* Nhánh CLOSED (Tốt) */
+.summary-card.branch-closed {
+    border-color: var(--ck-green);
+    box-shadow: var(--ck-shadow-glow-green), var(--ck-shadow-card);
+}
+
+.summary-card.branch-closed::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--ck-green), var(--ck-mint), var(--ck-sky), var(--ck-green));
+    background-size: 300% 100%;
+    animation: gradient-slide 3s linear infinite;
+}
+
+@keyframes gradient-slide {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 300% 50%; }
+}
+
+.summary-icon-badge {
+    width: 76px;
+    height: 76px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 38px;
+    box-shadow: var(--ck-shadow-card);
+    animation: icon-bounce 2s ease-in-out infinite;
+}
+
+@keyframes icon-bounce {
+    0%, 100% { transform: scale(1) translateY(0); }
+    50% { transform: scale(1.08) translateY(-4px); }
+}
+
+.summary-card.branch-open .summary-icon-badge {
+    background: linear-gradient(135deg, var(--ck-red-light), var(--ck-red));
+}
+
+.summary-card.branch-closed .summary-icon-badge {
+    background: linear-gradient(135deg, var(--ck-green-light), var(--ck-green));
+}
+
+.summary-title {
+    font-family: var(--font-heading);
+    font-size: clamp(1.3rem, 3.5vw, 1.9rem);
+    font-weight: 800;
+    line-height: 1.25;
+}
+
+.summary-card.branch-open .summary-title {
+    background: linear-gradient(135deg, var(--ck-red), var(--ck-orange));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.summary-card.branch-closed .summary-title {
+    background: linear-gradient(135deg, var(--ck-green), var(--ck-mint));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.summary-reward-box {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: linear-gradient(135deg, var(--ck-blue-50), #F0F7FF);
+    border: 2px solid var(--ck-blue-200);
+    padding: 8px 22px;
+    border-radius: 999px;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 13.5px;
+}
+
+.summary-reward-xp {
+    color: var(--ck-orange);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.summary-reward-badge {
+    color: var(--ck-blue-500);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.lessons-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    text-align: left;
+    margin: 4px 0;
+}
+
+.lesson-item {
+    background: linear-gradient(135deg, var(--ck-blue-50), #F0F7FF);
+    border-left: 4px solid var(--ck-blue-400);
+    padding: 10px 14px;
+    border-radius: 0 14px 14px 0;
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--ck-text-primary);
+}
+
+.summary-card.branch-open .lesson-item {
+    border-left-color: var(--ck-red);
+    background: linear-gradient(135deg, #FFF0F0, #FFE8E8);
+}
+
+.summary-card.branch-closed .lesson-item {
+    border-left-color: var(--ck-green);
+    background: linear-gradient(135deg, #F0FFF4, #E8FFE8);
+}
+
+/* Nhóm kỹ năng cốt lõi luôn hiển thị */
+.skills-mastered-box {
+    width: 100%;
+    background: #ffffff;
+    border: 1.5px solid var(--ck-blue-200);
+    border-radius: 16px;
+    padding: 12px 14px;
+    text-align: left;
+}
+
+.skills-title {
+    font-family: var(--font-heading);
+    font-size: 11.5px;
+    font-weight: 800;
+    color: var(--ck-blue-600);
+    margin-bottom: 6px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.skills-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.skill-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ck-text-primary);
+}
+
+/* ====== LỜI KHUYÊN DÀNH CHO TRẺ (2 cột NÊN / KHÔNG NÊN) ====== */
+.advice-box {
+    width: 100%;
+    background: linear-gradient(135deg, #fff8e6 0%, #fffbf0 100%);
+    border: 2px solid #f5a623;
+    border-radius: 18px;
+    padding: 14px 16px;
+    text-align: left;
+    box-shadow: 0 6px 20px rgba(245, 166, 35, 0.15);
+    margin-top: 4px;
+}
+
+.advice-box-title {
+    font-family: var(--font-heading);
+    font-size: 13px;
+    font-weight: 800;
+    color: #c47800;
+    text-align: center;
+    margin-bottom: 10px;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+}
+
+.advice-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.advice-do,
+.advice-dont {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 10px 12px;
+    border: 1.5px solid transparent;
+}
+
+.advice-do {
+    border-color: #4ade80;
+    box-shadow: 0 2px 8px rgba(74, 222, 128, 0.12);
+}
+
+.advice-dont {
+    border-color: #f87171;
+    box-shadow: 0 2px 8px rgba(248, 113, 113, 0.12);
+}
+
+.advice-header-do,
+.advice-header-dont {
+    font-family: var(--font-heading);
+    font-size: 11.5px;
+    font-weight: 800;
+    margin-bottom: 6px;
+    letter-spacing: 0.4px;
+}
+
+.advice-header-do {
+    color: #16a34a;
+}
+
+.advice-header-dont {
+    color: #dc2626;
+}
+
+.advice-item {
+    font-size: 11.5px;
+    line-height: 1.45;
+    color: var(--ck-text-primary);
+    font-weight: 600;
+    padding: 3px 0;
+    border-bottom: 1px dashed rgba(0, 0, 0, 0.06);
+}
+
+.advice-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.advice-motto {
+    background: linear-gradient(90deg, #1e3a8a 0%, #2563eb 100%);
+    color: #ffffff;
+    font-size: 12.5px;
+    font-weight: 700;
+    text-align: center;
+    padding: 8px 12px;
+    border-radius: 999px;
+    letter-spacing: 0.3px;
+    box-shadow: 0 3px 10px rgba(37, 99, 235, 0.25);
+}
+
+.advice-motto b {
+    font-weight: 800;
+    color: #fde047;
+}
+
+/* Responsive: màn hình nhỏ xếp dọc 2 cột */
+@media (max-width: 480px) {
+    .advice-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.summary-actions {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+    margin-top: 6px;
+}
+
+.btn-summary-replay {
+    flex: 1;
+    padding: 13px;
+    background: rgba(255, 255, 255, 0.95);
+    color: var(--ck-text-primary);
+    border: 2px solid var(--ck-blue-300);
+    border-radius: 50px;
+    font-family: var(--font-heading);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: var(--ck-shadow-soft);
+    transition: all 0.2s ease;
+}
+
+.btn-summary-replay:hover {
+    background: var(--ck-blue-50);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0, 102, 255, 0.15);
+}
+
+.btn-summary-continue {
+    flex: 1.4;
+    padding: 13px;
+    background: linear-gradient(135deg, var(--ck-blue-500), var(--ck-blue-400));
+    color: #fff;
+    border: none;
+    border-radius: 50px;
+    font-family: var(--font-heading);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: var(--ck-shadow-button), 0 2px 0 0 var(--ck-blue-700);
+    transition: all 0.2s ease;
+}
+
+.btn-summary-continue:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 102, 255, 0.4), 0 2px 0 0 var(--ck-blue-700);
+}
+
+/* ==========================================================================
+   FLOATING SPARKLES ANIMATION
+   ========================================================================== */
+
+.floating-sparkle {
+    position: absolute;
+    pointer-events: none;
+    z-index: 2;
+    animation: sparkle-float linear infinite;
+}
+
+.floating-sparkle.star {
+    width: 16px;
+    height: 16px;
+    background: var(--ck-yellow);
+    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    opacity: 0.6;
+}
+
+.floating-sparkle.circle {
+    width: 10px;
+    height: 10px;
+    background: var(--ck-blue-300);
+    border-radius: 50%;
+    opacity: 0.5;
+}
+
+.floating-sparkle.diamond {
+    width: 12px;
+    height: 12px;
+    background: var(--ck-sky);
+    transform: rotate(45deg);
+    opacity: 0.45;
+}
+
+@keyframes sparkle-float {
+    0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+    10% { opacity: 0.6; }
+    90% { opacity: 0.6; }
+    100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
+}
+
+/* ==========================================================================
+   RESPONSIVE DESIGN (Màn hình hẹp / Mobile)
+   ========================================================================== */
+
+@media (max-width: 640px) {
+    .dual-decision-container {
+        flex-direction: column;
+        gap: 10px;
+        max-width: 320px;
+    }
+
+    .btn-decision {
+        min-height: 56px;
+        padding: 14px 16px;
+        font-size: 14px;
+    }
+
+    .character-logo-left,
+    .brand-logo-right {
+        display: none;
+    }
+
+    .dp-arena {
+        height: clamp(360px, 55vh, 440px);
+    }
+
+    /* Mobile: co slot + piece cho vừa màn hình nhỏ */
+    .dp-slot {
+        width: 64px;
+        height: 64px;
+    }
+
+    .dp-slot-label {
+        font-size: 9px;
+        max-width: 80px;
+    }
+
+    .dp-piece {
+        width: 64px;
+        height: 64px;
+    }
+
+    .dp-piece-icon {
+        font-size: 24px;
+    }
+
+    .dp-piece-text {
+        font-size: 8px;
+    }
+
+    .summary-card {
+        padding: 24px 18px;
+        border-radius: 24px;
+    }
+
+    .summary-actions {
+        flex-direction: column;
+    }
+}

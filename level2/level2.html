@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CyberKnight — Level 2: Kết Bạn Online — Người Bạn Mới (Ghép Cửa Bảo Vệ Căn Cứ)</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+
+    <!-- Canvas Confetti CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <!-- Level 2 Stylesheet -->
+    <link rel="stylesheet" href="level2.css">
+</head>
+
+<body>
+
+    <div id="app-container">
+
+        <!-- ===================================================================
+             TOP BAR: THANH ĐIỀU KHIỂN HỆ THỐNG GÓC TRÊN BÊN PHẢI (FLEXBOX CHỐNG ĐÈ NÚT)
+             =================================================================== -->
+        <div class="level2-top-bar" id="level2-top-bar">
+            <button id="btn-exit-level" class="btn-level2-exit" type="button" title="Thoát trò chơi (ESC)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+                <span>THOÁT</span>
+            </button>
+        </div>
+
+        <!-- Nút Bỏ Qua video - đặt riêng ở góc dưới bên phải (không đè nút THOÁT) -->
+        <button id="btn-skip-video" class="btn-level2-skip hidden" type="button" title="Bỏ qua video (⏩)">
+            <span>BỎ QUA ⏩</span>
+        </button>
+
+        <!-- ===================================================================
+             START OVERLAY (Mở khóa AudioContext & Khởi động Level 2)
+             =================================================================== -->
+        <div id="start-overlay">
+            <!-- Floating Sparkle Decorations -->
+            <div class="floating-sparkle star" style="left:10%;animation-duration:13s;animation-delay:0s;"></div>
+            <div class="floating-sparkle circle" style="left:30%;animation-duration:16s;animation-delay:1s;"></div>
+            <div class="floating-sparkle diamond" style="left:50%;animation-duration:11s;animation-delay:3s;"></div>
+            <div class="floating-sparkle star" style="left:70%;animation-duration:14s;animation-delay:2s;"></div>
+            <div class="floating-sparkle circle" style="left:88%;animation-duration:15s;animation-delay:4s;"></div>
+
+            <!-- CyberKnight Logo -->
+            <img src="../image/z8014995224177_069f99816bf77dda5fed3feb153a6c0e-removebg-preview.png" alt="CyberKnight Logo" class="overlay-brand-logo">
+
+            <div class="cyber-badge">LEVEL 2 • KẾT BẠN ONLINE</div>
+            <h1 class="cyber-title">KẾT BẠN ONLINE — NGƯỜI BẠN MỚI</h1>
+            <p class="cyber-subtitle">
+                Trải nghiệm tình huống tương tác thực tế: Khi có người lạ làm quen trên mạng xã hội và tặng quà, con sẽ xử lý như thế nào?
+            </p>
+            <button id="btn-start-level" class="btn-cyber-primary">
+                <span>▶ BẮT ĐẦU LEVEL 2</span>
+            </button>
+        </div>
+
+        <!-- ===================================================================
+             STAGE 1: VIDEO MỞ ĐẦU (16:9 Letterbox Ambient Backdrop chống vỡ hạt 720p)
+             =================================================================== -->
+        <div id="stage-intro" class="stage">
+            <div class="video-ambient-backdrop"></div>
+            <div class="video-container">
+                <video id="video-intro" class="video-player" playsinline preload="metadata"></video>
+            </div>
+        </div>
+
+        <!-- ===================================================================
+             STAGE 2: MINI-GAME "GHÉP CỬA BẢO VỆ CĂN CỨ" (DOOR PUZZLE — DRAG & DROP ASSEMBLY)
+             =================================================================== -->
+        <div id="stage-game" class="stage">
+            <div class="cyber-grid"></div>
+
+            <!-- Floating Sparkle Decorations -->
+            <div class="floating-sparkle star" style="left:4%;animation-duration:12s;animation-delay:0s;"></div>
+            <div class="floating-sparkle circle" style="left:12%;animation-duration:15s;animation-delay:2s;"></div>
+            <div class="floating-sparkle diamond" style="left:22%;animation-duration:18s;animation-delay:4s;"></div>
+            <div class="floating-sparkle star" style="left:32%;animation-duration:14s;animation-delay:1s;"></div>
+            <div class="floating-sparkle circle" style="left:42%;animation-duration:16s;animation-delay:3s;"></div>
+            <div class="floating-sparkle diamond" style="left:55%;animation-duration:11s;animation-delay:5s;"></div>
+            <div class="floating-sparkle star" style="left:66%;animation-duration:17s;animation-delay:2.5s;"></div>
+            <div class="floating-sparkle circle" style="left:78%;animation-duration:13s;animation-delay:0.5s;"></div>
+            <div class="floating-sparkle diamond" style="left:88%;animation-duration:15s;animation-delay:1.5s;"></div>
+            <div class="floating-sparkle star" style="left:95%;animation-duration:12s;animation-delay:3.5s;"></div>
+
+            <!-- Decorative gradient blobs -->
+            <div class="deco-blob deco-blob-1"></div>
+            <div class="deco-blob deco-blob-2"></div>
+            <div class="deco-blob deco-blob-3"></div>
+
+            <!-- Decorative shield & cyber icons floating -->
+            <div class="deco-shield deco-shield-1">🛡️</div>
+            <div class="deco-shield deco-shield-2">💬</div>
+            <div class="deco-shield deco-shield-3">🛑</div>
+            <div class="deco-shield deco-shield-4">⭐</div>
+
+            <!-- CyberKnight Character Logo (Left) -->
+            <img src="../image/z8014995224177_069f99816bf77dda5fed3feb153a6c0e-removebg-preview.png" alt="CyberKnight" class="character-logo-left">
+
+            <!-- SigmaBloom Brand Logo (Right corner) -->
+            <img src="../image/z8014995365895_a3eb178f5f7a17a45925b55e43e202be-removebg-preview.png" alt="SigmaBloom" class="brand-logo-right">
+
+            <!-- Container Game Ghép Cửa Bảo Vệ Căn Cứ -->
+            <div id="door-puzzle-container" class="door-puzzle-arena"></div>
+
+            <!--
+                MÀN HÌNH QUYẾT ĐỊNH 2 NÚT MỞ CỬA / GIỮ CỬA ĐÓNG SAU MINI-GAME:
+                NGUYÊN TẮC QUYẾT ĐỊNH KHÔNG ĐỊNH HƯỚNG:
+                2 nút MỞ CỬA / GIỮ CỬA ĐÓNG dưới đây TUYỆT ĐỐI bằng nhau về kích thước, độ sáng, animation.
+                Không gắn hiệu ứng pulse/glow hay viền nổi bật thiên vị bất kỳ nút nào.
+            -->
+            <div id="decision-screen-wrapper" class="decision-screen-wrapper hidden">
+                <div class="decision-card">
+                    <div class="decision-header">
+                        <span class="decision-badge">THỜI KHẮC HÀNH ĐỘNG</span>
+                        <h2 class="decision-title">BÂY GIỜ CON SẼ XỬ LÝ THẾ NÀO?</h2>
+                        <p class="decision-subtitle">Căn cứ đã được bảo vệ an toàn! Bây giờ con hãy quyết định:</p>
+                    </div>
+
+                    <div id="dual-decision-container" class="dual-decision-container" aria-label="2 Lựa chọn quyết định">
+                        <button id="btn-decision-open" class="btn-decision btn-decision-open" type="button" aria-label="Mở cửa">
+                            <span class="decision-icon">🔓</span>
+                            <span class="decision-text">CON SẼ ĐI GẶP NGƯỜI LẠ</span>
+                        </button>
+                        <button id="btn-decision-closed" class="btn-decision btn-decision-closed" type="button" aria-label="Giữ cửa đóng">
+                            <span class="decision-icon">🔒</span>
+                            <span class="decision-text">CON SẼ KHÔNG ĐI GẶP NGƯỜI LẠ</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================================================================
+             STAGE 3: VIDEO HẬU QUẢ (Rẽ 2 nhánh: open / closed)
+             Nếu video không tồn tại → fallback panel "outro-fallback-panel" sẽ hiển thị
+             =================================================================== -->
+        <div id="stage-outro" class="stage">
+            <div class="video-ambient-backdrop"></div>
+            <div class="video-container">
+                <video id="video-outro" class="video-player" playsinline preload="metadata"></video>
+
+                <!-- FALLBACK: Hiển thị khi video không load được -->
+                <div id="outro-fallback-panel" class="outro-fallback-panel hidden">
+                    <div class="outro-fallback-content">
+                        <div class="outro-fallback-icon" id="outro-fallback-icon">⚠️</div>
+                        <h2 class="outro-fallback-title" id="outro-fallback-title">ĐANG TẢI...</h2>
+                        <p class="outro-fallback-message" id="outro-fallback-message"></p>
+                        <div class="outro-fallback-lessons" id="outro-fallback-lessons"></div>
+                        <button id="outro-fallback-continue" class="outro-fallback-cta" type="button">
+                            XEM BÀI HỌC CHI TIẾT ▶
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================================================================
+             STAGE 4: SUMMARY & BÀI HỌC AN TOÀN MẠNG THEO NHÁNH OPEN / CLOSED
+             =================================================================== -->
+        <div id="stage-summary" class="stage">
+            <!-- Floating Sparkle Decorations -->
+            <div class="floating-sparkle star" style="left:5%;animation-duration:14s;animation-delay:0.5s;"></div>
+            <div class="floating-sparkle circle" style="left:15%;animation-duration:16s;animation-delay:1.5s;"></div>
+            <div class="floating-sparkle diamond" style="left:30%;animation-duration:12s;animation-delay:3s;"></div>
+            <div class="floating-sparkle star" style="left:45%;animation-duration:15s;animation-delay:2s;"></div>
+            <div class="floating-sparkle circle" style="left:60%;animation-duration:13s;animation-delay:4s;"></div>
+            <div class="floating-sparkle diamond" style="left:75%;animation-duration:17s;animation-delay:1s;"></div>
+            <div class="floating-sparkle star" style="left:90%;animation-duration:14s;animation-delay:3.5s;"></div>
+
+            <!-- Decorative gradient blobs -->
+            <div class="deco-blob deco-blob-1"></div>
+            <div class="deco-blob deco-blob-2"></div>
+            <div class="deco-blob deco-blob-3"></div>
+
+            <!-- Decorative floating icons -->
+            <div class="deco-shield deco-shield-1">🛡️</div>
+            <div class="deco-shield deco-shield-3">⭐</div>
+            <div class="deco-shield deco-shield-4">💎</div>
+
+            <div id="summary-card-container" class="summary-card branch-closed">
+                <!-- Nội dung card sẽ được populate động qua SummaryScene.render(branch) -->
+            </div>
+        </div>
+
+        <!-- ===================================================================
+             FREEZE FRAME OVERLAY (Đảm bảo 100% không bao giờ có màn hình đen)
+             =================================================================== -->
+        <canvas id="freeze-canvas"></canvas>
+
+        <!-- (particle-canvas đã lược bỏ — chỉ dùng canvas-confetti CDN ở level2.js) -->
+
+        <!-- Preload 2 video hậu quả ngầm để chuyển cảnh tức thì không bị giật lag -->
+        <!-- preload="metadata" thay vì "auto" để chỉ load duration + 1 frame đầu (tiết kiệm RAM), không load full file -->
+        <video id="preload-bad" preload="metadata" style="display:none;"></video>
+        <video id="preload-good" preload="metadata" style="display:none;"></video>
+
+    </div>
+
+    <!-- Door Puzzle Module (UMD — exposes window.DoorPuzzleGame) -->
+    <script src="door-puzzle.js"></script>
+
+    <!-- Script điều khiển Level 2 -->
+    <script src="level2.js"></script>
+</body>
+
+</html>
