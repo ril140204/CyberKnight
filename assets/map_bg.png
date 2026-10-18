@@ -1,0 +1,102 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" width="600" height="400">
+  <defs>
+    <linearGradient id="sky" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a2a50"/>
+      <stop offset="100%" style="stop-color:#0d1526"/>
+    </linearGradient>
+    <linearGradient id="grass" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#2f6b45"/>
+      <stop offset="100%" style="stop-color:#1e4a2e"/>
+    </linearGradient>
+    <radialGradient id="treeGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#5cd0ff;stop-opacity:0.3"/>
+      <stop offset="100%" style="stop-color:#5cd0ff;stop-opacity:0"/>
+    </radialGradient>
+  </defs>
+  
+  <!-- Sky background -->
+  <rect width="600" height="400" fill="url(#sky)"/>
+  
+  <!-- Stars -->
+  <circle cx="50" cy="40" r="1.5" fill="white" opacity="0.6"/>
+  <circle cx="120" cy="80" r="1" fill="white" opacity="0.4"/>
+  <circle cx="200" cy="30" r="1.5" fill="white" opacity="0.5"/>
+  <circle cx="300" cy="50" r="2" fill="white" opacity="0.7"/>
+  <circle cx="400" cy="35" r="1" fill="white" opacity="0.4"/>
+  <circle cx="480" cy="70" r="1.5" fill="white" opacity="0.6"/>
+  <circle cx="550" cy="25" r="1" fill="white" opacity="0.5"/>
+  <circle cx="80" cy="100" r="1" fill="white" opacity="0.3"/>
+  <circle cx="520" cy="100" r="1.5" fill="white" opacity="0.4"/>
+  
+  <!-- Ground/grass base -->
+  <ellipse cx="300" cy="380" rx="320" ry="100" fill="url(#grass)"/>
+  
+  <!-- Path roads -->
+  <path d="M 300 400 Q 280 300 282 132" stroke="#8B7355" stroke-width="30" fill="none" opacity="0.6" stroke-linecap="round"/>
+  <path d="M 282 132 Q 84 120 84 132" stroke="#8B7355" stroke-width="25" fill="none" opacity="0.6" stroke-linecap="round"/>
+  <path d="M 282 132 Q 480 100 516 132" stroke="#8B7355" stroke-width="25" fill="none" opacity="0.6" stroke-linecap="round"/>
+  
+  <!-- Central ancient tree -->
+  <ellipse cx="300" cy="250" rx="80" ry="80" fill="url(#treeGlow)"/>
+  <rect x="290" y="280" width="20" height="60" fill="#5D4037" rx="3"/>
+  <ellipse cx="300" cy="230" rx="70" ry="65" fill="#2E7D32"/>
+  <ellipse cx="280" cy="220" rx="40" ry="35" fill="#388E3C"/>
+  <ellipse cx="320" cy="215" rx="45" ry="38" fill="#43A047"/>
+  <ellipse cx="300" cy="200" rx="35" ry="30" fill="#4CAF50"/>
+  <!-- Tree glow effect -->
+  <ellipse cx="300" cy="250" rx="40" ry="40" fill="#5cd0ff" opacity="0.1"/>
+  
+  <!-- House 1 (bottom) -->
+  <rect x="255" y="350" width="90" height="60" fill="#8D6E63" rx="4"/>
+  <polygon points="255,350 300,315 345,350" fill="#C62828"/>
+  <rect x="285" y="375" width="30" height="35" fill="#5D4037" rx="2"/>
+  <rect x="260" y="360" width="20" height="20" fill="#81D4FA" rx="2"/>
+  <rect x="320" y="360" width="20" height="20" fill="#81D4FA" rx="2"/>
+  
+  <!-- House 2 (left) -->
+  <rect x="55" y="95" width="60" height="45" fill="#A1887F" rx="3"/>
+  <polygon points="55,95 85,70 115,95" fill="#D32F2F"/>
+  <rect x="75" y="115" width="20" height="25" fill="#6D4C41" rx="2"/>
+  <rect x="58" y="102" width="14" height="14" fill="#81D4FA" rx="2"/>
+  <text x="85" y="155" text-anchor="middle" font-size="10" fill="#aaa">🔒</text>
+  
+  <!-- Grandma's house (right) -->
+  <rect x="485" y="95" width="65" height="48" fill="#BCAAA4" rx="3"/>
+  <polygon points="485,95 517,68 550,95" fill="#E53935"/>
+  <rect x="505" y="115" width="22" height="28" fill="#5D4037" rx="2"/>
+  <rect x="488" y="102" width="15" height="15" fill="#81D4FA" rx="2"/>
+  <rect x="537" y="102" width="15" height="15" fill="#81D4FA" rx="2"/>
+  
+  <!-- Decorative trees -->
+  <ellipse cx="150" cy="200" rx="25" ry="30" fill="#388E3C"/>
+  <rect x="147" y="225" width="6" height="20" fill="#5D4037"/>
+  <ellipse cx="450" cy="190" rx="28" ry="32" fill="#43A047"/>
+  <rect x="447" y="218" width="6" height="22" fill="#5D4037"/>
+  <ellipse cx="180" cy="300" rx="20" ry="25" fill="#2E7D32"/>
+  <rect x="178" y="322" width="4" height="15" fill="#5D4037"/>
+  <ellipse cx="420" cy="310" rx="22" ry="26" fill="#388E3C"/>
+  <rect x="418" y="333" width="4" height="16" fill="#5D4037"/>
+  
+  <!-- Flowers -->
+  <circle cx="220" cy="340" r="4" fill="#E91E63"/>
+  <circle cx="235" cy="345" r="3" fill="#FF5722"/>
+  <circle cx="380" cy="335" r="4" fill="#9C27B0"/>
+  <circle cx="395" cy="342" r="3" fill="#E91E63"/>
+  <circle cx="170" cy="280" r="3" fill="#FFEB3B"/>
+  <circle cx="430" cy="270" r="3" fill="#FF5722"/>
+  
+  <!-- Stream/water -->
+  <path d="M 50 350 Q 100 340 150 355 Q 200 370 250 360" stroke="#4FC3F7" stroke-width="8" fill="none" opacity="0.6" stroke-linecap="round"/>
+  <path d="M 50 350 Q 100 340 150 355 Q 200 370 250 360" stroke="#81D4FA" stroke-width="3" fill="none" opacity="0.8" stroke-linecap="round"/>
+  
+  <!-- Sparkle effects on tree -->
+  <circle cx="280" cy="210" r="2" fill="white" opacity="0.8">
+    <animate attributeName="opacity" values="0.8;0.2;0.8" dur="2s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="320" cy="195" r="1.5" fill="white" opacity="0.6">
+    <animate attributeName="opacity" values="0.6;0.1;0.6" dur="1.5s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="300" cy="230" r="2" fill="#5cd0ff" opacity="0.7">
+    <animate attributeName="opacity" values="0.7;0.2;0.7" dur="2.5s" repeatCount="indefinite"/>
+  </circle>
+</svg>

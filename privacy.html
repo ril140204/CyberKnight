@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chính Sách Bảo Mật | CyberKnight</title>
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="description" content="Chính sách bảo mật thông tin cá nhân của CyberKnight / Sigmabloom.">
+  <link rel="stylesheet" href="/assets/tailwind.css">
+  <style>
+    body { font-family: 'Poppins', sans-serif; }
+    .prose-content h2 { font-size: 1.125rem; font-weight: 700; margin-top: 1.5rem; margin-bottom: 0.75rem; color: #1e3a8a; }
+    .prose-content p  { margin-bottom: 0.75rem; color: #334155; line-height: 1.7; font-size: 0.875rem; }
+    .prose-content ul { margin-left: 1.25rem; margin-bottom: 0.75rem; }
+    .prose-content li { color: #334155; line-height: 1.6; font-size: 0.875rem; margin-bottom: 0.25rem; }
+    .prose-content strong { color: #1e293b; }
+    .prose-content a { color: #2563eb; text-decoration: underline; }
+    .section-card {
+      background: white;
+      border-radius: 1.25rem;
+      padding: 1.5rem 2rem;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+      border: 1px solid #e2e8f0;
+      margin-bottom: 1.25rem;
+    }
+    .badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 9999px; font-size: 0.7rem; font-weight: 700; }
+    .badge-vn  { background: #dbeafe; color: #1d4ed8; }
+    .badge-gdpr { background: #ede9fe; color: #6d28d9; }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 min-h-screen flex flex-col">
+
+  <!-- ── Header ───────────────────────────────────────────────── -->
+  <header class="bg-white/80 backdrop-blur-sm border-b border-indigo-100 sticky top-0 z-10">
+    <div class="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span class="text-2xl">🛡️</span>
+        <div>
+          <div class="font-bold text-indigo-900 text-sm leading-none">CyberKnight Shield</div>
+          <div class="text-xs text-indigo-400 mt-0.5">Sigmabloom Platform</div>
+        </div>
+      </div>
+      <a href="/" class="text-sm text-indigo-600 hover:text-indigo-800 font-medium flex items-center gap-1">
+        ← Quay lại trang chủ
+      </a>
+    </div>
+  </header>
+
+  <!-- ── Main Content ──────────────────────────────────────────── -->
+  <main class="flex-1 max-w-3xl mx-auto w-full px-4 py-8">
+
+    <!-- Title Block -->
+    <div class="text-center mb-8">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 text-xs font-bold mb-3">
+        <span>📋</span> CHÍNH SÁCH BẢO MẬT
+      </div>
+      <h1 class="text-2xl font-extrabold text-indigo-950 mb-2">
+        Chính Sách Bảo Mật &amp; Quyền Riêng Tư
+      </h1>
+      <p class="text-sm text-slate-500">Cập nhật lần cuối: <strong class="text-slate-700">Tháng 10 năm 2026</strong></p>
+      <p class="text-xs text-slate-400 mt-1">
+        <span class="badge badge-vn">🇻🇳 Theo Nghị định 13/2023/NĐ-CP</span>
+        <span class="badge badge-gdpr">🇪🇺 GDPR (nếu áp dụng)</span>
+      </p>
+    </div>
+
+    <!-- ── 1. Giới thiệu ─────────────────────────────────────────── -->
+    <div class="section-card">
+      <h2>1. Giới thiệu</h2>
+      <p>
+        <strong>CyberKnight (Sigmabloom)</strong> ("chúng tôi", "dịch vụ") cam kết bảo vệ quyền riêng tư
+        của trẻ em và người dùng. Chính sách này giải thích chúng tôi thu thập, sử dụng, lưu trữ
+        và bảo vệ dữ liệu cá nhân như thế nào.
+      </p>
+      <p>
+        Đối tượng áp dụng: toàn bộ người dùng trang web <strong>https://&lt;TEN_MIEN&gt;</strong>,
+        bao gồm phụ huynh và người giám hộ của trẻ em dưới 18 tuổi.
+      </p>
+      <p>
+        Liên hệ về vấn đề bảo mật dữ liệu:
+        <strong>privacy@&lt;TEN_MIEN&gt;</strong>.
+      </p>
+    </div>
+
+    <!-- ── 2. Dữ liệu thu thập ─────────────────────────────────── -->
+    <div class="section-card">
+      <h2>2. Dữ liệu thu thập</h2>
+
+      <h3 class="text-sm font-semibold text-slate-700 mt-4 mb-2">2.1. Dữ liệu tài khoản</h3>
+      <ul>
+        <li>Email đăng ký, tên đăng nhập (username).</li>
+        <li>Mật khẩu được băm (bcrypt) — chúng tôi <strong>không bao giờ lưu mật khẩu dạng gốc</strong>.</li>
+        <li>Năm sinh (birthYear) — bắt buộc nhập khi đăng ký; yêu cầu ≥ 2010 (13+ tuổi).</li>
+        <li>Vai trò tài khoản (người chơi thường, quản trị viên).</li>
+        <li>OAuth profile (nếu đăng nhập qua Google/Facebook — chỉ thu thập email và tên hiển thị).</li>
+      </ul>
+
+      <h3 class="text-sm font-semibold text-slate-700 mt-4 mb-2">2.2. Dữ liệu thanh toán</h3>
+      <p>
+        <strong>Chúng tôi KHÔNG lưu trữ số thẻ ngân hàng, CVV hay mật khẩu thanh toán.</strong>
+        Thông tin thanh toán do SePay và ngân hàng của bạn xử lý hoàn toàn.
+      </p>
+      <p>Chúng tôi chỉ ghi nhận:</p>
+      <ul>
+        <li>Mã giao dịch (transaction_id) từ SePay.</li>
+        <li>Số tiền chuyển khoản (amount).</li>
+        <li>Trạng thái giao dịch (pending / paid / failed / underpaid).</li>
+        <li>Thời điểm giao dịch.</li>
+      </ul>
+
+      <h3 class="text-sm font-semibold text-slate-700 mt-4 mb-2">2.3. Dữ liệu sử dụng dịch vụ</h3>
+      <ul>
+        <li>Tiến độ màn chơi (level progress, scores, thời gian chơi từng level).</li>
+        <li>Dữ liệu thiết bị cơ bản (loại trình duyệt, hệ điều hành) — chỉ dùng để hỗ trợ kỹ thuật.</li>
+        <li>Device fingerprint để phát hiện tài khoản trùng lặp / gian lận (chỉ dùng hash, không lưu thông tin thiết bị gốc).</li>
+      </ul>
+
+      <h3 class="text-sm font-semibold text-slate-700 mt-4 mb-2">2.4. Dữ liệu trẻ em</h3>
+      <p>
+        Chúng tôi thu thập dữ liệu của trẻ em từ 13 tuổi trở lên (yêu cầu birthYear ≥ 2010).
+        Theo <strong>Nghị định 13/2023/NĐ-CP, Điều 9</strong>, chúng tôi:
+      </p>
+      <ul>
+        <li>Nghiêm cấm thu thập dữ liệu trẻ em dưới 7 tuổi.</li>
+        <li>Với trẻ em từ 7–15 tuổi, yêu cầu sự đồng ý của phụ huynh/người giám hộ.</li>
+        <li>Cung cấp cơ chế để phụ huynh yêu cầu xem, sửa hoặc xóa dữ liệu của con mình.</li>
+      </ul>
+    </div>
+
+    <!-- ── 3. Mục đích sử dụng ───────────────────────────────────── -->
+    <div class="section-card">
+      <h2>3. Mục đích sử dụng dữ liệu</h2>
+      <p>Chúng tôi sử dụng dữ liệu cá nhân cho các mục đích sau:</p>
+      <ul>
+        <li><strong>Cung cấp dịch vụ:</strong> tạo và quản lý tài khoản, mở khóa màn chơi trả phí.</li>
+        <li><strong>Xác thực &amp; bảo mật:</strong> đăng nhập, phát hiện đăng nhập bất thường, chống gian lận.</li>
+        <li><strong>Thanh toán tự động:</strong> xác nhận giao dịch VietQR qua SePay webhook, kích hoạt quyền truy cập.</li>
+        <li><strong>Giao tiếp:</strong> gửi email xác nhận đơn hàng, thông báo bảo trì, hỗ trợ kỹ thuật.</li>
+        <li><strong>Cải thiện dịch vụ:</strong> phân tích anonymized để hiểu cách người dùng tương tác với game.</li>
+        <li><strong>Tuân thủ pháp luật:</strong> lưu trữ dữ liệu theo yêu cầu của cơ quan có thẩm quyền.</li>
+      </ul>
+      <p>Chúng tôi <strong>không bán</strong> dữ liệu cá nhân cho bên thứ ba.</p>
+    </div>
+
+    <!-- ── 4. Cơ sở pháp lý ──────────────────────────────────────── -->
+    <div class="section-card">
+      <h2>4. Cơ sở pháp lý</h2>
+      <p>Việc xử lý dữ liệu cá nhân của chúng tôi dựa trên các cơ sở pháp lý sau:</p>
+      <ul>
+        <li>
+          <strong>Nghị định 13/2023/NĐ-CP</strong> về bảo vệ dữ liệu cá nhân trong thương mại điện tử
+          (có hiệu lực từ ngày 01/07/2023). Đây là cơ sở pháp lý chính cho thị trường Việt Nam.
+        </li>
+        <li>
+          <strong>Luật An toàn thông tin mạng 2015</strong> (Luật số 86/2015/QH13) — liên quan đến
+          bảo vệ trẻ em trên không gian mạng.
+        </li>
+        <li>
+          <strong>GDPR</strong> (General Data Protection Regulation — Quy định bảo vệ dữ liệu Liên minh Châu Âu):
+          áp dụng nếu người dùng có địa chỉ IP hoặc tài khoản từ Khu vực Kinh tế Châu Âu (EEA).
+          Cơ sở pháp lý cho GDPR: <em>legitimate interest</em> (lợi ích chính đáng) và
+          <em>performance of contract</em> (thực hiện hợp đồng dịch vụ).
+        </li>
+        <li>
+          <strong>Đồng ý của người dùng (consent):</strong> khi đăng ký tài khoản, người dùng đồng ý
+          với Điều khoản sử dụng và Chính sách bảo mật này.
+        </li>
+      </ul>
+    </div>
+
+    <!-- ── 5. Lưu trữ & Bảo mật ─────────────────────────────────── -->
+    <div class="section-card">
+      <h2>5. Lưu trữ &amp; Bảo mật</h2>
+
+      <h3 class="text-sm font-semibold text-slate-700 mt-4 mb-2">5.1. Nơi lưu trữ</h3>
+      <p>
+        Toàn bộ dữ liệu cá nhân được lưu trữ tại <strong>cơ sở dữ liệu MySQL 8</strong> đặt tại
+        máy chủ ảo riêng (VPS) vật lý tại <strong>Việt Nam hoặc Singapore</strong>.
+        Dữ liệu KHÔNG được chuyển ra ngoài lãnh thổ Việt Nam trừ khi được pháp luật cho phép.
+      </p>
+
+      <h3 class="text-sm font-semibold text-slate-700 mt-4 mb-2">5.2. Thời gian lưu trữ</h3>
+      <ul>
+        <li>Tài khoản người dùng: lưu vĩnh viễn cho đến khi người dùng yêu cầu xóa.</li>
+        <li>Dữ liệu thanh toán: lưu tối thiểu <strong>5 năm</strong> theo quy định kế toán, thuế Việt Nam.</li>
+        <li>Logs truy cập (server-side): lưu tối đa 90 ngày, sau đó tự động xóa.</li>
+        <li>Dữ liệu phụ huynh/người giám hộ: lưu cùng thời hạn với tài khoản trẻ em được giám hộ.</li>
+      </ul>
+
+      <h3 class="text-sm font-semibold text-slate-700 mt-4 mb-2">5.3. Ai có quyền truy cập</h3>
+      <ul>
+        <li><strong>Quản trị viên hệ thống (admin):</strong> có quyền xem tài khoản và giao dịch để vận hành dịch vụ.</li>
+        <li><strong>Đội ngũ phát triển:</strong> chỉ truy cập khi cần hỗ trợ kỹ thuật, có log ghi nhận.</li>
+        <li><strong>SePay &amp; ngân hàng:</strong> theo quy trình thanh toán VietQR tiêu chuẩn.</li>
+        <li><strong>Cơ quan có thẩm quyền:</strong> theo yêu cầu hợp pháp.</li>
+      </ul>
+
+      <h3 class="text-sm font-semibold text-slate-700 mt-4 mb-2">5.4. Biện pháp bảo mật kỹ thuật</h3>
+      <ul>
+        <li>Mật khẩu băm bằng <strong>bcrypt</strong> (cost factor 12).</li>
+        <li>JWT tokens với thời hạn ngắn (15 phút), lưu trong HttpOnly cookie.</li>
+        <li>Rate limiting trên API để chống brute-force.</li>
+        <li>HTTPS bắt buộc với TLS 1.2+ và HSTS.</li>
+        <li>Backup database mã hóa, chỉ lưu trên máy chủ riêng.</li>
+        <li>Phát hiện xâm nhập và giám sát logs tự động.</li>
+      </ul>
+    </div>
+
+    <!-- ── 6. Quyền của người dùng ──────────────────────────────── -->
+    <div class="section-card">
+      <h2>6. Quyền của người dùng</h2>
+      <p>Bạn có các quyền sau đối với dữ liệu cá nhân của mình:</p>
+      <ul>
+        <li>
+          <strong>Truy cập:</strong> yêu cầu xem toàn bộ dữ liệu cá nhân chúng tôi lưu về bạn.
+          Gửi email kèm địa chỉ email đã đăng ký tới <strong>privacy@&lt;TEN_MIEN&gt;</strong>
+          hoặc sử dụng <a href="/api/privacy/request">form trực tuyến</a>.
+        </li>
+        <li>
+          <strong>Sửa đổi:</strong> yêu cầu chỉnh sửa thông tin không chính xác
+          (ví dụ: năm sinh, email liên hệ).
+        </li>
+        <li>
+          <strong>Xóa ("Quyền được lãng quên"):</strong> yêu cầu xóa tài khoản và toàn bộ dữ liệu cá nhân.
+          Thời hạn xử lý: <strong>72 giờ</strong> (hoặc 30 ngày nếu cần xác minh phức tạp).
+          Lưu ý: dữ liệu kế toán/thuế sẽ được giữ theo quy định pháp luật.
+        </li>
+        <li>
+          <strong>Rút consent:</strong> bạn có thể rút lại sự đồng ý bất kỳ lúc nào.
+          Việc này không ảnh hưởng đến tính hợp lệ của xử lý đã thực hiện trước khi rút consent.
+        </li>
+        <li>
+          <strong>Phản đối xử lý:</strong> yêu cầu ngừng sử dụng dữ liệu cho mục đích tiếp thị.
+        </li>
+        <li>
+          <strong>Khiếu nại:</strong> nếu bạn cho rằng chúng tôi vi phạm quyền riêng tư,
+          bạn có quyền khiếu nại tới <strong>Cục An toàn thông tin, Bộ Thông tin và Truyền thông</strong>.
+        </li>
+      </ul>
+      <p>
+        <strong>Đối với trẻ em:</strong> Phụ huynh hoặc người giám hộ có quyền thay mặt trẻ em
+        thực hiện các quyền trên. Vui lòng gửi yêu cầu kèm bằng chứng mối quan hệ giám hộ
+        tới <strong>privacy@&lt;TEN_MIEN&gt;</strong>.
+      </p>
+    </div>
+
+    <!-- ── 7. Trẻ em ─────────────────────────────────────────────── -->
+    <div class="section-card">
+      <h2>7. Bảo vệ trẻ em</h2>
+      <p>
+        CyberKnight là nền tảng giáo dục dành cho trẻ em Việt Nam. Chúng tôi áp dụng các biện pháp
+        bảo vệ đặc biệt:
+      </p>
+      <ul>
+        <li>
+          <strong>Giới hạn độ tuổi:</strong> tài khoản chỉ được tạo khi người dùng khai báo năm sinh ≥ 2010
+          (13 tuổi trở lên). Người dưới 13 tuổi cần phụ huynh/người giám hộ đồng ý và hỗ trợ đăng ký.
+        </li>
+        <li>
+          <strong>Cam kết theo Nghị định 13/2023/NĐ-CP, Điều 9:</strong>
+          nghiêm cấm thu thập dữ liệu trẻ em dưới 7 tuổi mà không có sự đồng ý của cha mẹ/người giám hộ.
+          Với trẻ em từ 7–15 tuổi, chúng tôi yêu cầu sự đồng ý rõ ràng của phụ huynh.
+        </li>
+        <li>
+          <strong>Phụ huynh có quyền yêu cầu xóa</strong> toàn bộ dữ liệu của con mình bất kỳ lúc nào.
+          Chúng tôi xử lý trong vòng 72 giờ.
+        </li>
+        <li>
+          <strong>Nội dung game an toàn:</strong> game không chứa nội dung bạo lực, khiêu dâm hoặc
+          thông tin cá nhân có thể bị lạm dụng.
+        </li>
+      </ul>
+    </div>
+
+    <!-- ── 8. Cookies ────────────────────────────────────────────── -->
+    <div class="section-card">
+      <h2>8. Cookies &amp; Công nghệ theo dõi</h2>
+      <p>Trang web của chúng tôi sử dụng tối thiểu cookies cần thiết:</p>
+      <ul>
+        <li>
+          <strong>Session Cookie (`PHPSESSID` / `connect.sid`):</strong>
+          dùng để duy trì phiên đăng nhập. Tự động hết hạn khi đóng trình duyệt.
+          Thuộc tính: HttpOnly, Secure (chỉ qua HTTPS), SameSite=Strict.
+        </li>
+        <li>
+          <strong>CSRF Token Cookie:</strong> bảo vệ chống tấn công Cross-Site Request Forgery.
+          HttpOnly (không truy cập được từ JavaScript).
+        </li>
+        <li>
+          <strong>Level Access Cookie (`levelAccess`):</strong> HttpOnly cookie chứa JWT,
+          cho phép truy cập các màn chơi trả phí đã mua. Tự động hết hạn sau 2 giờ.
+        </li>
+      </ul>
+      <p>
+        Chúng tôi <strong>không dùng</strong> cookies quảng cáo, tracking cookies,
+        hay bất kỳ cookies nào của bên thứ ba (Google Analytics, Facebook Pixel, v.v.).
+      </p>
+    </div>
+
+    <!-- ── 9. Thay đổi chính sách ──────────────────────────────── -->
+    <div class="section-card">
+      <h2>9. Thay đổi Chính sách bảo mật</h2>
+      <p>
+        Chúng tôi có thể cập nhật Chính sách bảo mật này theo thời gian.
+        Mọi thay đổi quan trọng (thu thập thêm dữ liệu, thay đổi mục đích sử dụng,
+        chia sẻ với bên thứ ba mới) sẽ được:
+      </p>
+      <ul>
+        <li>Thông báo qua <strong>email</strong> tới địa chỉ đã đăng ký của bạn ít nhất <strong>30 ngày trước</strong>.</li>
+        <li>Hiển thị <strong>thông báo banner</strong> nổi bật trên trang chủ trong 30 ngày liên tục.</li>
+        <li>Cập nhật ngày "Cập nhật lần cuối" ở đầu trang này.</li>
+      </ul>
+      <p>
+        Nếu bạn không đồng ý với các thay đổi, bạn có quyền yêu cầu xóa tài khoản trước khi
+        thay đổi có hiệu lực.
+      </p>
+    </div>
+
+    <!-- ── 10. Liên hệ ──────────────────────────────────────────── -->
+    <div class="section-card border-indigo-200 bg-indigo-50/50">
+      <h2>10. Liên hệ</h2>
+      <p>Nếu bạn có bất kỳ câu hỏi hoặc yêu cầu nào liên quan đến bảo mật dữ liệu:</p>
+      <ul>
+        <li><strong>Email bảo mật dữ liệu:</strong> <a href="mailto:privacy@&lt;TEN_MIEN&gt;">privacy@&lt;TEN_MIEN&gt;</a></li>
+        <li><strong>Email hỗ trợ chung:</strong> hỗ trợ tại trang <a href="/">Trang chủ</a></li>
+        <li><strong>Thời gian phản hồi:</strong> trong vòng 72 giờ làm việc</li>
+      </ul>
+      <p class="mt-3 text-xs text-slate-500">
+        Để yêu cầu xóa tài khoản hoặc dữ liệu, vui lòng gửi email kèm địa chỉ
+        email đã đăng ký với tiêu đề: <strong>"YÊU CẦU XÓA DỮ LIỆU"</strong>.
+      </p>
+    </div>
+
+  </main>
+
+  <!-- ── Footer ───────────────────────────────────────────────── -->
+  <footer class="bg-white border-t border-indigo-100 py-4 mt-8">
+    <div class="max-w-3xl mx-auto px-4 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-slate-500">
+      <a href="/privacy" class="hover:text-indigo-600 font-medium">Chính sách bảo mật</a>
+      <span>·</span>
+      <a href="/terms" class="hover:text-indigo-600 font-medium">Điều khoản sử dụng</a>
+      <span>·</span>
+      <a href="/refund" class="hover:text-indigo-600 font-medium">Chính sách hoàn tiền</a>
+      <span>·</span>
+      <span>© 2026 CyberKnight / Sigmabloom</span>
+    </div>
+  </footer>
+
+</body>
+</html>

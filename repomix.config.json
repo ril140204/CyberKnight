@@ -1,0 +1,31 @@
+{
+  "output": {
+    "filePath": "repomix-output.xml",
+    "style": "xml",
+    "compress": true,
+    "removeComments": true,
+    "removeEmptyLines": true,
+    "showLineNumbers": false
+  },
+  "ignore": {
+    "customPatterns": [
+      "repomix/**",
+      "repomix-output.xml",
+      "node_modules/**",
+      "backend/node_modules/**",
+      "video/**",
+      "assets/*.glb",
+      "image/**",
+      "*.mp4",
+      "*.png",
+      "*.jpg",
+      "*.jpeg",
+      "*.log",
+      ".git/**",
+      "package-lock.json",
+      "backend/package-lock.json",
+      "CHANGES.md",
+      "SPEC.md"
+    ]
+  }
+}

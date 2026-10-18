@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex,nofollow">
+    <title>Mua gói CyberKnight — Thanh toán</title>
+    <link rel="stylesheet" href="/assets/tailwind.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <script>
+        /* Tailwind custom colors — giờ đã build tĩnh qua tailwind.config.js */
+    </script>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --accent: #06b6d4;
+            --dark: #0a0e27;
+            --dark2: #111327;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, var(--dark) 0%, #1a1f4e 50%, var(--dark2) 100%);
+            min-height: 100vh;
+            color: var(--text-main);
+        }
+        .font-heading { font-family: 'Poppins', sans-serif; }
+        .card {
+            background: var(--card-bg);
+            border-radius: 1.5rem;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+        }
+        .package-card {
+            background: white;
+            border-radius: 1.25rem;
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+        .package-card:hover {
+            border-color: #2563eb;
+            box-shadow: 0 8px 24px rgba(37,99,235,0.15);
+            transform: translateY(-3px);
+        }
+        .package-card.recommended {
+            border-color: #7c3aed;
+            position: relative;
+        }
+        .package-card.recommended::before {
+            content: '⭐ Phổ biến nhất';
+            position: absolute;
+            top: -14px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #7c3aed, #2563eb);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 900;
+            padding: 4px 14px;
+            border-radius: 999px;
+            white-space: nowrap;
+        }
+        .btn-buy {
+            background: linear-gradient(135deg, #2563eb, #06b6d4);
+            color: white;
+            font-weight: 800;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+            font-size: 0.95rem;
+        }
+        .btn-buy:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37,99,235,0.4);
+        }
+        .btn-buy:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .btn-gold {
+            background: linear-gradient(135deg, #f59e0b, #eab308);
+            color: white;
+        }
+        .btn-gold:hover {
+            box-shadow: 0 6px 20px rgba(245,158,11,0.4);
+        }
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            display: inline-block;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .fade-in { animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .nav-link {
+            color: rgba(255,255,255,0.75);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+        .nav-link:hover { color: white; }
+    </style>
+</head>
+<body>
+
+    <!-- Simple top nav -->
+    <nav class="w-full px-6 py-4 flex items-center justify-between">
+        <a href="index.html" class="font-heading text-white text-xl font-black tracking-tight flex items-center gap-2">
+            🛡️ CyberKnight
+        </a>
+        <div class="flex items-center gap-4">
+            <a href="index.html" class="nav-link text-sm">Trang chủ</a>
+            <a href="index.html#login" id="navAuth" class="nav-link text-sm">Đăng nhập</a>
+        </div>
+    </nav>
+
+    <!-- Main content -->
+    <main class="max-w-3xl mx-auto px-4 py-10">
+
+        <!-- Page header -->
+        <div class="text-center mb-10">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-300 text-xs font-black tracking-wider uppercase mb-4">
+                <span>💳</span> THANH TOÁN
+            </div>
+            <h1 class="font-heading text-3xl md:text-4xl font-black text-white mb-3" id="pageTitle">
+                Nâng cấp tài khoản
+            </h1>
+            <p class="text-white/60 text-sm max-w-md mx-auto" id="pageDesc">
+                Chọn gói phù hợp để mở khóa tất cả các level CyberKnight
+            </p>
+        </div>
+
+        <!-- Loading state -->
+        <div id="loadingState" class="text-center py-16">
+            <div class="spinner mx-auto mb-4 border-blue-400 border-t-blue-600"></div>
+            <p class="text-white/60 text-sm">Đang tải danh sách gói...</p>
+        </div>
+
+        <!-- Packages grid -->
+        <div id="packagesGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-5 hidden">
+            <!-- Filled dynamically -->
+        </div>
+
+        <!-- Error state -->
+        <div id="errorState" class="hidden text-center py-10">
+            <div class="text-4xl mb-4">⚠️</div>
+            <p class="text-red-300 font-semibold" id="errorMsg">Đã xảy ra lỗi.</p>
+        </div>
+
+        <!-- Order result (shown after buy) -->
+        <div id="orderResult" class="card p-8 text-center hidden fade-in">
+            <div class="text-5xl mb-4" id="orderEmoji">✅</div>
+            <h2 class="font-heading text-2xl font-black text-gray-900 mb-2" id="orderTitle">Đơn hàng đã được tạo!</h2>
+            <p class="text-gray-600 text-sm mb-6" id="orderMsg">Vui lòng thanh toán để kích hoạt gói.</p>
+
+            <div class="bg-gray-50 rounded-xl p-4 mb-6 text-left space-y-3">
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-500">Mã đơn hàng:</span>
+                    <span class="font-black text-gray-900 font-mono" id="resOrderCode">—</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-500">Gói:</span>
+                    <span class="font-bold text-gray-900" id="resPackageName">—</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-500">Số tiền:</span>
+                    <span class="font-black text-blue-600" id="resAmount">—</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-500">Hạn thanh toán:</span>
+                    <span class="font-semibold text-gray-700" id="resExpires">—</span>
+                </div>
+            </div>
+
+            <!-- QR info -->
+            <div id="qrSection" class="mb-6">
+                <p class="text-xs text-gray-500 mb-3">Quét QR hoặc chuyển khoản với nội dung:</p>
+                <div class="bg-gray-100 rounded-lg p-3 font-mono text-sm text-gray-800 break-all text-left mb-3 select-all" id="qrContent">
+                    —
+                </div>
+                <a href="#" target="_blank" rel="noopener noreferrer" id="qrLink" class="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700 font-semibold underline">
+                    Mở QR trong tab mới ↗
+                </a>
+            </div>
+
+            <button onclick="resetOrder()" class="mt-4 text-gray-500 hover:text-gray-700 text-sm font-semibold transition">
+                ← Quay lại danh sách gói
+            </button>
+        </div>
+
+        <!-- Login prompt -->
+        <div id="loginPrompt" class="card p-8 text-center hidden">
+            <div class="text-5xl mb-4">🔐</div>
+            <h2 class="font-heading text-xl font-black text-gray-900 mb-2">Bạn cần đăng nhập để mua gói</h2>
+            <p class="text-gray-600 text-sm mb-6">Vui lòng đăng nhập trước khi thực hiện thanh toán.</p>
+            <a href="index.html#login" class="inline-flex px-8 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-black shadow-lg hover:shadow-xl transition">
+                Đăng nhập ngay
+            </a>
+        </div>
+
+    </main>
+
+    <script src="/assets/safe.js"></script>
+    <script>
+    /**
+     * Phase 5 — payment.html
+     * Self-contained payment page. Reads ?level=N to filter packages.
+     * Endpoints used:
+     *   GET  /api/catalog/packages  (public)
+     *   POST /api/payments/create-order (auth required)
+     */
+
+    // ── State ─────────────────────────────────────────────────────────────────
+    const params     = new URLSearchParams(window.location.search);
+    const targetLevel = params.get('level') ? Number(params.get('level')) : null;
+    let packagesData  = [];    // { id, name, price, levels }
+    let isLoggedIn    = false;
+    let accessToken   = null;
+
+    // ── Helpers ───────────────────────────────────────────────────────────────
+
+    /** Format VND price */
+    function fmtVnd(n) {
+        return new Intl.NumberFormat('vi-VN').format(n) + 'đ';
+    }
+
+    /** Format ISO date string to local Vietnamese */
+    function fmtDate(isoStr) {
+        if (!isoStr) return '—';
+        try {
+            return new Date(isoStr).toLocaleString('vi-VN', {
+                day: '2-digit', month: '2-digit', year: 'numeric',
+                hour: '2-digit', minute: '2-digit',
+            });
+        } catch (_) { return isoStr; }
+    }
+
+    /** Get auth token from memory */
+    function getToken() {
+        return accessToken || window.__accessToken || null;
+    }
+
+    /** Show/hide sections */
+    function show(id) { document.getElementById(id)?.classList.remove('hidden'); }
+    function hide(id) { document.getElementById(id)?.classList.add('hidden'); }
+
+    /** Set page title/desc based on targetLevel */
+    function setPageContext(levelId) {
+        if (levelId === null) return;
+        document.getElementById('pageTitle').textContent = `Mở khóa Level ${levelId}`;
+        document.getElementById('pageDesc').textContent =
+            'Chọn gói phù hợp để bắt đầu chơi ngay hôm nay!';
+    }
+
+    // ── Boot ──────────────────────────────────────────────────────────────────
+
+    async function init() {
+        if (!accessToken) {
+            try {
+                const refRes = await fetch('/api/auth/refresh', { method: 'POST', credentials: 'include' });
+                const refData = await refRes.json();
+                if (refRes.ok && refData.success && refData.accessToken) {
+                    accessToken = refData.accessToken;
+                    window.__accessToken = accessToken;
+                }
+            } catch (_err) {
+                // Khách vãng lai chưa đăng nhập hoặc cookie hết hạn, tiếp tục ở chế độ xem gói
+            }
+        }
+        isLoggedIn  = !!accessToken;
+
+        if (targetLevel !== null) setPageContext(targetLevel);
+
+        // If no token, show login prompt and still load packages (for browsing)
+        if (!isLoggedIn) {
+            hide('loginPrompt'); // hide it until we know
+        }
+
+        await loadPackages();
+    }
+
+    // ── Load & render packages ────────────────────────────────────────────────
+
+    async function loadPackages() {
+        try {
+            const res  = await fetch('/api/catalog/packages');
+            const json = await res.json();
+
+            if (!json.success) throw new Error(json.message || 'Lỗi tải gói');
+
+            // json.data shape: { premium: { name, price, levels }, pack_1_4: {...}, pack_5_10: {...} }
+            packagesData = Object.entries(json.data).map(([id, pkg]) => ({
+                id, name: pkg.name, price: pkg.price, levels: pkg.levels,
+            }));
+
+            // If ?level=N, filter to packages that contain this level
+            let visible = packagesData;
+            if (targetLevel !== null) {
+                visible = packagesData.filter(pkg => {
+                    if (pkg.levels === 'ALL') return true;
+                    if (Array.isArray(pkg.levels)) return pkg.levels.includes(targetLevel);
+                    return false;
+                });
+            }
+
+            renderPackages(visible);
+            hide('loadingState');
+            show('packagesGrid');
+
+        } catch (err) {
+            console.error('loadPackages error:', err);
+            hide('loadingState');
+            document.getElementById('errorMsg').textContent = err.message || 'Không thể tải danh sách gói.';
+            show('errorState');
+        }
+    }
+
+    function renderPackages(pkgs) {
+        const grid = document.getElementById('packagesGrid');
+        grid.innerHTML = '';
+
+        if (pkgs.length === 0) {
+            grid.innerHTML = '<p class="text-white/60 col-span-2 text-center py-8 text-sm">Không có gói phù hợp cho level này.</p>';
+            return;
+        }
+
+        pkgs.forEach((pkg, idx) => {
+            const isRecommended = idx === 0; // first = recommended
+            const levelHint = pkg.levels === 'ALL' ? 'Tất cả các level' : `Levels ${pkg.levels?.join(', ')}`;
+            const tagColor = isRecommended
+                ? 'bg-purple-100 text-purple-800'
+                : 'bg-blue-100 text-blue-800';
+            const tagText  = isRecommended ? '👑 Premium Vĩnh Viễn' : '📦 Gói Level';
+
+            const card = document.createElement('div');
+            card.className = `package-card p-6 flex flex-col gap-4 fade-in ${isRecommended ? 'recommended' : ''}`;
+            card.style.animationDelay = `${idx * 100}ms`;
+
+            card.innerHTML = `
+                <div>
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="text-xs font-black px-2 py-0.5 rounded-full ${tagColor}">${tagText}</span>
+                    </div>
+                    <h3 class="font-heading text-xl font-black text-gray-900 mb-1">${escapeHtml(pkg.name)}</h3>
+                    <p class="text-xs text-gray-500">${escapeHtml(levelHint)}</p>
+                </div>
+                <div class="text-center py-2">
+                    <span class="font-heading text-3xl font-black text-gray-900">${fmtVnd(pkg.price)}</span>
+                    ${pkg.id === 'premium' ? '<span class="block text-xs text-purple-600 font-bold mt-1">Vĩnh viễn</span>' : '<span class="block text-xs text-gray-400 mt-1">1 năm</span>'}
+                </div>
+                <ul class="space-y-1.5 text-xs text-gray-600">
+                    ${pkg.id === 'premium' ? `
+                        <li class="flex items-center gap-1.5"><span class="text-green-500">✔</span> Truy cập TẤT CẢ level</li>
+                        <li class="flex items-center gap-1.5"><span class="text-green-500">✔</span> Không giới hạn thời gian</li>
+                        <li class="flex items-center gap-1.5"><span class="text-green-500">✔</span> Ưu tiên truy cập level mới</li>
+                    ` : `
+                        <li class="flex items-center gap-1.5"><span class="text-green-500">✔</span> Truy cập các level trong gói</li>
+                        <li class="flex items-center gap-1.5"><span class="text-green-500">✔</span> Thời hạn 1 năm</li>
+                    `}
+                </ul>
+                <button
+                    type="button"
+                    class="btn-buy ${isRecommended ? 'btn-gold' : ''}"
+                    onclick="handleBuy('${escapeHtml(pkg.id)}')"
+                    ${!isLoggedIn ? 'disabled title="Cần đăng nhập trước"' : ''}
+                >
+                    ${!isLoggedIn ? '🔒 Đăng nhập để mua' : 'MUA NGAY'}
+                </button>
+            `;
+
+            grid.appendChild(card);
+        });
+    }
+
+    // ── Buy flow ──────────────────────────────────────────────────────────────
+
+    async function handleBuy(packageId) {
+        if (!isLoggedIn) {
+            show('packagesGrid');
+            show('loginPrompt');
+            return;
+        }
+
+        // Show loading on the clicked button
+        const allBtns = document.querySelectorAll('.btn-buy');
+        allBtns.forEach(b => b.disabled = true);
+
+        try {
+            const res  = await fetch('/api/payments/create-order', {
+                method:  'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`,
+                },
+                credentials: 'include',
+                body: JSON.stringify({ packageId }),
+            });
+            const json = await res.json();
+
+            if (!json.success) {
+                throw new Error(json.message || 'Tạo đơn hàng thất bại.');
+            }
+
+            showOrderResult(json.data);
+
+        } catch (err) {
+            alert('❌ ' + (err.message || 'Đã xảy ra lỗi. Vui lòng thử lại.'));
+            allBtns.forEach(b => b.disabled = false);
+        }
+    }
+
+    function showOrderResult(data) {
+        // data shape: { order: { orderCode, packageName, amount, expiresAt, ... }, qr: { content, amount, ... } }
+        hide('packagesGrid');
+        hide('loginPrompt');
+        hide('errorState');
+
+        document.getElementById('resOrderCode').textContent  = data.order.orderCode;
+        document.getElementById('resPackageName').textContent = data.order.packageName || '—';
+        document.getElementById('resAmount').textContent      = fmtVnd(data.order.amount);
+        document.getElementById('resExpires').textContent     = fmtDate(data.order.expiresAt);
+
+        const qrContent = data.qr?.content || data.order.orderCode;
+        document.getElementById('qrContent').textContent = qrContent;
+
+        const qrLinkEl = document.getElementById('qrLink');
+        if (qrLinkEl) {
+            if (data.qr?.qrUrl && isAllowedQrUrl(data.qr.qrUrl)) {
+                qrLinkEl.href = data.qr.qrUrl;
+                qrLinkEl.classList.remove('hidden');
+            } else {
+                qrLinkEl.classList.add('hidden');
+            }
+        }
+
+        if (data.qr?.accountNumber) {
+            document.getElementById('qrSection').innerHTML = `
+                <p class="text-xs text-gray-500 mb-3">Chuyển khoản với nội dung:</p>
+                <div class="bg-gray-100 rounded-lg p-3 font-mono text-sm text-gray-800 break-all text-left mb-3 select-all">
+                    ${escapeHtml(qrContent)}
+                </div>
+                <p class="text-xs text-gray-600 mb-1">Tài khoản: <strong>${escapeHtml(data.qr.accountNumber)}</strong> ${data.qr.bankBin ? `(${escapeHtml(data.qr.bankBin)})` : ''}</p>
+                <p class="text-xs text-gray-600 mb-3">Tên: ${escapeHtml(data.qr.accountName || '—')}</p>
+                <a href="index.html" class="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700 font-semibold underline">
+                    ← Quay lại trang chủ
+                </a>
+            `;
+        }
+
+        show('orderResult');
+    }
+
+    function resetOrder() {
+        hide('orderResult');
+        show('packagesGrid');
+        document.querySelectorAll('.btn-buy').forEach(b => b.disabled = false);
+    }
+
+    // ── Start ─────────────────────────────────────────────────────────────────
+    init();
+    </script>
+
+    <!-- Policy Links Footer -->
+    <footer class="bg-slate-100 border-t border-slate-200 py-4 px-6 mt-8">
+        <div class="max-w-3xl mx-auto flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs text-slate-500">
+            <a href="/privacy" class="hover:text-indigo-600 font-medium">Chính sách bảo mật</a>
+            <span>·</span>
+            <a href="/terms" class="hover:text-indigo-600 font-medium">Điều khoản sử dụng</a>
+            <span>·</span>
+            <a href="/refund" class="hover:text-indigo-600 font-medium">Chính sách hoàn tiền</a>
+            <span>·</span>
+            <span>© 2026 CyberKnight / Sigmabloom</span>
+        </div>
+    </footer>
+</body>
+</html>

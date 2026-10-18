@@ -1,0 +1,17 @@
+{
+  "name": "cyberknight",
+  "version": "1.0.0",
+  "private": true,
+  "description": "CyberKnight Web Project",
+  "scripts": {
+    "dev": "npm --prefix backend run dev",
+    "start": "npm --prefix backend start",
+    "test": "npm --prefix backend test",
+    "test:all": "npm --prefix backend run test:all",
+    "start-mysql": "npm --prefix backend run start-mysql",
+    "build:css": "tailwindcss -i ./assets/tailwind-input.css -o ./assets/tailwind.css --minify"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.19"
+  }
+}

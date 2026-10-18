@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex,nofollow">
+  <title>CyberKnight — Bảng Quản Trị Hệ Thống</title>
+  <link rel="stylesheet" href="/assets/tailwind.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Poppins', sans-serif; }
+    .glass-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="glass-card sticky top-0 z-40 px-6 py-4 flex items-center justify-between border-b border-slate-800">
+    <div class="flex items-center gap-3">
+      <span class="text-3xl">🛡️</span>
+      <div>
+        <h1 class="text-xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+          CyberKnight Shield — Quản Trị
+        </h1>
+        <p class="text-xs text-slate-400">Hệ thống giám sát thanh toán & cấp quyền học tập</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-4">
+      <a href="/" class="text-sm text-slate-300 hover:text-cyan-400 transition-colors">← Về Trang Chủ</a>
+      <div id="adminUserBadge" class="hidden items-center gap-2 bg-slate-800/80 px-3 py-1.5 rounded-full border border-slate-700 text-xs">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span id="adminUsername" class="font-semibold text-slate-200">Admin</span>
+        <button type="button" onclick="handleLogout()" class="ml-2 text-rose-400 hover:underline">Thoát</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Login Overlay (Nếu chưa đăng nhập) -->
+  <div id="loginOverlay" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="glass-card rounded-2xl max-w-md w-full p-8 shadow-2xl border border-slate-700">
+      <div class="text-center mb-6">
+        <span class="text-5xl inline-block mb-2">🔐</span>
+        <h2 class="text-2xl font-bold text-white">Đăng Nhập Quản Trị</h2>
+        <p class="text-sm text-slate-400 mt-1">Chỉ dành cho tài khoản có vai trò Quản trị viên (Admin)</p>
+      </div>
+      <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1" for="loginEmail">Email hoặc Tên đăng nhập</label>
+          <input type="text" id="loginEmail" required class="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-cyan-400 text-sm">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1" for="loginPassword">Mật khẩu</label>
+          <input type="password" id="loginPassword" required class="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-cyan-400 text-sm">
+        </div>
+        <div id="loginError" class="hidden text-xs text-rose-400 bg-rose-950/40 border border-rose-800/50 p-2.5 rounded-lg"></div>
+        <button type="submit" id="loginSubmitBtn" class="w-full py-3 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold rounded-xl transition-all shadow-lg text-sm">
+          Đăng Nhập Bảng Quản Trị
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-6 space-y-6">
+
+    <!-- Stats Row -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
+      <div class="glass-card rounded-2xl p-4 border border-slate-800 flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center text-xl font-bold">👥</div>
+        <div>
+          <p class="text-[11px] text-slate-400">Tổng Thành Viên</p>
+          <h3 id="statUsers" class="text-xl font-extrabold text-white mt-0.5">--</h3>
+        </div>
+      </div>
+      <div class="glass-card rounded-2xl p-4 border border-slate-800 flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-xl font-bold">🚀</div>
+        <div>
+          <p class="text-[11px] text-slate-400">Hôm Nay</p>
+          <h3 id="statTodayUsers" class="text-xl font-extrabold text-cyan-300 mt-0.5">--</h3>
+        </div>
+      </div>
+      <div class="glass-card rounded-2xl p-4 border border-slate-800 flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xl font-bold">🛒</div>
+        <div>
+          <p class="text-[11px] text-slate-400">Đơn Đã Trả</p>
+          <h3 id="statPaidOrders" class="text-xl font-extrabold text-emerald-400 mt-0.5">--</h3>
+        </div>
+      </div>
+      <div class="glass-card rounded-2xl p-4 border border-slate-800 flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-teal-500/20 text-teal-400 flex items-center justify-center text-xl font-bold">💰</div>
+        <div>
+          <p class="text-[11px] text-slate-400">Doanh Thu</p>
+          <h3 id="statRevenue" class="text-xl font-extrabold text-teal-300 mt-0.5">--</h3>
+        </div>
+      </div>
+      <div class="glass-card rounded-2xl p-4 border border-slate-800 flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center text-xl font-bold">⭐</div>
+        <div>
+          <p class="text-[11px] text-slate-400">Gói Active</p>
+          <h3 id="statEntitlements" class="text-xl font-extrabold text-purple-300 mt-0.5">--</h3>
+        </div>
+      </div>
+      <div class="glass-card rounded-2xl p-4 border border-slate-800 flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center text-xl font-bold">⚠️</div>
+        <div>
+          <p class="text-[11px] text-slate-400">Cần Đối Soát</p>
+          <h3 id="statMismatches" class="text-xl font-extrabold text-rose-400 mt-0.5">--</h3>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="flex border-b border-slate-800 gap-2 overflow-x-auto pb-1">
+      <button type="button" onclick="switchTab('orders')" id="tabBtn-orders" class="px-4 py-2.5 font-semibold text-xs sm:text-sm border-b-2 border-cyan-400 text-cyan-400 whitespace-nowrap transition-colors">
+        📋 Quản Lý Đơn Hàng
+      </button>
+      <button type="button" onclick="switchTab('transactions')" id="tabBtn-transactions" class="px-4 py-2.5 font-semibold text-xs sm:text-sm border-b-2 border-transparent text-slate-400 hover:text-slate-200 whitespace-nowrap transition-colors">
+        💳 Giao Dịch Ngân Hàng
+      </button>
+      <button type="button" onclick="switchTab('mismatches')" id="tabBtn-mismatches" class="px-4 py-2.5 font-semibold text-xs sm:text-sm border-b-2 border-transparent text-slate-400 hover:text-slate-200 whitespace-nowrap transition-colors flex items-center gap-1.5">
+        ⚠️ Đối Soát Giao Dịch Lỗi
+        <span id="mismatchesCountBadge" class="hidden px-1.5 py-0.5 text-[10px] rounded-full bg-rose-500 text-white font-bold">0</span>
+      </button>
+      <button type="button" onclick="switchTab('grant')" id="tabBtn-grant" class="px-4 py-2.5 font-semibold text-xs sm:text-sm border-b-2 border-transparent text-slate-400 hover:text-slate-200 whitespace-nowrap transition-colors">
+        🎁 Cấp Quyền Thủ Công
+      </button>
+      <button type="button" onclick="switchTab('audit')" id="tabBtn-audit" class="px-4 py-2.5 font-semibold text-xs sm:text-sm border-b-2 border-transparent text-slate-400 hover:text-slate-200 whitespace-nowrap transition-colors">
+        📜 Nhật Ký Hoạt Động
+      </button>
+      <button type="button" onclick="switchTab('users')" id="tabBtn-users" class="px-4 py-2.5 font-semibold text-xs sm:text-sm border-b-2 border-transparent text-slate-400 hover:text-slate-200 whitespace-nowrap transition-colors">
+        👤 Danh Sách Thành Viên
+      </button>
+    </div>
+
+    <!-- TAB 1: ĐƠN HÀNG -->
+    <section id="tabContent-orders" class="space-y-4">
+      <div class="flex flex-col sm:flex-row justify-between gap-3">
+        <div class="flex items-center gap-2">
+          <input type="text" id="orderSearchInput" aria-label="Tìm kiếm theo mã đơn hoặc email" placeholder="Tìm theo mã đơn, email..." class="px-4 py-2 rounded-xl bg-slate-900 border border-slate-700 text-sm focus:outline-none focus:border-cyan-400 w-64">
+          <select id="orderStatusFilter" aria-label="Lọc theo trạng thái đơn hàng" onchange="loadOrders(1)" class="px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-sm focus:outline-none focus:border-cyan-400 text-slate-300">
+            <option value="">Tất cả trạng thái</option>
+            <option value="pending">Chờ thanh toán (pending)</option>
+            <option value="paid">Đã thanh toán (paid)</option>
+            <option value="expired">Hết hạn (expired)</option>
+            <option value="underpaid">Chuyển thiếu (underpaid)</option>
+            <option value="cancelled">Đã hủy (cancelled)</option>
+          </select>
+          <button type="button" onclick="loadOrders(1)" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-sm font-semibold transition-colors">Lọc</button>
+        </div>
+        <button type="button" onclick="loadOrders(currentOrderPage)" class="text-sm text-cyan-400 hover:underline">🔄 Làm mới</button>
+      </div>
+
+      <div class="glass-card rounded-2xl overflow-hidden border border-slate-800">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs sm:text-sm">
+            <thead class="bg-slate-900/90 text-slate-400 border-b border-slate-800 uppercase tracking-wider text-[11px]">
+              <tr>
+                <th class="p-3.5">Mã đơn</th>
+                <th class="p-3.5">Người dùng</th>
+                <th class="p-3.5">Gói</th>
+                <th class="p-3.5">Số tiền</th>
+                <th class="p-3.5">Trạng thái</th>
+                <th class="p-3.5">Thời gian tạo</th>
+              </tr>
+            </thead>
+            <tbody id="ordersTableBody" class="divide-y divide-slate-800 text-slate-300">
+              <tr><td colspan="6" class="p-6 text-center text-slate-500">Đang tải dữ liệu...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div id="ordersPagination" class="flex justify-between items-center text-xs text-slate-400 px-2"></div>
+    </section>
+
+    <!-- TAB 2: GIAO DỊCH NGÂN HÀNG -->
+    <section id="tabContent-transactions" class="hidden space-y-4">
+      <div class="flex justify-between items-center">
+        <h3 class="text-base font-bold text-white">Lịch Sử Webhook / Giao Dịch Đã Nhận</h3>
+        <button type="button" onclick="loadTransactions(1)" class="text-sm text-cyan-400 hover:underline">🔄 Làm mới</button>
+      </div>
+      <div class="glass-card rounded-2xl overflow-hidden border border-slate-800">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs sm:text-sm">
+            <thead class="bg-slate-900/90 text-slate-400 border-b border-slate-800 uppercase tracking-wider text-[11px]">
+              <tr>
+                <th class="p-3.5">ID / Cổng</th>
+                <th class="p-3.5">Mã GD Cổng</th>
+                <th class="p-3.5">Số tiền nhận</th>
+                <th class="p-3.5">Nội dung CK</th>
+                <th class="p-3.5">Khớp đơn</th>
+                <th class="p-3.5">Trạng thái khớp</th>
+                <th class="p-3.5">Thời điểm nhận</th>
+              </tr>
+            </thead>
+            <tbody id="txTableBody" class="divide-y divide-slate-800 text-slate-300">
+              <tr><td colspan="7" class="p-6 text-center text-slate-500">Đang tải dữ liệu...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: ĐỐI SOÁT GIAO DỊCH LỖI (MISMATCHES) -->
+    <section id="tabContent-mismatches" class="hidden space-y-4">
+      <div class="flex justify-between items-center">
+        <div>
+          <h3 class="text-base font-bold text-white flex items-center gap-2">
+            <span>⚠️</span> Giao Dịch Chờ Đối Soát & Khớp Đơn
+          </h3>
+          <p class="text-xs text-slate-400 mt-0.5">Các giao dịch chuyển thiếu tiền (underpaid), không có mã đơn (no_order) hoặc gặp lỗi khớp.</p>
+        </div>
+        <button type="button" onclick="loadMismatches()" class="text-sm text-cyan-400 hover:underline">🔄 Làm mới</button>
+      </div>
+      <div class="glass-card rounded-2xl overflow-hidden border border-slate-800">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs sm:text-sm">
+            <thead class="bg-slate-900/90 text-slate-400 border-b border-slate-800 uppercase tracking-wider text-[11px]">
+              <tr>
+                <th class="p-3.5">ID / Cổng</th>
+                <th class="p-3.5">Mã GD Cổng</th>
+                <th class="p-3.5">Số tiền</th>
+                <th class="p-3.5">Nội dung chuyển</th>
+                <th class="p-3.5">Thời điểm</th>
+                <th class="p-3.5">Trạng thái lỗi</th>
+                <th class="p-3.5 text-center">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody id="mismatchesTableBody" class="divide-y divide-slate-800 text-slate-300">
+              <tr><td colspan="7" class="p-6 text-center text-slate-500">Đang tải dữ liệu...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: CẤP QUYỀN THỦ CÔNG -->
+    <section id="tabContent-grant" class="hidden space-y-6">
+      <div class="glass-card rounded-2xl p-6 border border-slate-800 max-w-xl">
+        <h3 class="text-lg font-bold text-white mb-2">🎁 Cấp Quyền Học Tập Trực Tiếp (Admin Grant)</h3>
+        <p class="text-xs text-slate-400 mb-6">Cấp quyền mở khóa màn chơi vĩnh viễn cho học sinh gặp sự cố chuyển khoản hoặc được ban quản trị tặng học bổng.</p>
+
+        <form onsubmit="handleGrantSubmit(event)" class="space-y-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1" for="grantEmail">Email hoặc User ID học sinh</label>
+            <input type="text" id="grantEmail" required placeholder="Nhập email học sinh hoặc ID" class="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-cyan-400 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1" for="grantPackage">Gói mở khóa</label>
+            <select id="grantPackage" required class="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-cyan-400 text-sm">
+              <option value="premium">Gói Cá Nhân Premium — Mở khóa toàn bộ Level 1–10 (120.000đ)</option>
+              <option value="pack_1_4">Gói Khởi Động — Mở khóa Level 1–4 (59.000đ)</option>
+              <option value="pack_5_10">Gói Nâng Cao — Mở khóa Level 5–10 (79.000đ)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1" for="grantReason">Lý do cấp quyền (Lưu nhật ký Audit)</label>
+            <input type="text" id="grantReason" required placeholder="Ví dụ: Đã nhận tiền mặt / Hỗ trợ học bổng / Khách chuyển sai nội dung" class="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-cyan-400 text-sm">
+          </div>
+          <div id="grantAlert" class="hidden text-xs p-3 rounded-xl"></div>
+          <button type="submit" id="grantSubmitBtn" class="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-bold rounded-xl transition-all shadow-lg text-sm">
+            Xác Nhận Cấp Gói Vĩnh Viễn
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- TAB 5: NHẬT KÝ HOẠT ĐỘNG (AUDIT LOG) -->
+    <section id="tabContent-audit" class="hidden space-y-4">
+      <div class="flex justify-between items-center">
+        <div>
+          <h3 class="text-base font-bold text-white flex items-center gap-2">
+            <span>📜</span> Nhật Ký Hoạt Động Quản Trị (Admin Audit Log)
+          </h3>
+          <p class="text-xs text-slate-400 mt-0.5">Lưu vết toàn bộ thao tác cấp gói, thu hồi quyền và đối soát giao dịch.</p>
+        </div>
+        <button type="button" onclick="loadAuditLogs(1)" class="text-sm text-cyan-400 hover:underline">🔄 Làm mới</button>
+      </div>
+      <div class="glass-card rounded-2xl overflow-hidden border border-slate-800">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs sm:text-sm">
+            <thead class="bg-slate-900/90 text-slate-400 border-b border-slate-800 uppercase tracking-wider text-[11px]">
+              <tr>
+                <th class="p-3.5">ID</th>
+                <th class="p-3.5">Thời gian</th>
+                <th class="p-3.5">Admin thao tác</th>
+                <th class="p-3.5">Hành động</th>
+                <th class="p-3.5">Học sinh nhận</th>
+                <th class="p-3.5">Gói</th>
+                <th class="p-3.5">Lý do / Ghi chú</th>
+              </tr>
+            </thead>
+            <tbody id="auditTableBody" class="divide-y divide-slate-800 text-slate-300">
+              <tr><td colspan="7" class="p-6 text-center text-slate-500">Đang tải dữ liệu...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div id="auditPagination" class="flex justify-between items-center text-xs text-slate-400 px-2"></div>
+    </section>
+
+    <!-- TAB 6: DANH SÁCH NGƯỜI DÙNG -->
+    <section id="tabContent-users" class="hidden space-y-4">
+      <div class="flex justify-between items-center">
+        <h3 class="text-base font-bold text-white">Danh Sách Thành Viên Hệ Thống</h3>
+        <button type="button" onclick="loadUsers(1)" class="text-sm text-cyan-400 hover:underline">🔄 Làm mới</button>
+      </div>
+      <div class="glass-card rounded-2xl overflow-hidden border border-slate-800">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs sm:text-sm">
+            <thead class="bg-slate-900/90 text-slate-400 border-b border-slate-800 uppercase tracking-wider text-[11px]">
+              <tr>
+                <th class="p-3.5">ID</th>
+                <th class="p-3.5">Tên đăng nhập</th>
+                <th class="p-3.5">Email</th>
+                <th class="p-3.5">Vai trò</th>
+                <th class="p-3.5">Cấp độ</th>
+                <th class="p-3.5">Điểm</th>
+                <th class="p-3.5">Ngày tham gia</th>
+              </tr>
+            </thead>
+            <tbody id="usersTableBody" class="divide-y divide-slate-800 text-slate-300">
+              <tr><td colspan="7" class="p-6 text-center text-slate-500">Đang tải dữ liệu...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Modal Đối Soát Khớp Đơn -->
+  <div id="reconcileModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="glass-card rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-700 space-y-4">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          <span>🔗</span> Đối Soát & Khớp Giao Dịch
+        </h3>
+        <button type="button" onclick="closeReconcileModal()" class="text-slate-400 hover:text-white text-xl leading-none">&times;</button>
+      </div>
+
+      <div class="bg-slate-900/60 p-3.5 rounded-xl border border-slate-800 space-y-1.5 text-xs">
+        <div class="flex justify-between"><span class="text-slate-400">ID Giao Dịch:</span> <span id="recTxId" class="font-mono text-cyan-300 font-bold">--</span></div>
+        <div class="flex justify-between"><span class="text-slate-400">Số tiền nhận được:</span> <span id="recAmount" class="font-bold text-emerald-400">--</span></div>
+        <div class="flex justify-between"><span class="text-slate-400">Nội dung chuyển:</span> <span id="recContent" class="text-slate-200 truncate max-w-[260px]">--</span></div>
+      </div>
+
+      <form onsubmit="handleReconcileSubmit(event)" class="space-y-3.5 text-xs">
+        <input type="hidden" id="recTxIdInput">
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1" for="recOrderCode">Mã đơn hàng cần khớp (Bắt đầu với CK...):</label>
+          <input type="text" id="recOrderCode" required placeholder="Ví dụ: CK3Z8X3Z2N" class="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white font-mono uppercase focus:outline-none focus:border-cyan-400 text-sm">
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1" for="recNote">Ghi chú đối soát (Lưu vào Audit Log):</label>
+          <input type="text" id="recNote" placeholder="Ví dụ: Khách CK thiếu tiền / Học sinh quên nhập mã đơn" class="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white focus:outline-none focus:border-cyan-400 text-sm">
+        </div>
+        <div id="recAlert" class="hidden p-3 rounded-xl"></div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" onclick="closeReconcileModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl font-semibold transition-colors">Hủy</button>
+          <button type="submit" id="recSubmitBtn" class="px-5 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold rounded-xl transition-all shadow-lg">Xác Nhận Khớp Đơn</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/assets/safe.js"></script>
+  <script src="/assets/api.js"></script>
+  <script>
+    let currentOrderPage = 1;
+
+    // Khởi tạo trang
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Thử refresh token để nhận diện phiên
+      const ok = await window.CyberAPI.refreshToken();
+      if (ok) {
+        checkAdminSession();
+      } else {
+        document.getElementById('loginOverlay').classList.remove('hidden');
+      }
+    });
+
+    async function checkAdminSession() {
+      const errorBox = document.getElementById('loginError');
+      try {
+        const stats = await window.CyberAPI.admin.getStats();
+        if (stats && stats.success) {
+          // Là Admin hợp lệ!
+          document.getElementById('loginOverlay').classList.add('hidden');
+          document.getElementById('adminUserBadge').classList.remove('hidden');
+          document.getElementById('adminUserBadge').classList.add('flex');
+          if (errorBox) errorBox.classList.add('hidden');
+          renderStats(stats.data);
+          loadOrders(1);
+        } else {
+          document.getElementById('loginOverlay').classList.remove('hidden');
+          if (errorBox) {
+            errorBox.innerText = stats.message || 'Tài khoản của bạn không có quyền Quản trị viên (Admin).';
+            errorBox.classList.remove('hidden');
+          }
+        }
+      } catch (err) {
+        // Người dùng chưa có phiên đăng nhập admin hợp lệ
+        console.warn('Chưa xác thực quyền Admin:', err);
+        document.getElementById('loginOverlay').classList.remove('hidden');
+        if (errorBox) {
+          errorBox.innerText = 'Phiên đăng nhập hết hạn hoặc tài khoản không có quyền Admin.';
+          errorBox.classList.remove('hidden');
+        }
+      }
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value;
+      const errorBox = document.getElementById('loginError');
+      const submitBtn = document.getElementById('loginSubmitBtn');
+
+      errorBox.classList.add('hidden');
+      submitBtn.disabled = true;
+      submitBtn.innerText = 'Đang kiểm tra...';
+
+      const res = await window.CyberAPI.auth.login(email, password);
+      submitBtn.disabled = false;
+      submitBtn.innerText = 'Đăng Nhập Bảng Quản Trị';
+
+      if (res.ok && res.data.success) {
+        checkAdminSession();
+      } else {
+        errorBox.innerText = res.data.message || 'Đăng nhập thất bại hoặc tài khoản không có quyền Admin.';
+        errorBox.classList.remove('hidden');
+      }
+    }
+
+    async function handleLogout() {
+      await window.CyberAPI.auth.logout();
+      window.location.reload();
+    }
+
+    function switchTab(tabName) {
+      ['orders', 'transactions', 'mismatches', 'grant', 'audit', 'users'].forEach(t => {
+        const btn = document.getElementById(`tabBtn-${t}`);
+        const content = document.getElementById(`tabContent-${t}`);
+        if (btn && content) {
+          if (t === tabName) {
+            btn.className = 'px-4 py-2.5 font-semibold text-xs sm:text-sm border-b-2 border-cyan-400 text-cyan-400 whitespace-nowrap transition-colors flex items-center gap-1.5';
+            content.classList.remove('hidden');
+          } else {
+            btn.className = 'px-4 py-2.5 font-semibold text-xs sm:text-sm border-b-2 border-transparent text-slate-400 hover:text-slate-200 whitespace-nowrap transition-colors flex items-center gap-1.5';
+            content.classList.add('hidden');
+          }
+        }
+      });
+
+      if (tabName === 'transactions') loadTransactions(1);
+      if (tabName === 'mismatches') loadMismatches();
+      if (tabName === 'audit') loadAuditLogs(1);
+      if (tabName === 'users') loadUsers(1);
+    }
+
+    function renderStats(data) {
+      if (!data) return;
+      document.getElementById('statUsers').innerText = data.totalUsers || 0;
+      document.getElementById('statTodayUsers').innerText = data.todayNewUsers || 0;
+      document.getElementById('statPaidOrders').innerText = data.totalPaidOrders || 0;
+      document.getElementById('statRevenue').innerText = Number(data.totalRevenue || 0).toLocaleString('vi-VN') + ' đ';
+      document.getElementById('statEntitlements').innerText = data.totalEntitlements || 0;
+      document.getElementById('statMismatches').innerText = data.totalMismatches || 0;
+
+      const badge = document.getElementById('mismatchesCountBadge');
+      if (badge) {
+        if (data.totalMismatches > 0) {
+          badge.innerText = data.totalMismatches;
+          badge.classList.remove('hidden');
+        } else {
+          badge.classList.add('hidden');
+        }
+      }
+    }
+
+    async function loadOrders(page = 1) {
+      currentOrderPage = page;
+      const status = document.getElementById('orderStatusFilter').value;
+      const search = document.getElementById('orderSearchInput').value.trim();
+      const tbody = document.getElementById('ordersTableBody');
+      tbody.innerHTML = '<tr><td colspan="6" class="p-6 text-center text-slate-500">Đang tải...</td></tr>';
+
+      try {
+        const res = await window.CyberAPI.admin.getOrders({ page, limit: 15, status, search });
+        if (res.success && res.data && res.data.orders) {
+          if (res.data.orders.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="p-6 text-center text-slate-500">Không tìm thấy đơn hàng nào.</td></tr>';
+            return;
+          }
+          tbody.innerHTML = res.data.orders.map(o => {
+            let statusBadge = '<span class="px-2 py-0.5 rounded text-xs bg-slate-800 text-slate-300">' + escapeHtml(o.status) + '</span>';
+            if (o.status === 'paid') statusBadge = '<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-950 text-emerald-400 border border-emerald-800">Đã thanh toán</span>';
+            else if (o.status === 'pending') statusBadge = '<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-950 text-amber-400 border border-amber-800">Chờ chuyển khoản</span>';
+            else if (o.status === 'expired') statusBadge = '<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-800 text-slate-400">Hết hạn</span>';
+            else if (o.status === 'underpaid') statusBadge = '<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-950 text-rose-400 border border-rose-800">Thiếu tiền</span>';
+            else if (o.status === 'cancelled') statusBadge = '<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-800 text-slate-400">Đã hủy</span>';
+
+            return `
+              <tr class="hover:bg-slate-900/50 transition-colors">
+                <td class="p-3.5 font-mono font-bold text-cyan-400">${escapeHtml(o.orderCode)}</td>
+                <td class="p-3.5">
+                  <div class="font-medium text-white">${escapeHtml(o.username || 'Khách')}</div>
+                  <div class="text-xs text-slate-400">${escapeHtml(o.userEmail || '')}</div>
+                </td>
+                <td class="p-3.5 font-semibold text-slate-300">${escapeHtml(o.packageId)}</td>
+                <td class="p-3.5 font-bold text-white">${Number(o.amount || 0).toLocaleString('vi-VN')} đ</td>
+                <td class="p-3.5">${statusBadge}</td>
+                <td class="p-3.5 text-xs text-slate-400">${escapeHtml(new Date(o.createdAt).toLocaleString('vi-VN'))}</td>
+              </tr>
+            `;
+          }).join('');
+        }
+      } catch (err) {
+        console.error('Lỗi khi tải đơn hàng:', err);
+        tbody.innerHTML = '<tr><td colspan="6" class="p-6 text-center text-rose-400">Lỗi khi tải dữ liệu đơn hàng.</td></tr>';
+      }
+    }
+
+    async function loadTransactions(page = 1) {
+      const tbody = document.getElementById('txTableBody');
+      tbody.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-slate-500">Đang tải...</td></tr>';
+      try {
+        const res = await window.CyberAPI.admin.getTransactions({ page, limit: 15 });
+        if (res.success && res.data && res.data.transactions) {
+          if (res.data.transactions.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-slate-500">Chưa có giao dịch webhook nào.</td></tr>';
+            return;
+          }
+          tbody.innerHTML = res.data.transactions.map(t => {
+            let matchColor = 'text-slate-400';
+            if (t.matchStatus === 'matched') matchColor = 'text-emerald-400 font-semibold';
+            else if (t.matchStatus === 'underpaid') matchColor = 'text-rose-400 font-semibold';
+            else if (t.matchStatus === 'no_order') matchColor = 'text-amber-400';
+
+            return `
+              <tr class="hover:bg-slate-900/50 transition-colors">
+                <td class="p-3.5 text-xs text-slate-400">#${escapeHtml(t.id)} <span class="uppercase text-cyan-400">(${escapeHtml(t.provider)})</span></td>
+                <td class="p-3.5 font-mono text-xs">${escapeHtml(t.providerTxId)}</td>
+                <td class="p-3.5 font-bold text-emerald-400">+${Number(t.amountIn || 0).toLocaleString('vi-VN')} đ</td>
+                <td class="p-3.5 text-xs text-slate-300 max-w-xs truncate" title="${escapeHtml(t.content || '')}">${escapeHtml(t.content || '-')}</td>
+                <td class="p-3.5 font-mono text-cyan-300 font-semibold">${escapeHtml(t.orderCode || '-')}</td>
+                <td class="p-3.5 ${matchColor}">${escapeHtml(t.matchStatus)}</td>
+                <td class="p-3.5 text-xs text-slate-400">${escapeHtml(new Date(t.createdAt).toLocaleString('vi-VN'))}</td>
+              </tr>
+            `;
+          }).join('');
+        }
+      } catch (err) {
+        console.error('Lỗi khi tải giao dịch:', err);
+        tbody.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-rose-400">Lỗi khi tải giao dịch.</td></tr>';
+      }
+    }
+
+    async function loadUsers(page = 1) {
+      const tbody = document.getElementById('usersTableBody');
+      tbody.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-slate-500">Đang tải...</td></tr>';
+      try {
+        const res = await window.CyberAPI.admin.getUsers({ page, limit: 15 });
+        if (res.success && res.data && res.data.users) {
+          tbody.innerHTML = res.data.users.map(u => `
+            <tr class="hover:bg-slate-900/50 transition-colors">
+              <td class="p-3.5 text-slate-400">#${escapeHtml(u.id)}</td>
+              <td class="p-3.5 font-bold text-white">${escapeHtml(u.username)}</td>
+              <td class="p-3.5 text-slate-300">${escapeHtml(u.email)}</td>
+              <td class="p-3.5"><span class="px-2 py-0.5 rounded text-xs ${u.role === 'admin' ? 'bg-purple-900 text-purple-200 border border-purple-700' : 'bg-slate-800 text-slate-400'}">${escapeHtml(u.role)}</span></td>
+              <td class="p-3.5 text-cyan-400 font-semibold">Cấp ${escapeHtml(u.level || 1)}</td>
+              <td class="p-3.5 font-bold text-amber-400">${Number(u.points || 0)}</td>
+              <td class="p-3.5 text-xs text-slate-400">${escapeHtml(new Date(u.createdAt).toLocaleDateString('vi-VN'))}</td>
+            </tr>
+          `).join('');
+        }
+      } catch (err) {
+        console.error('Lỗi khi tải người dùng:', err);
+        tbody.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-rose-400">Lỗi tải danh sách người dùng.</td></tr>';
+      }
+    }
+
+    async function handleGrantSubmit(e) {
+      e.preventDefault();
+      const input = document.getElementById('grantEmail').value.trim();
+      const packageId = document.getElementById('grantPackage').value;
+      const reason = document.getElementById('grantReason').value.trim();
+      const alertBox = document.getElementById('grantAlert');
+      const submitBtn = document.getElementById('grantSubmitBtn');
+
+      alertBox.classList.add('hidden');
+      submitBtn.disabled = true;
+      submitBtn.innerText = 'Đang xử lý cấp gói...';
+
+      const payload = {
+        package_id: packageId,
+        reason,
+      };
+
+      if (!Number.isNaN(Number(input)) && Number(input) > 0) {
+        payload.user_id = Number(input);
+      } else {
+        payload.email = input;
+      }
+
+      try {
+        const res = await window.CyberAPI.admin.grantPackage(payload);
+        submitBtn.disabled = false;
+        submitBtn.innerText = 'Xác Nhận Cấp Gói Vĩnh Viễn';
+
+        if (res.success) {
+          alertBox.className = 'text-xs p-3 rounded-xl bg-emerald-950/80 border border-emerald-800 text-emerald-300';
+          alertBox.innerText = '✅ ' + res.message;
+          alertBox.classList.remove('hidden');
+          document.getElementById('grantEmail').value = '';
+          document.getElementById('grantReason').value = '';
+        } else {
+          alertBox.className = 'text-xs p-3 rounded-xl bg-rose-950/80 border border-rose-800 text-rose-300';
+          alertBox.innerText = '❌ ' + (res.message || 'Không thể cấp gói.');
+          alertBox.classList.remove('hidden');
+        }
+      } catch (err) {
+        console.error('Lỗi khi cấp gói:', err);
+        submitBtn.disabled = false;
+        submitBtn.innerText = 'Xác Nhận Cấp Gói Vĩnh Viễn';
+        alertBox.className = 'text-xs p-3 rounded-xl bg-rose-950/80 border border-rose-800 text-rose-300';
+        alertBox.innerText = '❌ Lỗi kết nối máy chủ.';
+        alertBox.classList.remove('hidden');
+      }
+    }
+
+    async function loadMismatches() {
+      const tbody = document.getElementById('mismatchesTableBody');
+      tbody.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-slate-500">Đang tải danh sách giao dịch lỗi...</td></tr>';
+      try {
+        const res = await window.CyberAPI.admin.getMismatches();
+        if (res.success && res.data && res.data.transactions) {
+          const list = res.data.transactions;
+          const badge = document.getElementById('mismatchesCountBadge');
+          if (badge) {
+            badge.innerText = list.length;
+            if (list.length > 0) badge.classList.remove('hidden');
+            else badge.classList.add('hidden');
+          }
+          if (list.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-emerald-400">🎉 Tuyệt vời! Hiện không có giao dịch nào bị lỗi hay chuyển thiếu tiền.</td></tr>';
+            return;
+          }
+          tbody.innerHTML = list.map(t => {
+            let statusBadge = '<span class="px-2 py-0.5 rounded text-xs bg-slate-800 text-slate-300">' + escapeHtml(t.matchStatus) + '</span>';
+            if (t.matchStatus === 'no_order') statusBadge = '<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-950 text-amber-400 border border-amber-800">Không có mã đơn</span>';
+            else if (t.matchStatus === 'underpaid') statusBadge = '<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-950 text-rose-400 border border-rose-800">Thiếu tiền</span>';
+            else if (t.matchStatus === 'error') statusBadge = '<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-950 text-rose-400 border border-rose-800">Lỗi đối soát</span>';
+
+            const safeContent = escapeHtml(t.content || '');
+            const safeTxId = Number(t.id);
+            const safeAmount = Number(t.amountIn || 0);
+
+            return `
+              <tr class="hover:bg-slate-900/50 transition-colors">
+                <td class="p-3.5 text-xs text-slate-400 font-mono">#${safeTxId} <span class="uppercase text-cyan-400 font-bold">(${escapeHtml(t.provider)})</span></td>
+                <td class="p-3.5 font-mono text-xs text-slate-300">${escapeHtml(t.providerTxId)}</td>
+                <td class="p-3.5 font-bold text-emerald-400">+${safeAmount.toLocaleString('vi-VN')} đ</td>
+                <td class="p-3.5 text-xs text-slate-200 max-w-xs truncate" title="${safeContent}">${safeContent || '-'}</td>
+                <td class="p-3.5 text-xs text-slate-400">${escapeHtml(new Date(t.createdAt).toLocaleString('vi-VN'))}</td>
+                <td class="p-3.5">${statusBadge}</td>
+                <td class="p-3.5 text-center">
+                  <button type="button" data-action="reconcile" data-tx-id="${safeTxId}" data-amount="${safeAmount}" data-content="${safeContent}" class="px-3 py-1 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-semibold rounded-lg text-xs shadow transition-all">
+                    🔗 Khớp Đơn
+                  </button>
+                </td>
+              </tr>
+            `;
+          }).join('');
+
+          if (!tbody.__hasReconcileListener) {
+            tbody.__hasReconcileListener = true;
+            tbody.addEventListener('click', (e) => {
+              const btn = e.target.closest('[data-action="reconcile"]');
+              if (btn) {
+                const txId = btn.getAttribute('data-tx-id');
+                const amount = btn.getAttribute('data-amount');
+                const content = btn.getAttribute('data-content');
+                openReconcileModal(txId, amount, content);
+              }
+            });
+          }
+        }
+      } catch (err) {
+        console.error('Lỗi khi tải giao dịch lỗi:', err);
+        tbody.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-rose-400">Lỗi khi tải danh sách giao dịch cần đối soát.</td></tr>';
+      }
+    }
+
+    function openReconcileModal(txId, amount, content) {
+      document.getElementById('recTxIdInput').value = txId;
+      document.getElementById('recTxId').innerText = '#' + txId;
+      document.getElementById('recAmount').innerText = '+' + Number(amount).toLocaleString('vi-VN') + ' đ';
+      document.getElementById('recContent').innerText = content || '(Trống)';
+      document.getElementById('recOrderCode').value = '';
+      document.getElementById('recNote').value = '';
+      const alertBox = document.getElementById('recAlert');
+      alertBox.classList.add('hidden');
+      const modal = document.getElementById('reconcileModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeReconcileModal() {
+      const modal = document.getElementById('reconcileModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    async function handleReconcileSubmit(e) {
+      e.preventDefault();
+      const txId = Number(document.getElementById('recTxIdInput').value);
+      const orderCode = document.getElementById('recOrderCode').value.trim();
+      const note = document.getElementById('recNote').value.trim();
+      const alertBox = document.getElementById('recAlert');
+      const submitBtn = document.getElementById('recSubmitBtn');
+
+      alertBox.classList.add('hidden');
+      submitBtn.disabled = true;
+      submitBtn.innerText = 'Đang khớp đơn...';
+
+      try {
+        const res = await window.CyberAPI.admin.reconcileTransaction({
+          transaction_id: txId,
+          order_code: orderCode,
+          note,
+        });
+
+        submitBtn.disabled = false;
+        submitBtn.innerText = 'Xác Nhận Khớp Đơn';
+
+        if (res.success) {
+          alertBox.className = 'p-3 rounded-xl bg-emerald-950/80 border border-emerald-800 text-emerald-300 text-xs';
+          alertBox.innerText = '✅ ' + res.message;
+          alertBox.classList.remove('hidden');
+          setTimeout(() => {
+            closeReconcileModal();
+            loadMismatches();
+            loadOrders(currentOrderPage);
+            window.CyberAPI.admin.getStats().then(s => s && s.success && renderStats(s.data));
+          }, 1200);
+        } else {
+          alertBox.className = 'p-3 rounded-xl bg-rose-950/80 border border-rose-800 text-rose-300 text-xs';
+          alertBox.innerText = '❌ ' + (res.message || 'Không thể khớp đơn.');
+          alertBox.classList.remove('hidden');
+        }
+      } catch (err) {
+        console.error('Lỗi khi khớp đơn:', err);
+        submitBtn.disabled = false;
+        submitBtn.innerText = 'Xác Nhận Khớp Đơn';
+        alertBox.className = 'p-3 rounded-xl bg-rose-950/80 border border-rose-800 text-rose-300 text-xs';
+        alertBox.innerText = '❌ Lỗi kết nối máy chủ.';
+        alertBox.classList.remove('hidden');
+      }
+    }
+
+    async function loadAuditLogs(page = 1) {
+      const tbody = document.getElementById('auditTableBody');
+      tbody.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-slate-500">Đang tải nhật ký...</td></tr>';
+      try {
+        const res = await window.CyberAPI.admin.getAuditLogs({ page, limit: 15 });
+        if (res.success && res.data && res.data.logs) {
+          if (res.data.logs.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-slate-500">Chưa có nhật ký hoạt động nào.</td></tr>';
+            return;
+          }
+          tbody.innerHTML = res.data.logs.map(log => {
+            let actionBadge = '<span class="px-2 py-0.5 rounded text-xs bg-slate-800 text-slate-300">' + escapeHtml(log.action) + '</span>';
+            if (log.action === 'grant_package') actionBadge = '<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-950 text-emerald-400 border border-emerald-800">Cấp Gói</span>';
+            else if (log.action === 'revoke_package') actionBadge = '<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-950 text-rose-400 border border-rose-800">Thu Hồi Gói</span>';
+            else if (log.action === 'reconcile_transaction') actionBadge = '<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-cyan-950 text-cyan-400 border border-cyan-800">Đối Soát Giao Dịch</span>';
+
+            return `
+              <tr class="hover:bg-slate-900/50 transition-colors">
+                <td class="p-3.5 text-xs text-slate-400 font-mono">#${Number(log.id)}</td>
+                <td class="p-3.5 text-xs text-slate-400">${escapeHtml(new Date(log.createdAt).toLocaleString('vi-VN'))}</td>
+                <td class="p-3.5">
+                  <div class="font-semibold text-white">${escapeHtml(log.adminUsername || 'Admin #' + log.adminId)}</div>
+                  <div class="text-[11px] text-slate-400">${escapeHtml(log.adminEmail || '')}</div>
+                </td>
+                <td class="p-3.5">${actionBadge}</td>
+                <td class="p-3.5">
+                  <div class="font-semibold text-white">${escapeHtml(log.targetUsername || 'User #' + log.targetUserId)}</div>
+                  <div class="text-[11px] text-slate-400">${escapeHtml(log.targetEmail || '')}</div>
+                </td>
+                <td class="p-3.5 font-mono text-cyan-300 font-bold text-xs">${escapeHtml(log.packageId || '-')}</td>
+                <td class="p-3.5 text-xs text-slate-300 max-w-xs truncate" title="${escapeHtml(log.reason || '')}">${escapeHtml(log.reason || '-')}</td>
+              </tr>
+            `;
+          }).join('');
+
+          const pag = res.data.pagination;
+          const pagEl = document.getElementById('auditPagination');
+          if (pagEl && pag) {
+            pagEl.innerHTML = `
+              <span>Trang ${pag.page} / ${pag.totalPages || 1} (Tổng: ${pag.total} thao tác)</span>
+              <div class="flex gap-2">
+                <button type="button" ${pag.page <= 1 ? 'disabled class="opacity-50"' : `onclick="loadAuditLogs(${pag.page - 1})"`} class="px-3 py-1 bg-slate-800 hover:bg-slate-700 rounded text-slate-300">Trước</button>
+                <button type="button" ${pag.page >= pag.totalPages ? 'disabled class="opacity-50"' : `onclick="loadAuditLogs(${pag.page + 1})"`} class="px-3 py-1 bg-slate-800 hover:bg-slate-700 rounded text-slate-300">Sau</button>
+              </div>
+            `;
+          }
+        }
+      } catch (err) {
+        console.error('Lỗi khi tải audit log:', err);
+        tbody.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-rose-400">Lỗi khi tải nhật ký hoạt động.</td></tr>';
+      }
+    }
+  </script>
+
+  <!-- Policy Links Footer -->
+  <footer class="bg-slate-900 border-t border-slate-800 py-4 px-6 mt-8">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs text-slate-500">
+      <a href="/privacy" class="hover:text-indigo-400 font-medium">Chính sách bảo mật</a>
+      <span>·</span>
+      <a href="/terms" class="hover:text-indigo-400 font-medium">Điều khoản sử dụng</a>
+      <span>·</span>
+      <a href="/refund" class="hover:text-indigo-400 font-medium">Chính sách hoàn tiền</a>
+      <span>·</span>
+      <span>© 2026 CyberKnight / Sigmabloom</span>
+    </div>
+  </footer>
+</body>
+</html>

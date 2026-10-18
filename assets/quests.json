@@ -1,0 +1,43 @@
+{
+  "chapter": 1,
+  "title": "Rừng Cổ Tích Số",
+  "quests": [
+    {
+      "id": "quest_1_map_puzzle",
+      "type": "puzzle",
+      "npc": "CHIP",
+      "title": "Ghép bản đồ",
+      "dialogue_intro": "Bạn đồng ý nhận nhiệm vụ",
+      "objective": "Tìm đường đến nhà bà ngoại",
+      "minigame": "map_puzzle_9pieces",
+      "reward": { "badge": "badge_navigator", "score": 30 }
+    },
+    {
+      "id": "quest_2_wolf_privacy",
+      "type": "sorting",
+      "npc": "Sói Ka",
+      "title": "Đừng tiết lộ địa chỉ",
+      "dialogue_intro": "Chúng ta làm bạn nhé! Cậu cho tớ biết địa chỉ nhà được không?",
+      "objective": "Phân loại thông tin có thể/không thể chia sẻ",
+      "minigame": "privacy_sort",
+      "reward": { "score": 50, "badge": "badge_privacy_guard" },
+      "penalty": { "score": -10 }
+    }
+  ],
+  "cards": [
+    { "id": "c1", "label": "Địa chỉ nhà", "emoji": "🏠", "correct_bin": "khong_chia_se" },
+    { "id": "c2", "label": "Số điện thoại", "emoji": "📱", "correct_bin": "khong_chia_se" },
+    { "id": "c3", "label": "Ngày sinh", "emoji": "🎂", "correct_bin": "khong_chia_se" },
+    { "id": "c4", "label": "Tên trường học", "emoji": "🏫", "correct_bin": "khong_chia_se" },
+    { "id": "c5", "label": "Tên bố mẹ", "emoji": "👪", "correct_bin": "khong_chia_se" },
+    { "id": "c6", "label": "Màu sắc yêu thích", "emoji": "🎨", "correct_bin": "co_the_chia_se" },
+    { "id": "c7", "label": "Môn thể thao yêu thích", "emoji": "⚽", "correct_bin": "co_the_chia_se" },
+    { "id": "c8", "label": "Con vật yêu thích", "emoji": "🐱", "correct_bin": "co_the_chia_se" },
+    { "id": "c9", "label": "Món ăn yêu thích", "emoji": "🍕", "correct_bin": "co_the_chia_se" }
+  ],
+  "badges": [
+    { "id": "badge_navigator", "name": "Nhà thám hiểm", "emoji": "🧭", "desc": "Hoàn thành ghép bản đồ" },
+    { "id": "badge_privacy_guard", "name": "Vệ sĩ quyền riêng tư", "emoji": "🔐", "desc": "Bảo vệ thông tin thành công" },
+    { "id": "badge_first_step", "name": "Bước chân đầu tiên", "emoji": "👣", "desc": "Bắt đầu cuộc phiêu lưu" }
+  ]
+}

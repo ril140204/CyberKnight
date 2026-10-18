@@ -1,0 +1,126 @@
+# ============================================================
+# CyberKnight / Sigmabloom — Cấu hình Nginx mẫu (production)
+#
+# THỨ TỰ HTTPS ĐÚNG (để Certbot HTTP-01 cho www hoạt động):
+#   1. Triển khai file này lên port 80 (chưa có HTTPS).
+#   2. Chạy:
+#        certbot --nginx -d <TEN_MIEN> -d www.<TEN_MIEN> \
+#                -m <EMAIL> --agree-tos --redirect
+#      Certbot sẽ tự thêm khối listen 443 + chuyển hướng HTTP→HTTPS.
+#   3. SAU KHI certbot thành công, thêm vào khối server{ listen 443 ssl }
+#      NGAY SAU dòng server_name dòng:
+#        if ($host = www.<TEN_MIEN>) { return 301 https://<TEN_MIEN>$request_uri; }
+#      (KHÔNG thêm trước khi chạy certbot — sẽ phá vỡ HTTP-01 cho www)
+#   4. Xác nhận:  nginx -t && systemctl reload nginx
+#
+# Hướng dẫn:
+#   1. Sao chép vào /etc/nginx/sites-available/cyberknight
+#   2. Bật:  ln -s /etc/nginx/sites-available/cyberknight /etc/nginx/sites-enabled/
+#   3. Kiểm tra: nginx -t && systemctl reload nginx
+#   4. HTTPS:  certbot --nginx -d <TEN_MIEN> -d www.<TEN_MIEN>
+#      (Certbot sẽ tự thêm khối listen 443 và chuyển hướng HTTP → HTTPS.)
+#
+# LƯU Ý: Chỉ bỏ comment các khối SSL bên dưới khi đã có certificate.
+# ============================================================
+
+# ── Rate-limit zones ────────────────────────────────────────────
+# authStrict: login/register/forgot/reset — 30r/m burst 30
+limit_req_zone $binary_remote_addr zone=authStrict:10m rate=30r/m;
+
+# authGeneral: các route auth còn lại (logout, refresh, me...) — 120r/m burst 60
+limit_req_zone $binary_remote_addr zone=authGeneral:10m rate=120r/m;
+
+# webhook: thanh toán — 100r/m burst 200 (wide burst để chịu được spike)
+limit_req_zone $binary_remote_addr zone=webhook:10m rate=100r/m;
+
+server {
+    listen 80;
+    # Thay <TEN_MIEN> bằng tên miền thật
+    server_name <TEN_MIEN> www.<TEN_MIEN>;
+
+    # ── Bảo mật: ẩn phiên bản Nginx ──────────────────────────
+    # Thêm vào /etc/nginx/nginx.conf (khối http{}):
+    #   server_tokens off;
+
+    # Giới hạn kích thước request body
+    client_max_body_size 1m;
+
+    # ── Gzip compression ─────────────────────────────────────
+    gzip on;
+    gzip_vary on;
+    gzip_min_length 1024;
+    gzip_proxied any;
+    gzip_types text/plain text/css application/json application/javascript
+               application/xml application/xml+rss image/svg+xml;
+
+    # ── ACME challenge (Certbot) ────────────────────────────
+    location ^~ /.well-known/acme-challenge/ {
+        root /var/www/html;
+    }
+
+    # ── Chặn truy cập file/folder nhạy cảm ──────────────────
+    # Hidden files/dirs (trừ .well-known đã xử lý ở trên)
+    location ~ /\.(?!well-known) {
+        deny all;
+    }
+
+    # Sensitive directories
+    location ~* ^/(backend|node_modules|\.git|\.claude|\.cursor|_claude|_cursor|deploy|logs)/ {
+        return 404;
+    }
+
+    # Sensitive file extensions
+    location ~* \.(env|sql|log|md|yml|yaml|toml|lock|bak|sh)$ {
+        return 404;
+    }
+
+    # ── API: Rate-limit login/register/forgot/reset riêng ────
+    # (Áp dụng limit_req_status 429 ở server level)
+    limit_req_status 429;
+
+    location ~ ^/api/auth/(login|register|forgot-password|reset-password)$ {
+        limit_req zone=authStrict burst=30 nodelay;
+        include /etc/nginx/includes/nginx-proxy-params.conf;
+        proxy_pass http://127.0.0.1:5000;
+    }
+
+    # ── API: Rate-limit auth còn lại (logout, refresh, me...) ─
+    location /api/auth/ {
+        limit_req zone=authGeneral burst=60 nodelay;
+        include /etc/nginx/includes/nginx-proxy-params.conf;
+        proxy_pass http://127.0.0.1:5000;
+    }
+
+    # ── Webhook thanh toán (wide burst) ──────────────────────
+    location /api/payments/webhook {
+        limit_req zone=webhook burst=200 nodelay;
+        include /etc/nginx/includes/nginx-proxy-params.conf;
+        proxy_pass http://127.0.0.1:5000;
+    }
+
+    # ── Proxy mặc định tới Node.js ───────────────────────────
+    location / {
+        include /etc/nginx/includes/nginx-proxy-params.conf;
+        proxy_pass http://127.0.0.1:5000;
+        proxy_read_timeout 30s;
+        proxy_connect_timeout 5s;
+    }
+}
+
+# ── HTTPS server (bỏ comment sau khi có certificate từ Certbot) ──
+# server {
+#     listen 443 ssl http2;
+#     server_name <TEN_MIEN> www.<TEN_MIEN>;
+#
+#     # www.<TEN_MIEN> → <TEN_MIEN> (thêm SAU khi certbot thành công)
+#     if ($host = www.<TEN_MIEN>) {
+#         return 301 https://<TEN_MIEN>$request_uri;
+#     }
+#
+#     ssl_certificate /etc/letsencrypt/live/<TEN_MIEN>/fullchain.pem;
+#     ssl_certificate_key /etc/letsencrypt/live/<TEN_MIEN>/privkey.pem;
+#     include /etc/letsencrypt/options-ssl-nginx.conf;
+#     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+#
+#     # (Sao chép toàn bộ location{} từ khối HTTP ở trên vào đây)
+# }

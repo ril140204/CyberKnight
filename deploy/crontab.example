@@ -1,0 +1,20 @@
+# ============================================================
+# CyberKnight / Sigmabloom — Crontab mẫu cho deployer
+#
+# Cách dùng:
+#   crontab -e
+#   (paste toàn bộ nội dung bên dưới vào)
+#
+# Ghi chú:
+#   - deployer cần quyền đọc backup file và chạy restore
+#   - File restore-test.log nằm trong home của deployer
+#   - Certbot gia hạn tự động qua certbot.timer (systemd) — KHÔNG cần cron
+# ============================================================
+
+# Backup hằng ngày lúc 03:00
+0 3 * * * /opt/cyberknight/deploy/backup-db.sh >> /home/deployer/cyberknight-backup.log 2>&1
+
+# Phục hồi thử hằng tuần vào DB test (Chủ nhật 04:00)
+# — chọn file mới nhất trong /var/backups/cyberknight/
+# — wrapper test-restore.sh chọn file mới nhất và restore vào sigmabloom_restore_test
+0 4 * * 0 /opt/cyberknight/deploy/test-restore.sh >> /home/deployer/cyberknight-restore-test.log 2>&1
