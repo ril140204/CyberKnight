@@ -3911,10 +3911,10 @@
             if (amtEl) amtEl.textContent = Number(order.amount).toLocaleString('vi-VN') + 'đ';
 
             const contentEl = document.getElementById('qrDisplayContent');
-            if (contentEl) contentEl.textContent = order.orderCode;
+            if (contentEl) contentEl.textContent = (qr && qr.content) ? qr.content : order.orderCode;
 
             const bankEl = document.getElementById('qrDisplayBank');
-            if (bankEl && qr && qr.bankName) bankEl.textContent = qr.bankName;
+            if (bankEl) bankEl.textContent = (qr && qr.bankName) ? qr.bankName : '';
 
             const accEl = document.getElementById('qrDisplayAccount');
             if (accEl && qr && qr.accountNumber) accEl.textContent = qr.accountNumber;
@@ -4338,7 +4338,7 @@
                         <div class="p-3 bg-gray-50 rounded-xl border border-gray-200 space-y-2">
                             <div class="flex items-center justify-between">
                                 <span class="text-gray-500">Ngân hàng:</span>
-                                <span id="qrDisplayBank" class="font-bold text-gray-800">Vietcombank</span>
+                                <span id="qrDisplayBank" class="font-bold text-gray-800"></span>
                             </div>
                             <div class="flex items-center justify-between">
                                 <span class="text-gray-500">Số tài khoản:</span>
