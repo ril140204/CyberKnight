@@ -630,7 +630,7 @@
                 videoEl.load();
             }
             if (videoEl.getAttribute('src') !== url || forceReload) {
-                videoEl.muted = true;
+                // KHÔNG set muted — level 4 video có tiếng.
                 videoEl.src = url;
             }
             videoEl.preload = 'auto';
@@ -701,20 +701,11 @@
                 if (playPromise !== undefined) {
                     playPromise.catch((err) => {
                         if (err.name === 'NotAllowedError') {
-                            // Autoplay blocked — try muted fallback before showing
-                            // the play button. Muted videos are always allowed to
-                            // autoplay by Chrome/Edge/Safari.
-                            videoEl.muted = true;
-                            const retry = videoEl.play();
-                            if (retry) {
-                                retry.catch(() => {
-                                    hideLoading();
-                                    _showPlayButtonOverlay(videoEl, sceneName);
-                                });
-                            } else {
-                                hideLoading();
-                                _showPlayButtonOverlay(videoEl, sceneName);
-                            }
+                            // Autoplay bị chặn vì video có tiếng (không mute).
+                            // Hiển thị play overlay để user bấm — KHÔNG mute video,
+                            // vì level 4 cần phát audio.
+                            hideLoading();
+                            _showPlayButtonOverlay(videoEl, sceneName);
                         } else if (err.name === 'NotSupportedError' || err.name === 'AbortError') {
                             onError();
                         }
@@ -777,7 +768,9 @@
 
             videoEl.removeAttribute('src');
             videoEl.load();
-            videoEl.muted = true;
+            // NOTE: KHÔNG ép muted — level 4 video có tiếng (giọng kể/dẫn dắt).
+            // Nếu browser chặn autoplay có âm thanh, onProbeCanPlay hoặc
+            // Promise.catch bên dưới sẽ hiển thị play overlay để user bấm.
             videoEl.src = url;
             videoEl.preload = 'auto';
             // Kick off playback immediately, in the same call stack as the
@@ -816,7 +809,8 @@
             // listener on the document: the very next user click anywhere
             // (skip button, Q-option, zone tap, …) will resume playback.
             if (videoEl.paused && videoEl.currentTime === 0) {
-                videoEl.muted = true;
+                // KHÔNG set muted — video level 4 có tiếng.
+                // Nếu autoplay bị chặn (do có âm thanh), retry sẽ catch và arm click fallback.
                 const retry = videoEl.play();
                 if (retry) {
                     retry.then(() => {
@@ -826,7 +820,7 @@
                         const armClick = () => {
                             document.removeEventListener('click', armClick, true);
                             document.removeEventListener('pointerdown', armClick, true);
-                            videoEl.muted = true;
+                            // KHÔNG set muted — bấm là để đáp ứng gesture, video sẽ phát có tiếng
                             videoEl.play().catch(() => {
                                 _showPlayButtonOverlay(videoEl, level4State.currentScene);
                             });
@@ -990,6 +984,12 @@
 
     function _advanceToScene(sceneName) {
         sound.init();
+        // 'summary' không phải video scene — gọi _showSummary() trực tiếp
+        // để chuyển sang màn hình tổng kết khi scene5 kết thúc.
+        if (sceneName === 'summary') {
+            _showSummary();
+            return;
+        }
         _playScene(sceneName);
     }
 
