@@ -1208,7 +1208,10 @@ html, body {
     background: linear-gradient(180deg, #E8F4FD 0%, #D0E8FF 50%, #C3DDFF 100%);
     padding: 24px;
     overflow-y: auto;
-    position: relative;
+    /* Giữ position: absolute của .stage — "relative" làm stage rơi xuống dưới khung nhìn (màn trắng) */
+    position: absolute;
+    justify-content: flex-start;   /* fallback trình duyệt cũ */
+    justify-content: safe center;  /* căn giữa nhưng không cắt nội dung khi màn hình thấp */
 }
 
 /* Floating decoration shapes */
