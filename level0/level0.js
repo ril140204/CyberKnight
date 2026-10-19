@@ -380,19 +380,26 @@
             this.outroVideo.load();
             this.outroVideo.currentTime = 0;
 
-            // Safety fallback: if video doesn't play within 5s, skip to summary
+            // Safety fallback: if video doesn't START playing within 5s, skip to summary.
+            // Huỷ ngay khi video bắt đầu phát — trước đây timer không bị huỷ nên
+            // video hậu quả luôn bị cắt ở giây thứ 5 (cùng lỗi đã sửa ở Level 1/2).
             clearTimeout(this._outroFallbackTimer);
             this._outroFallbackTimer = setTimeout(() => {
-                if (!this._outroEnded) {
-                    console.warn('⚠️ Outro video timeout — skipping to summary');
-                    this.onOutroEnded();
-                }
+                if (this._outroEnded) return;
+                if (this.outroVideo && this.outroVideo.currentTime > 0.1) return; // đang phát bình thường
+                console.warn('⚠️ Outro video timeout — skipping to summary');
+                this.onOutroEnded();
             }, 5000);
+            this.outroVideo.addEventListener('playing', () => {
+                clearTimeout(this._outroFallbackTimer);
+            }, { once: true });
 
             // Attempt to play
             const playPromise = this.outroVideo.play();
             if (playPromise !== undefined) {
-                playPromise.catch(e => {
+                playPromise.then(() => {
+                    clearTimeout(this._outroFallbackTimer);
+                }).catch(e => {
                     console.warn('Outro play err:', e);
                     // If play fails, go to summary after a short delay
                     if (!this._outroEnded) {
