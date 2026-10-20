@@ -24,12 +24,7 @@
     // =========================================================================
 
     const CONFIG = {
-        VIDEO_BASES: [
-            '../video/level3/',
-            '../video/level 3/',
-            'video/level3/',
-            './'
-        ],
+        VIDEO_BASE: '/video/level3/',
         VIDEO_SCENES: ['scene1', 'scene2', 'scene3', 'scene4', 'scene5'],
         XP_REWARD: 30,
         BADGE_NAME: 'NGƯỜI GIỮ CHÌA KHÓA',
@@ -38,11 +33,14 @@
         SCREEN_SHAKE_MS: 300,
     };
 
-    // VideoSource: attempt-index based base discovery (never derive from URL)
+    // VideoSource: nguồn HLS/MP4 cho từng cảnh (đường dẫn tuyệt đối, không suy từ URL trang)
     const VideoSource = {
-        baseIdx: null,          // confirmed working base index, null until known
-        urlFor(scene, idx) {
-            return encodeURI(CONFIG.VIDEO_BASES[idx] + scene + '.mp4');
+        baseIdx: 0,             // giữ để tương thích (nút "Thử lại" đặt về null)
+        sourcesFor(scene) {
+            return {
+                hls: `${CONFIG.VIDEO_BASE}hls/${scene}/master.m3u8`,
+                mp4: `${CONFIG.VIDEO_BASE}${scene}.mp4`,
+            };
         },
         triedScenes: new WeakSet(),
     };
@@ -511,11 +509,15 @@
     }
 
     /**
-     * Main scene playback using VideoSource attempt index.
+     * Phát một cảnh. Nguồn video do CKVideo quản lý:
+     *   HLS thích ứng (hls.js, tự đổi 360p/480p/720p theo băng thông)
+     *   → HLS native (Safari) → MP4 720p (fallback cuối).
+     * Chỉ cảnh KẾ TIẾP được chuẩn bị trước (nạp playlist, chưa tải segment)
+     * để không tranh băng thông với cảnh đang phát trên mạng yếu.
      * @param {string} sceneName - e.g. 'scene1'
      * @param {Object} options
      * @param {Function} [options.onEnded] - callback when scene ends
-     * @param {boolean} [options.forceReload] - force reload even if src matches
+     * @param {boolean} [options.forceReload] - nạp lại nguồn (nút "Thử lại")
      */
     function _playScene(sceneName, options = {}) {
         const { onEnded, forceReload } = options;
@@ -529,268 +531,71 @@
             return;
         }
 
-        // ---- Preload next scene (only after baseIdx is known) ----
-        // Fix H4: only the next scene gets preload=auto; all others stay at "none" to
-        // avoid burning decoder slots on videos we won't play yet. This caps
-        // concurrent video decoders at 3 (current, next, previous) instead of
-        // letting it grow to 9 (5 stage videos + 4 preloads) by scene4.
+        // ---- Chuẩn bị cảnh KẾ TIẾP (playlist + segment đầu 240p) — nhưng chỉ SAU KHI cảnh này
+        //      đã phát được 2s, để không tranh băng thông lúc khởi động trên mạng yếu ----
         const nextSceneIdx = sceneNum + 1;
-        const allVideoIds = ['scene1', 'scene2', 'scene3', 'scene4', 'scene5'];
-        for (const s of allVideoIds) {
-            const v = document.getElementById(`video-${s}`);
-            if (v) v.preload = 'none';
-        }
-        if (nextSceneIdx <= 5 && VideoSource.baseIdx !== null) {
-            const nextScene = `scene${nextSceneIdx}`;
-            const nextVideo = document.getElementById(`video-${nextScene}`);
+        const prepareNext = () => {
+            if (nextSceneIdx > 5) return;
+            const nextVideo = document.getElementById(`video-scene${nextSceneIdx}`);
             if (nextVideo) {
-                // Fix H5: compare URLs in their decoded (original) form so
-                // '%20' in the encoded form does not cause spurious reloads.
-                const expectedUrl = VideoSource.urlFor(nextScene, VideoSource.baseIdx);
-                const currentDecoded = decodeURI(videoEl.getAttribute('src') || '');
-                const expectedDecoded = decodeURI(expectedUrl);
-                if (currentDecoded !== expectedDecoded) {
-                    nextVideo.src = expectedUrl;
-                }
-                nextVideo.preload = 'auto';
+                CKVideo.load(nextVideo, VideoSource.sourcesFor(`scene${nextSceneIdx}`), { preloadOnly: true }).catch(() => {});
             }
-        }
+        };
+        videoEl.addEventListener('playing', () => setTimeout(prepareNext, 2000), { once: true });
 
         // ---- Loading state helpers ----
-        let loadingShown = false;
-        let slowLoadingShown = false;
+        const container = videoEl.closest('.video-container');
+        const spinner = container ? container.querySelector('.video-loading-spinner') : null;
+        const slowNote = container ? container.querySelector('.video-loading-slow') : null;
         let loadingTimer = null;
-        let slowLoadingTimer = null;
 
         function showLoading() {
-            if (loadingShown) return;
-            loadingShown = true;
-            const container = videoEl.closest('.video-container');
-            if (!container) return;
-            const spinner = container.querySelector('.video-loading-spinner');
             if (spinner) spinner.classList.remove('hidden');
         }
-
         function hideLoading() {
-            const container = videoEl.closest('.video-container');
-            if (container) {
-                const spinner = container.querySelector('.video-loading-spinner');
-                if (spinner) spinner.classList.add('hidden');
-                const slow = container.querySelector('.video-loading-slow');
-                if (slow) slow.classList.add('hidden');
-            }
+            if (spinner) spinner.classList.add('hidden');
+            if (slowNote) slowNote.classList.add('hidden');
             clearTimeout(loadingTimer);
-            clearTimeout(slowLoadingTimer);
         }
 
         showLoading();
         loadingTimer = setTimeout(() => {
-            const container = videoEl.closest('.video-container');
-            if (container) {
-                const slow = container.querySelector('.video-loading-slow');
-                if (slow) { slow.classList.remove('hidden'); slowLoadingShown = true; }
-            }
+            if (slowNote) slowNote.classList.remove('hidden');
         }, CONFIG.LOADING_TIMEOUT_MS);
 
-        // ---- Determine which base(s) to try ----
-        const isFirstLoad = VideoSource.baseIdx === null;
+        const sources = VideoSource.sourcesFor(sceneName);
+        if (_isDebugMode()) console.log(`[Level3] Scene ${sceneName} →`, sources);
 
-        if (!isFirstLoad) {
-            // baseIdx known: try ONLY that base, immediate error on failure
-            const idx = VideoSource.baseIdx;
-            const url = VideoSource.urlFor(sceneName, idx);
-            const currentSrc = videoEl.getAttribute('src') || videoEl.src;
-            if (currentSrc !== url && !forceReload) {
-                videoEl.removeAttribute('src');
-                videoEl.load();
-            }
-            if (videoEl.getAttribute('src') !== url || forceReload) {
-                videoEl.src = url;
-            }
-            videoEl.preload = 'auto';
-
-            if (_isDebugMode()) {
-                const abs = new URL(url, location.href).href;
-                console.log(`[Level3] Scene ${sceneName} → ${abs}`);
-            }
-
-            let errorHandled = false;
-            function onError() {
-                if (errorHandled) return;
-                errorHandled = true;
-                hideLoading();
-                cleanupListeners();
-                // baseIdx is wrong? reset and retry from scratch
-                VideoSource.baseIdx = null;
-                const tried = CONFIG.VIDEO_BASES.map((_, i) => new URL(VideoSource.urlFor(sceneName, i), location.href).href);
-                if (_isDebugMode()) console.error('[Level3] All bases failed for', sceneName, tried);
-                _showVideoErrorPanel(sceneName, sceneNum, CONFIG.VIDEO_BASES.map((b, i) => VideoSource.urlFor(sceneName, i)));
-            }
-
-            function onCanPlay() {
-                // Confirm this base works — save it
-                VideoSource.baseIdx = idx;
-                hideLoading();
-            }
-
-            function onPlaying() {
-                // No-op: end detection handled by 'ended' / ontimeupdate
-            }
-
-            function cleanupListeners() {
-                videoEl.removeEventListener('canplay', onCanPlay);
-                videoEl.removeEventListener('error', onError);
-                videoEl.removeEventListener('playing', onPlaying);
-            }
-
-            videoEl.addEventListener('canplay', onCanPlay, { once: true });
-            videoEl.addEventListener('error', onError);
-            videoEl.addEventListener('playing', onPlaying, { once: true });
-
-            // End detection: 'ended' primary, ontimeupdate fallback
-            let endedTriggered = false;
-            function triggerEnd() {
-                if (endedTriggered) return;
-                endedTriggered = true;
-                cleanupListeners();
-                hideLoading();
-                _triggerSceneEnd(sceneName, onEnded);
-            }
-            videoEl.onended = triggerEnd;
-            videoEl.ontimeupdate = () => {
-                if (videoEl.duration && !endedTriggered) {
-                    if (videoEl.duration - videoEl.currentTime <= 0.15) triggerEnd();
-                }
-            };
-
-            videoEl.currentTime = 0;
-            const playPromise = videoEl.play();
-            if (playPromise !== undefined) {
-                playPromise.catch((err) => {
-                    if (err.name === 'NotAllowedError') {
-                        hideLoading();
-                        _showPlayButtonOverlay(videoEl, sceneName);
-                    }
-                });
-            }
-
-            switchStage(sceneName);
-            TopBar.updateVisibility(sceneName);
-            // #region agent log
-            try {
-                const _dbg = (h, l, m, d) => { try { fetch('http://127.0.0.1:7768/ingest/8602fe44-4a08-43e9-a828-2d55bf3cf826', { method:'POST', headers:{'Content-Type':'application/json','X-Debug-Session-Id':'6ec25f'}, body: JSON.stringify({sessionId:'6ec25f', hypothesisId:h, location:l, message:m, data:d, timestamp:Date.now()}) }).catch(()=>{}); } catch (e) {} };
-                // H1: snapshot backdrop-filter state + video count
-                const bd = document.querySelector('.video-ambient-backdrop');
-                const cs = bd ? getComputedStyle(bd) : null;
-                const allVids = document.querySelectorAll('video');
-                _dbg('H1', 'level3.js:_playScene', 'scene-start', {
-                    scene: sceneName,
-                    backdropFilter: cs ? (cs.backdropFilter || cs.webkitBackdropFilter || 'none') : 'none',
-                    filter: cs ? cs.filter : 'none',
-                    videoCount: allVids.length,
-                    videosWithSrc: Array.from(allVids).filter(v => v.getAttribute('src')).length
-                });
-                // H1+H3: rAF jank monitor for 5s
-                let _rs = performance.now(), _rc = 0, _rmx = 0, _rl = _rs;
-                const _rlp = (t) => {
-                    const dt = t - _rl;
-                    if (dt > _rmx) _rmx = dt;
-                    _rl = t; _rc++;
-                    if (t - _rs < 5000) requestAnimationFrame(_rlp);
-                    else {
-                        const q = videoEl.getVideoPlaybackQuality ? videoEl.getVideoPlaybackQuality() : {};
-                        _dbg('H1', 'level3.js:_playScene', '5s summary', {
-                            scene: sceneName,
-                            rafFrames: _rc,
-                            meanMs: _rc > 0 ? (5000/_rc).toFixed(2) : '0',
-                            maxMs: _rmx.toFixed(2),
-                            dropped: q.droppedVideoFrames ?? null,
-                            total: q.totalVideoFrames ?? null,
-                            curTime: videoEl.currentTime.toFixed(2)
-                        });
-                    }
-                };
-                requestAnimationFrame(_rlp);
-                // H2: log waiting/resume
-                const _onWait = () => _dbg('H2', 'level3.js:_playScene', 'video waiting', { scene: sceneName, ct: videoEl.currentTime.toFixed(2) });
-                const _onResume = () => _dbg('H2', 'level3.js:_playScene', 'video resumed', { scene: sceneName, ct: videoEl.currentTime.toFixed(2) });
-                videoEl.addEventListener('waiting', _onWait);
-                videoEl.addEventListener('playing', _onResume);
-            } catch (e) {}
-            // #endregion agent log
-            return;
-        }
-
-        // ---- First load: probe bases sequentially ----
-        // Compute all absolute URLs for debug reporting
-        const triedAbsoluteUrls = CONFIG.VIDEO_BASES.map((_, i) => new URL(VideoSource.urlFor(sceneName, i), location.href).href);
-
-        let probeIdx = 0;
         let errorHandled = false;
-
-        function tryProbe(idx) {
-            if (idx >= CONFIG.VIDEO_BASES.length) {
-                // All bases exhausted
-                if (errorHandled) return;
-                errorHandled = true;
-                hideLoading();
-                cleanupProbeListeners();
-                if (_isDebugMode()) {
-                    console.error('[Level3] All bases failed for', sceneName, triedAbsoluteUrls);
-                }
-                _showVideoErrorPanel(sceneName, sceneNum, triedAbsoluteUrls);
-                return;
-            }
-
-            const url = VideoSource.urlFor(sceneName, idx);
-            if (_isDebugMode()) {
-                console.log(`[Level3] Probing ${sceneName} @ base[${idx}] → ${new URL(url, location.href).href}`);
-            }
-
-            videoEl.removeAttribute('src');
-            videoEl.load();
-            videoEl.src = url;
-            videoEl.preload = 'auto';
-        }
-
-        function onProbeCanPlay() {
-            if (VideoSource.baseIdx !== null) return; // already confirmed
-            VideoSource.baseIdx = probeIdx;
-            hideLoading();
-            cleanupProbeListeners();
-            if (_isDebugMode()) {
-                console.log(`[Level3] baseIdx confirmed = ${probeIdx}`);
-            }
-        }
-
-        function onProbeError() {
-            if (VideoSource.baseIdx !== null) return;
+        function onError() {
             if (errorHandled) return;
-            probeIdx++;
-            tryProbe(probeIdx);
+            errorHandled = true;
+            hideLoading();
+            cleanupListeners();
+            if (_isDebugMode()) console.error('[Level3] Video failed for', sceneName, sources);
+            _showVideoErrorPanel(sceneName, sceneNum, [sources.hls, sources.mp4]);
+        }
+        function onCanPlay() { hideLoading(); }
+        function onWaiting() { showLoading(); }   // đang buffer giữa chừng → hiện spinner
+        function onPlaying() { hideLoading(); }
+        function cleanupListeners() {
+            videoEl.removeEventListener('canplay', onCanPlay);
+            videoEl.removeEventListener('error', onError);
+            videoEl.removeEventListener('waiting', onWaiting);
+            videoEl.removeEventListener('playing', onPlaying);
         }
 
-        function onProbeWaiting() { showLoading(); }
-        function onProbePlaying() { hideLoading(); }
-
-        function cleanupProbeListeners() {
-            videoEl.removeEventListener('canplay', onProbeCanPlay);
-            videoEl.removeEventListener('error', onProbeError);
-            videoEl.removeEventListener('waiting', onProbeWaiting);
-            videoEl.removeEventListener('playing', onProbePlaying);
-        }
-
-        videoEl.addEventListener('canplay', onProbeCanPlay, { once: true });
-        videoEl.addEventListener('error', onProbeError);
-        videoEl.addEventListener('waiting', onProbeWaiting);
-        videoEl.addEventListener('playing', onProbePlaying, { once: true });
+        videoEl.addEventListener('canplay', onCanPlay, { once: true });
+        videoEl.addEventListener('error', onError);
+        videoEl.addEventListener('waiting', onWaiting);
+        videoEl.addEventListener('playing', onPlaying);
 
         // End detection: 'ended' primary, ontimeupdate fallback
         let endedTriggered = false;
         function triggerEnd() {
             if (endedTriggered) return;
             endedTriggered = true;
-            cleanupProbeListeners();
+            cleanupListeners();
             hideLoading();
             _triggerSceneEnd(sceneName, onEnded);
         }
@@ -801,85 +606,36 @@
             }
         };
 
-        videoEl.currentTime = 0;
-        tryProbe(0); // starts probing from base 0
-
-        switchStage(sceneName);
-        TopBar.updateVisibility(sceneName);
-        // #region agent log
-        try {
-            const _dbg = (h, l, m, d) => { try { fetch('http://127.0.0.1:7768/ingest/8602fe44-4a08-43e9-a828-2d55bf3cf826', { method:'POST', headers:{'Content-Type':'application/json','X-Debug-Session-Id':'6ec25f'}, body: JSON.stringify({sessionId:'6ec25f', hypothesisId:h, location:l, message:m, data:d, timestamp:Date.now()}) }).catch(()=>{}); } catch (e) {} };
-            const bd = document.querySelector('.video-ambient-backdrop');
-            const cs = bd ? getComputedStyle(bd) : null;
-            const allVids = document.querySelectorAll('video');
-            _dbg('H1', 'level3.js:_playScene', 'scene-start', {
-                scene: sceneName,
-                backdropFilter: cs ? (cs.backdropFilter || cs.webkitBackdropFilter || 'none') : 'none',
-                filter: cs ? cs.filter : 'none',
-                videoCount: allVids.length,
-                videosWithSrc: Array.from(allVids).filter(v => v.getAttribute('src')).length
-            });
-            let _rs = performance.now(), _rc = 0, _rmx = 0, _rl = _rs;
-            const _rlp = (t) => {
-                const dt = t - _rl;
-                if (dt > _rmx) _rmx = dt;
-                _rl = t; _rc++;
-                if (t - _rs < 5000) requestAnimationFrame(_rlp);
-                else {
-                    const q = videoEl.getVideoPlaybackQuality ? videoEl.getVideoPlaybackQuality() : {};
-                    _dbg('H1', 'level3.js:_playScene', '5s summary', {
-                        scene: sceneName,
-                        rafFrames: _rc,
-                        meanMs: _rc > 0 ? (5000/_rc).toFixed(2) : '0',
-                        maxMs: _rmx.toFixed(2),
-                        dropped: q.droppedVideoFrames ?? null,
-                        total: q.totalVideoFrames ?? null,
-                        curTime: videoEl.currentTime.toFixed(2)
-                    });
-                }
-            };
-            requestAnimationFrame(_rlp);
-            const _onWait = () => _dbg('H2', 'level3.js:_playScene', 'video waiting', { scene: sceneName, ct: videoEl.currentTime.toFixed(2) });
-            const _onResume = () => _dbg('H2', 'level3.js:_playScene', 'video resumed', { scene: sceneName, ct: videoEl.currentTime.toFixed(2) });
-            videoEl.addEventListener('waiting', _onWait);
-            videoEl.addEventListener('playing', _onResume);
-            // H6: visibility / focus / long task on stall
-            const _onVis = () => _dbg('H6', 'level3.js:_playScene', 'visibilitychange', { scene: sceneName, hidden: document.hidden, ct: videoEl.currentTime.toFixed(2) });
-            const _onBlur = () => _dbg('H6', 'level3.js:_playScene', 'window blur', { scene: sceneName, ct: videoEl.currentTime.toFixed(2) });
-            const _onFreeze = () => _dbg('H6', 'level3.js:_playScene', 'FREEZE start (crossfade)', { scene: sceneName, ct: videoEl.currentTime.toFixed(2) });
-            document.addEventListener('visibilitychange', _onVis);
-            window.addEventListener('blur', _onBlur);
-            // Patch FreezeFrame.crossfade transiently
-            if (window.FreezeFrame === undefined) window.FreezeFrame = FreezeFrame;
-            const _origCrossfade = FreezeFrame.crossfade;
-            FreezeFrame.crossfade = function () { _onFreeze(); return _origCrossfade.apply(this, arguments); };
-            // Long task observer
-            try {
-                const _obs = new PerformanceObserver((list) => {
-                    for (const e of list.getEntries()) {
-                        _dbg('H6', 'level3.js:_playScene', 'long task', { scene: sceneName, dur: e.duration.toFixed(0), name: e.name });
-                    }
-                });
-                _obs.observe({ entryTypes: ['longtask'] });
-                setTimeout(() => { try { _obs.disconnect(); } catch (e) {} }, 5000);
-            } catch (e) {}
-        } catch (e) {}
-        // #endregion agent log
-
+        // Gắn nguồn (tái dùng instance nếu cảnh này đã được chuẩn bị trước),
+        // rồi gọi play() NGAY trong call stack hiện tại để giữ quyền autoplay.
+        CKVideo.load(videoEl, sources, { force: Boolean(forceReload) }).catch(onError);
+        if (videoEl.currentTime !== 0) {
+            try { videoEl.currentTime = 0; } catch (e) { /* chưa có metadata */ }
+        }
         const playPromise = videoEl.play();
         if (playPromise !== undefined) {
             playPromise.catch((err) => {
-                if (err.name === 'NotAllowedError') {
+                if (errorHandled || endedTriggered) return;
+                if (err && err.name === 'NotAllowedError') {
                     hideLoading();
                     _showPlayButtonOverlay(videoEl, sceneName);
+                } else {
+                    // Chưa có dữ liệu lúc gọi play(), hoặc play() bị huỷ (AbortError) vì nguồn
+                    // được gắn ngay sau đó → thử lại khi có thể phát
+                    const retryPlay = () => {
+                        if (errorHandled || endedTriggered || !videoEl.paused) return;
+                        videoEl.play().catch(() => _showPlayButtonOverlay(videoEl, sceneName));
+                    };
+                    if (videoEl.readyState >= 3) retryPlay();
+                    else videoEl.addEventListener('canplay', retryPlay, { once: true });
                 }
             });
         }
+
+        switchStage(sceneName);
+        TopBar.updateVisibility(sceneName);
     }
 
-    /**
-     * Show a "▶ BẤM ĐỂ XEM TIẾP" button over the video for iOS Safari.
-     */
     function _showPlayButtonOverlay(videoEl, sceneName) {
         const container = videoEl.closest('.video-container');
         if (!container) return;
@@ -929,6 +685,8 @@
             // Default flow
             const interaction = interactionPoints.find(ip => ip.afterScene === sceneName);
             if (interaction) {
+                // Câu hỏi không có video → tải trước TRỌN cảnh kế tiếp (bậc theo băng thông đã đo)
+                if (sceneNum < 5) CKVideo.warm(VideoSource.sourcesFor(`scene${sceneNum + 1}`));
                 _showInteraction(interaction);
             } else {
                 if (sceneNum < 5) {
@@ -1404,7 +1162,7 @@
 
         card.innerHTML = `
             <!-- D1: Title + badge + stars + XP -->
-            <img src="../image/z8014995224177_069f99816bf77dda5fed3feb153a6c0e-removebg-preview.png"
+            <img src="../image/z8014995224177_069f99816bf77dda5fed3feb153a6c0e-removebg-preview.webp"
                  alt="CyberKnight" style="width:90px;margin-top:-4px;filter:drop-shadow(0 6px 16px rgba(0,102,255,0.18));animation:icon-bounce 2s ease-in-out infinite;">
             <div class="summary-icon-badge">🔑</div>
             <h2 class="summary-title">LEVEL 3 COMPLETED!</h2>
@@ -1733,6 +1491,17 @@
 
         const isSkipped = handleDebugFlags();
         if (isSkipped) return;
+
+        // Chuẩn bị sẵn cảnh 1 ngay khi mở trang (playlist + segment đầu bậc thấp nhất)
+        // → bấm "Bắt đầu" là phát ngay, kể cả mạng yếu.
+        try {
+            const firstVideo = document.getElementById('video-scene1');
+            if (firstVideo && window.CKVideo) {
+                CKVideo.load(firstVideo, VideoSource.sourcesFor('scene1'), { preloadOnly: true }).catch(() => {});
+                // Màn "Bắt đầu": tải sẵn 10s đầu của cảnh 1 ở bậc thấp nhất (~250 KB)
+                CKVideo.warm(VideoSource.sourcesFor('scene1'), { level: 'lowest', seconds: 10 });
+            }
+        } catch (e) { if (_isDebugMode()) console.warn('[Level3] preload scene1:', e); }
 
         const btnStart = document.getElementById('btn-start-level');
         const startOverlay = document.getElementById('start-overlay');

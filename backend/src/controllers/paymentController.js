@@ -515,8 +515,8 @@ async function handleMatched(conn, tx, order, txDate, orderCode) {
   await conn.query(
     `INSERT INTO user_entitlements (user_id, package_id, order_id, source, granted_at, expires_at)
      VALUES (?, ?, ?, 'purchase', NOW(), NULL)
-     ON DUPLICATE KEY UPDATE
-       order_id = VALUES(order_id),
+     ON CONFLICT (user_id, package_id) DO UPDATE SET
+       order_id = EXCLUDED.order_id,
        source = 'purchase',
        granted_at = NOW(),
        expires_at = NULL`,
@@ -617,7 +617,7 @@ async function webhook(req, res) {
   try {
     conn = await db.getConnection();
   } catch (dbErr) {
-    console.error('❌ Lỗi kết nối MySQL khi nhận webhook:', dbErr.message);
+    console.error('❌ Lỗi kết nối PostgreSQL khi nhận webhook:', dbErr.message);
     return res.status(500).json({
       success: false,
       message: 'Lỗi kết nối cơ sở dữ liệu khi xử lý webhook.',
@@ -701,8 +701,8 @@ async function webhook(req, res) {
     });
   } catch (txErr) {
     await conn.rollback();
-    if (txErr.code === 'ER_DUP_ENTRY') {
-      console.warn(`⚠️ Webhook trùng lặp song song (ER_DUP_ENTRY Tx #${tx.id}) - đã rollback an toàn.`);
+    if (db.isDuplicateError(txErr)) {
+      console.warn(`⚠️ Webhook trùng lặp song song (duplicate key Tx #${tx.id}) - đã rollback an toàn.`);
       return res.json({ success: true, duplicate: true });
     }
 

@@ -16,7 +16,7 @@
 #   - Script này KHÔNG làm SSH hardening.
 #     Sau khi tạo deployer thành công, chạy riêng:
 #       sudo bash deploy/finish-ssh-hardening.sh
-#   - Script này KHÔNG chạy mysql_secure_installation tự động
+#   - KHÔNG cài MySQL/PostgreSQL server: DB chạy trên Supabase (chỉ cài postgresql-client-17 để backup)
 #     (yêu cầu tương tác). Hướng dẫn sẽ được in ra màn hình.
 # ============================================================
 
@@ -244,7 +244,7 @@ fi
 # ══════════════════════════════════════════════════════════════
 echo ""
 echo "=== 8/19: Cài các gói cơ bản ==="
-PACKAGES="nginx mysql-server git curl rsync ufw fail2ban unattended-upgrades"
+PACKAGES="nginx git curl rsync ufw fail2ban unattended-upgrades ca-certificates gnupg lsb-release"
 MISSING=""
 for pkg in $PACKAGES; do
   if ! command -v "$pkg" &>/dev/null && ! dpkg -l "$pkg" &>/dev/null; then
@@ -280,111 +280,49 @@ fi
 echo "PM2: $(pm2 --version 2>/dev/null || echo '?')"
 
 # ══════════════════════════════════════════════════════════════
-# 10. MYSQL LOW-MEM CONFIG (nếu RAM ≤ 2GB)
+# 10. POSTGRESQL CLIENT 17 (pg_dump/psql cho backup) — DB chạy trên SUPABASE
 # ══════════════════════════════════════════════════════════════
 echo ""
-echo "=== 10/19: MySQL low-mem config (nếu RAM ≤ 2GB) ==="
-MYSQL_CONF="/etc/mysql/mysql.conf.d/zz-lowmem.cnf"
-if [ "$TOTAL_MEM_GB" -le 2 ]; then
-  if [ -f "$MYSQL_CONF" ]; then
-    echo "[SKIP] $MYSQL_CONF đã tồn tại."
-  else
-    run_cmd "cat > $MYSQL_CONF << 'MYSQLCONF'
-[mysqld]
-bind-address=127.0.0.1
-innodb_buffer_pool_size=128M
-performance_schema=OFF
-MYSQLCONF"
-    run_cmd "systemctl restart mysql"
-    echo "[OK] MySQL low-mem config đã áp dụng."
-  fi
+echo "=== 10/19: Cài postgresql-client-17 (chỉ client — DB là Supabase, KHÔNG cài DB server) ==="
+if command -v pg_dump &>/dev/null && pg_dump --version | grep -qE " 1[7-9]\."; then
+  echo "[SKIP] $(pg_dump --version) đã cài."
 else
-  echo "[SKIP] RAM > 2GB — không cần low-mem config."
+  # Repo PGDG để có client cùng phiên bản với Supabase (PostgreSQL 17)
+  run_cmd "install -d /usr/share/postgresql-common/pgdg"
+  run_cmd "curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc"
+  run_cmd "sh -c 'echo \"deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt \$(lsb_release -cs)-pgdg main\" > /etc/apt/sources.list.d/pgdg.list'"
+  run_cmd "apt update"
+  run_cmd "apt install -y postgresql-client-17"
+  echo "[OK] $(pg_dump --version 2>/dev/null || echo 'postgresql-client-17') đã cài."
 fi
 
 # ══════════════════════════════════════════════════════════════
-# 11. MYSQL SECURE INSTALLATION
+# 11. TCP BBR — tối ưu stream video cho mạng yếu / rớt gói
 # ══════════════════════════════════════════════════════════════
 echo ""
-echo "=== 11/19: Hướng dẫn mysql_secure_installation ==="
-echo ""
-echo "============================================"
-echo " BƯỚC TƯƠNG TÁC — chạy thủ công trong cửa sổ này:"
-echo ""
-echo "   sudo mysql_secure_installation"
-echo ""
-echo " Checklist khi được hỏi:"
-echo "   [1] Switch to unix_socket authentication → Y"
-echo "   [2] Change root password? → Y (đặt mật khẩu root MySQL mạnh)"
-echo "       LƯU Ý: deploy script dùng user riêng (sigmabloom_*),"
-echo "              không cần password root cho ứng dụng."
-echo "   [3] Remove anonymous users? → Y"
-echo "   [4] Disallow root login remotely? → Y"
-echo "   [5] Remove test database? → Y"
-echo "   [6] Reload privilege tables? → Y"
-echo ""
-echo " Sau khi xong, nhấn ENTER để tiếp tục script..."
-echo "============================================"
-if [ "$DRY_RUN" = "0" ]; then
-  read -r -p "" _
-fi
-
-# ══════════════════════════════════════════════════════════════
-# 12. CREATE DATABASE + 3 USERS
-# ══════════════════════════════════════════════════════════════
-echo ""
-echo "=== 12/19: Tạo database và 3 user MySQL ==="
-
-# Kiểm tra DB đã tồn tại chưa
-if mysql --defaults-file=/etc/mysql/debian.cnf -e "USE sigmabloom;" 2>/dev/null; then
-  echo "[SKIP] Database 'sigmabloom' đã tồn tại — bỏ qua."
+echo "=== 11/19: Bật TCP BBR + fq (tối ưu stream video trên mạng yếu) ==="
+SYSCTL_CONF="/etc/sysctl.d/99-cyberknight.conf"
+if [ -f "$SYSCTL_CONF" ]; then
+  echo "[SKIP] $SYSCTL_CONF đã tồn tại."
 else
-  # Sinh mật khẩu ngẫu nhiên
-  APP_PW=$(openssl rand -hex 24)
-  MIG_PW=$(openssl rand -hex 24)
-  BK_PW=$(openssl rand -hex 24)
-
-  run_cmd "mysql --defaults-file=/etc/mysql/debian.cnf << 'SQL'
-CREATE DATABASE IF NOT EXISTS sigmabloom
-  CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE USER IF NOT EXISTS 'sigmabloom_app'@'localhost'
-  IDENTIFIED BY '${APP_PW}';
-GRANT SELECT, INSERT, UPDATE, DELETE
-  ON sigmabloom.* TO 'sigmabloom_app'@'localhost';
-CREATE USER IF NOT EXISTS 'sigmabloom_migrate'@'localhost'
-  IDENTIFIED BY '${MIG_PW}';
-GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, ALTER, INDEX, REFERENCES, DROP
-  ON sigmabloom.* TO 'sigmabloom_migrate'@'localhost';
-CREATE USER IF NOT EXISTS 'sigmabloom_backup'@'localhost'
-  IDENTIFIED BY '${BK_PW}';
-GRANT SELECT, SHOW VIEW, TRIGGER, LOCK TABLES
-  ON sigmabloom.* TO 'sigmabloom_backup'@'localhost';
-FLUSH PRIVILEGES;
-SQL"
-
-  echo ""
-  echo "============================================"
-  echo " LƯU 3 MẬT KHẨU NÀY VÀO TRÌNH QUẢN LÝ MẬT KHẨU!"
-  echo " Sau đó nhấn ENTER để xóa khỏi bộ nhớ."
-  echo "============================================"
-  echo "APP_PW:     $APP_PW"
-  echo "MIG_PW:     $MIG_PW"
-  echo "BK_PW:      $BK_PW"
-  echo "============================================"
-  if [ "$DRY_RUN" = "0" ]; then
-    read -r -p "" _
-  fi
-  unset APP_PW MIG_PW BK_PW
-  echo "[OK] Database và 3 user đã tạo."
+  run_cmd "cat > $SYSCTL_CONF << 'SYSCTL'
+# CyberKnight — tối ưu TCP cho HLS video trên mạng yếu
+net.core.default_qdisc = fq
+net.ipv4.tcp_congestion_control = bbr
+net.ipv4.tcp_notsent_lowat = 16384
+net.ipv4.tcp_slow_start_after_idle = 0
+SYSCTL"
+  run_cmd "sysctl --system >/dev/null"
+  echo "[OK] $(sysctl -n net.ipv4.tcp_congestion_control 2>/dev/null || echo bbr) đã bật."
 fi
 
 # ══════════════════════════════════════════════════════════════
-# 13. VERIFY MYSQL BIND
+# 12–13. (BỎ) MySQL — đã chuyển sang Supabase PostgreSQL
 # ══════════════════════════════════════════════════════════════
 echo ""
-echo "=== 13/19: Kiểm tra MySQL chỉ bind 127.0.0.1 ==="
-run_cmd "ss -tlnp | grep 3306 || echo '3306 không lắng nghe (OK)'"
-echo "(Phải thấy: 127.0.0.1:3306 hoặc không có dòng nào)"
+echo "=== 12-13/19: [SKIP] Không cài MySQL — ứng dụng dùng Supabase PostgreSQL ==="
+echo "   Sau bootstrap, điền DATABASE_URL / DIRECT_URL / DB_SCHEMA vào backend/.env"
+echo "   (Supabase → Project Settings → Database → Connection string → Transaction / Session pooler)."
 
 # ══════════════════════════════════════════════════════════════
 # 14. CREATE APP DIRECTORIES

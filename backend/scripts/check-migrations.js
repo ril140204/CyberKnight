@@ -3,11 +3,7 @@
  * Chạy: node --test backend/scripts/check-migrations.js
  *
  * Kiểm tra:
- * - 002_auth_complete.sql
- * - 003_create_feedbacks.sql
- * - 004_feedback_user_id.sql
- * - 005_payments.sql
- * - 006_user_role.sql
+ * - 001_init_schema.sql (PostgreSQL)
  */
 
 const { describe, test } = require('node:test');
@@ -18,12 +14,7 @@ const path = require('path');
 const MIGRATIONS_DIR = path.join(__dirname, '..', 'migrations');
 
 const EXPECTED_MIGRATIONS = [
-  '002_auth_complete.sql',
-  '003_create_feedbacks.sql',
-  '004_feedback_user_id.sql',
-  '005_payments.sql',
-  '006_user_role.sql',
-  '007_admin_audit_log.sql',
+  '001_init_schema.sql',
 ];
 
 describe('Migration files existence check', () => {

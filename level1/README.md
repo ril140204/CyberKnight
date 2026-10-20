@@ -32,7 +32,7 @@ Level 1 là một trải nghiệm tương tác 4 stages nối tiếp, liền m�
 
 ### 1.1 Nguyên tắc cốt lõi
 - **Không bao giờ để màn hình đen giữa các stage:** Mọi chuyển cảnh đều dùng **Freeze-Frame Crossfade**: chụp khung hình của thẻ `<video>` hoặc giao diện game lên `<canvas id="freeze-canvas">`, bật `opacity: 1`, đợi 60ms cho DOM chuyển đổi ngầm ổn định, rồi fade out freeze-frame canvas (120ms).
-- **Prefetch cả 3 video hậu quả ngầm:** Ngay khi vào Stage 2, cả 3 file video (`bad.mp4`, `middle.mp4`, `good.mp4`) được tải ngầm qua các thẻ `<video preload="auto">` ẩn (`preload-bad`, `preload-middle`, `preload-good`) → Đảm bảo khi người chơi bấm nút, video phát ngay tức khắc không bị giật lag loading.
+- **Video qua `CKVideo` (`/assets/video-loader.js`):** HLS thích ứng (hls.js, 360p/480p/720p theo băng thông) → HLS native (Safari) → MP4 720p. 3 nhánh hậu quả chỉ được **prefetch playlist** (không tải segment) để không tranh băng thông với intro; `tryLoadWithFallback` resolve ngay khi có metadata (timeout 45s) thay vì chờ tải cả file.
 - **Dừng triệt để video & audio (`stopAllVideos()`):** Khắc phục lỗi trùng tiếng ở Level 0 bằng cách gọi hàm `stopAllVideos()` tại mọi điểm chuyển stage và khi bấm "Chơi lại", dừng toàn bộ `<video>` đang chạy và đặt lại `currentTime = 0`.
 - **Synthesized Audio (`AudioSynth`):** Tích hợp bộ phát âm thanh Web Audio API tự động tổng hợp sóng âm cho tiếng tick, ting bắt đúng (tăng cao độ theo combo), bụp nhẹ khi bắt sai, còi cảnh báo siren, glitch explosion (Nhánh A), thoughtful chord (Nhánh B) và victory arpeggio (Nhánh C) — hoạt động 100% offline, không phụ thuộc file mp3 rời.
 - **Chống vỡ nét video 720p:** Sử dụng container chuẩn tỷ lệ 16:9 (`max-width: 1280px; max-height: 720px; aspect-ratio: 16/9;`) kết hợp thuộc tính `object-fit: contain` và nền mờ khuếch tán **Ambient Blurred Backdrop**, giữ độ sắc nét nguyên bản trên màn hình 1080p, 2K và 4K.
@@ -45,15 +45,10 @@ Level 1 là một trải nghiệm tương tác 4 stages nối tiếp, liền m�
 ```
 EXEWEB/
 ├── video/
-│   ├── level 0/
-│   │   ├── intro.mp4 (Vd tình huống.mp4)
-│   │   ├── bad.mp4 (hậu quả xấu .mp4)
-│   │   └── good.mp4 (hậu quả tốt .mp4)
-│   └── level 1/
-│       ├── intro.mp4 (tình huống_.mp4)
-│       ├── bad.mp4 (hậu quả xấu.mp4)
-│       ├── middle.mp4 (VIDEO HẬU QUẢ TRUNG GIAN.mp4)
-│       └── good.mp4 (hậy quả tốt.mp4)
+│   └── level1/
+│       ├── intro.mp4, bad.mp4, middle.mp4, good.mp4      (720p ~1.2 Mbps — fallback)
+│       └── hls/{intro,bad,middle,good}/master.m3u8       (HLS 720p/480p/360p)
+│       (nguồn gốc: video-src/level1/, encode bằng scripts/encode-videos.sh)
 ├── level0/
 │   ├── level0.html
 │   ├── level0.css
@@ -169,4 +164,4 @@ window.addEventListener('level1:complete', (event) => {
 2. **Khắc phục lỗi vỡ nét video khi toàn màn hình:** Sử dụng khung tỷ lệ 16:9 (`max-width: 1280px; max-height: 720px;`) kết hợp `object-fit: contain` và nền mờ khuếch tán (Ambient Backdrop).
 3. **Khắc phục lỗi chồng nút điều khiển:** Tích hợp thanh điều khiển đồng nhất `#level1-top-bar` bằng flexbox góc trên bên phải, có khoảng cách cố định `gap: 14px`.
 4. **Khắc phục lỗi chồng tiếng âm thanh khi chơi lại:** Xây dựng hàm `stopAllVideos()` dừng toàn bộ thẻ video trước khi phát bất kỳ video mới nào hoặc khi reset màn chơi.
-5. **Chuẩn hóa tên file video:** Hỗ trợ song song cả tên file tiếng Việt có dấu gốc và tên chuẩn tiếng Anh (`intro.mp4`, `bad.mp4`, `middle.mp4`, `good.mp4`) thông qua cơ chế fallback tự động.
+5. **Chuẩn hóa tên file video:** chỉ dùng tên ASCII (`intro`, `bad`, `middle`, `good`) — HLS `/video/level1/hls/<name>/master.m3u8` + MP4 `/video/level1/<name>.mp4`.

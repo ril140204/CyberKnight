@@ -16,5 +16,5 @@
 
 # Phục hồi thử hằng tuần vào DB test (Chủ nhật 04:00)
 # — chọn file mới nhất trong /var/backups/cyberknight/
-# — wrapper test-restore.sh chọn file mới nhất và restore vào sigmabloom_restore_test
+# — wrapper test-restore.sh chọn file .dump mới nhất, restore vào schema <DB_SCHEMA>_restore_test trên Supabase rồi xoá
 0 4 * * 0 /opt/cyberknight/deploy/test-restore.sh >> /home/deployer/cyberknight-restore-test.log 2>&1

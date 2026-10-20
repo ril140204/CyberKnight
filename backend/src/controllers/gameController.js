@@ -63,7 +63,7 @@ async function saveGame(req, res) {
     await db.query(
       `INSERT INTO game_saves (user_id, save_data)
        VALUES (?, ?)
-       ON DUPLICATE KEY UPDATE save_data = VALUES(save_data), updated_at = CURRENT_TIMESTAMP`,
+       ON CONFLICT (user_id) DO UPDATE SET save_data = EXCLUDED.save_data, updated_at = NOW()`,
       [userId, jsonString]
     );
 

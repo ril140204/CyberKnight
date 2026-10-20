@@ -2,7 +2,7 @@
  * Test Suite: POST /api/auth/change-password
  *
  * Chạy: node backend/scripts/test-change-password.js
- * Yêu cầu: server đang chạy trên PORT (mặc định 5000), MySQL sẵn sàng
+ * Yêu cầu: server đang chạy trên PORT (mặc định 5000), PostgreSQL (Supabase) sẵn sàng
  *
  * Kịch bản kiểm thử:
  *  1. Unauthenticated → 401

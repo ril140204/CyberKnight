@@ -6,7 +6,7 @@
  * Chạy: node backend/scripts/test-static-block.js
  *
  * Yêu cầu: server phải đang chạy tại PORT trong .env hoặc mặc định 5000.
- * Không cần MySQL — chỉ dùng HTTP requests.
+ * Không cần DB — chỉ dùng HTTP requests.
  */
 
 const http = require('http');

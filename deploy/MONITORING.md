@@ -30,8 +30,8 @@ flowchart LR
         Node["Node.js\nExpress :5000"]
     end
 
-    subgraph Database["🗄️ MySQL 8 (127.0.0.1:3306)"]
-        DB["sigmabloom\nutf8mb4"]
+    subgraph Database["🗄️ Supabase PostgreSQL 17 (managed, TLS)"]
+        DB["schema production\npooler :6543 / :5432"]
         BAK["Backup\n/var/backups/cyberknight/"]
     end
 
@@ -52,7 +52,7 @@ flowchart LR
 | Lớp | Phạm vi | Công cụ chính |
 |------|---------|--------------|
 | **Infrastructure** | CPU, RAM, Disk, Network, UFW, fail2ban | `htop`, `df`, `ss`, `pm2 monit`, logrotate |
-| **Application** | Node process, PM2 logs, MySQL slow queries, access/error logs | `pm2 logs`, `mysql slow query log`, nginx logs |
+| **Application** | Node process, PM2 logs, Supabase Query Performance, access/error logs | `pm2 logs`, Supabase Dashboard → Reports, nginx logs |
 | **Business** | Uptime, health check, backup thành công, doanh thu, user mới | healthchecks.io, UptimeRobot, Telegram alert |
 
 ---
@@ -181,28 +181,14 @@ pm2 show cyberknight
 - ERROR stack trace liên tục (> 5 lần/phút) → có bug hoặc DB chết.
 - "Too many unhandled rejections" → memory leak hoặc promise không catch.
 
-### 3.2. MySQL Slow Query Log
+### 3.2. Query chậm (Supabase)
 
-Bật slow query log (tổng thời gian query > 2 giây):
+DB chạy trên Supabase — xem *Dashboard → Reports → Query Performance* (bật extension `pg_stat_statements` trong *Database → Extensions*). Từ VPS có thể kiểm tra nhanh bằng psql:
 
 ```bash
-# Tạo file cấu hình MySQL riêng
-sudo tee /etc/mysql/mysql.conf.d/zz-cyberknight.cnf <<'EOF'
-[mysqld]
-slow_query_log      = 1
-slow_query_log_file = /var/log/mysql/slow-query.log
-long_query_time     = 2
-log_queries_not_using_indexes = 0
-EOF
-
-# Tạo file log và set quyền
-sudo touch /var/log/mysql/slow-query.log
-sudo chown mysql:mysql /var/log/mysql/slow-query.log
-sudo systemctl restart mysql
-
-# Xem 20 query chậm gần nhất
-sudo mysqldumpslow -s t -r /var/log/mysql/slow-query.log | head -40
-# Hoặc: cat /var/log/mysql/slow-query.log | grep -v "^SELECT" | tail -20
+# Đọc DIRECT_URL từ backend/.env (không in ra màn hình)
+DB_URL=$(grep '^DIRECT_URL=' /opt/cyberknight/backend/.env | cut -d= -f2- | tr -d '"')
+psql "$DB_URL" -c "SELECT calls, round(mean_exec_time) AS ms, left(query, 80) AS q FROM pg_stat_statements ORDER BY mean_exec_time DESC LIMIT 20;"
 ```
 
 ### 3.3. Bốn loại log và đường dẫn
@@ -213,8 +199,7 @@ sudo mysqldumpslow -s t -r /var/log/mysql/slow-query.log | head -40
 | **Nginx error** | `/var/log/nginx/error.log` | Lỗi Nginx (502, 504, config) | `tail -30 /var/log/nginx/error.log` |
 | **App (PM2 out)** | `/opt/cyberknight/logs/out.log` | Console.log từ Node | `pm2 logs cyberknight --out --lines 50` |
 | **App (PM2 err)** | `/opt/cyberknight/logs/error.log` | Uncaught error, crash | `pm2 logs cyberknight --err --lines 50` |
-| **MySQL error** | `/var/log/mysql/error.log` | Lỗi MySQL startup, crash | `sudo tail -30 /var/log/mysql/error.log` |
-| **MySQL slow** | `/var/log/mysql/slow-query.log` | Query chạy > 2s | `sudo tail -20 /var/log/mysql/slow-query.log` |
+| **Supabase** | Dashboard → Logs / Reports | Query chậm, lỗi kết nối pooler | https://supabase.com/dashboard |
 
 ### 3.4. Nâng cấp khi lớn (khi > 1000 user/ngày)
 
@@ -301,12 +286,12 @@ curl -s "https://api.telegram.org/bot<BOT_TOKEN>/sendMessage" \
 
 ```bash
 # 1. Khôi phục DB mới nhất
-bash /opt/cyberknight/deploy/restore-db.sh --force \
-  /var/backups/cyberknight/sigmabloom-YYYY-MM-DD_HHMMSS.sql.gz
+bash /opt/cyberknight/deploy/restore-db.sh \
+  /var/backups/cyberknight/cyberknight-production-YYYY-MM-DD_HHMMSS.dump --force
 
 # 2. Kiểm tra DB restored thành công
-mysql -u sigmabloom_app -p"$DB_PASSWORD" sigmabloom \
-  -e "SELECT COUNT(*) FROM users; SELECT COUNT(*) FROM orders;"
+DB_URL=$(grep '^DIRECT_URL=' /opt/cyberknight/backend/.env | cut -d= -f2- | tr -d '"')
+psql "$DB_URL" -c "SELECT COUNT(*) FROM production.users; SELECT COUNT(*) FROM production.orders;"
 
 # 3. PM2 restart
 pm2 restart cyberknight
@@ -403,11 +388,11 @@ cd backend && npm ci --omit=dev
 pm2 reload cyberknight
 ```
 
-### 6.4. Major upgrade (Node.js / MySQL)
+### 6.4. Major upgrade (Node.js / PostgreSQL trên Supabase)
 
 1. **Lên kế hoạch:** đọc changelog phiên bản mới.
 2. **Snapshot VPS** (qua control panel của nhà cung cấp) trước khi làm gì.
-3. **Test trên snapshot:** cài Node/MySQL mới, chạy migrations, PM2 restart.
+3. **Test trên snapshot:** cài Node mới, chạy migrations (`npm run setup-db`) lên schema thử nghiệm, PM2 restart.
 4. **Swap domain tạm:** trỏ DNS tạm sang snapshot, test đầy đủ.
 5. **Swap chính thức:** đổi DNS A về production, tắt snapshot.
 6. **Monitor 24h:** `pm2 logs`, `pm2 monit`, healthchecks.
@@ -421,7 +406,7 @@ pm2 reload cyberknight
 | Triệu chứng | Ngưỡng | Công cụ phát hiện |
 |------------|--------|------------------|
 | Event loop lag > 100ms | PM2 monit | `pm2 monit` |
-| MySQL `Threads_running` > 20 | Query concurrent | `mysql -e "SHOW STATUS LIKE 'Threads_running'"` |
+| Supabase pooler hết kết nối | Query concurrent / pool quá lớn | Dashboard → Database → Connection pooling; giảm `DB_POOL_MAX` |
 | Response time p95 > 1s | APM / curl timing | `curl -w "@%{time_total}\n"` |
 | Disk > 80% | Disk monitor | `df -h /` |
 
@@ -430,7 +415,7 @@ pm2 reload cyberknight
 **Vertical (tăng tài nguyên máy — ưu tiên trước):**
 
 - 2 vCPU + 2GB RAM → 4 vCPU + 4GB RAM.
-- Tăng `innodb_buffer_pool_size` trong MySQL config.
+- Nâng gói Supabase (compute add-on) hoặc thêm index cho query chậm.
 - Thay đổi qua control panel VPS (thường không cần reboot).
 
 **Horizontal (nhiều VPS — khi vertical không đủ):**
@@ -438,12 +423,12 @@ pm2 reload cyberknight
 ```
 User → HAProxy (load balancer) → VPS 1 (Node+PM2)
                              → VPS 2 (Node+PM2)
-MySQL read replica  ←  Proxy reads
-MySQL write         →  Primary
+Supabase read replica  ←  Proxy reads
+PostgreSQL write    →  Supabase Primary
 ```
 
 - Cần sticky session (cookie) vì JWT và levelAccess cookie.
-- MySQL read replica cho các truy vấn read-heavy (catalog, leaderboard).
+- Supabase read replica (add-on) cho các truy vấn read-heavy (catalog, leaderboard).
 - Static assets: chuyển sang CDN (Cloudflare R2 / Backblaze B2).
 
 **Static Assets CDN (khi > 500 user/ngày):**
@@ -458,7 +443,7 @@ rclone copy /opt/cyberknight/assets/ r2-cyberknight:assets/
 ### 7.3. Khi nào KHÔNG cần
 
 - < 100 user/ngày: 1 VPS 2 vCPU + 2GB RAM là quá đủ.
-- MySQL với InnoDB buffer pool 128MB–256MB phục vụ tốt < 10.000 user.
+- Supabase (compute Micro) phục vụ tốt < 10.000 user; theo dõi số kết nối pooler và `DB_POOL_MAX`.
 
 ---
 
@@ -579,7 +564,7 @@ Nếu có **> 1.000 user** hoặc **> 100 giao dịch/ngày**, một số quy đ
 | # | Triệu chứng | Chẩn đoán | Hành động | Liên hệ |
 |---|------------|-----------|-----------|---------|
 | **S1** | Site down, Nginx 502 | PM2 không chạy | `pm2 status` → `pm2 restart cyberknight` → `pm2 logs` | — |
-| **S2** | MySQL error, level không mở | MySQL chết | `systemctl status mysql` → `sudo systemctl restart mysql` → kiểm tra `/var/log/mysql/error.log` | Nhà cung cấp VPS nếu cần |
+| **S2** | Lỗi DB, level không mở (503 fail-closed) | Supabase không kết nối được (pooler/quota/mạng) | Kiểm tra https://status.supabase.com và Dashboard → Database; kiểm tra `DATABASE_URL` trong `.env`; `pm2 logs` | Supabase support nếu cần |
 | **S3** | Thanh toán không tự duyệt | SePay webhook lỗi | `pm2 logs \| grep sepay` → kiểm tra SEPAY_API_KEY trong .env → xem SePay dashboard | SePay support |
 | **S4** | Spam tài khoản fake | Bot đăng ký | Xem `pm2 logs \| grep "register"` → bật stricter rate-limit trong Nginx → báo cáo IP | Tự xử lý |
 | **S5** | DDoS / traffic bất thường | Bandwidth spike | `sudo ss -s` → `sudo netstat -anp \| grep :80` → chặn IP bằng UFW → bật Cloudflare (nếu có) | Nhà cung cấp VPS |

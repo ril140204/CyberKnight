@@ -15,22 +15,10 @@
         COUNTDOWN_SECONDS: 15,     // 15 giây đếm ngược clickbait
         GRACE_SECONDS: 5,          // 5 giây gia hạn khi hết giờ lần đầu
         TRANSITION_MS: 500,        // Thời gian chuyển cảnh crossfade
-        VIDEO_PATHS: {
-            intro: [
-                '../video/level 0/intro.mp4',
-                '../video/level 0/Vd tình huống.mp4',
-                '/video/level 0/intro.mp4'
-            ],
-            bad: [
-                '../video/level 0/bad.mp4',
-                '../video/level 0/hậu quả xấu .mp4',
-                '/video/level 0/bad.mp4'
-            ],
-            good: [
-                '../video/level 0/good.mp4',
-                '../video/level 0/hậu quả tốt .mp4',
-                '/video/level 0/good.mp4'
-            ]
+        VIDEO_SOURCES: {
+            intro: { hls: '/video/level0/hls/intro/master.m3u8', mp4: '/video/level0/intro.mp4' },
+            bad: { hls: '/video/level0/hls/bad/master.m3u8', mp4: '/video/level0/bad.mp4' },
+            good: { hls: '/video/level0/hls/good/master.m3u8', mp4: '/video/level0/good.mp4' },
         }
     };
 
@@ -241,9 +229,11 @@
             this.preloadBad = document.getElementById('preload-bad');
             this.preloadGood = document.getElementById('preload-good');
 
-            this.setupVideoFallback(this.introVideo, CONFIG.VIDEO_PATHS.intro);
-            this.setupVideoFallback(this.preloadBad, CONFIG.VIDEO_PATHS.bad);
-            this.setupVideoFallback(this.preloadGood, CONFIG.VIDEO_PATHS.good);
+            // Intro: HLS thích ứng (hls.js) → MP4 dự phòng — CKVideo tự chọn theo trình duyệt/băng thông
+            CKVideo.load(this.introVideo, CONFIG.VIDEO_SOURCES.intro).catch(() => {});
+            // 2 video hậu quả: chỉ làm ấm cache playlist (vài KB), KHÔNG tải trước dữ liệu để không tranh băng thông với intro
+            CKVideo.prefetch(CONFIG.VIDEO_SOURCES.bad, { whenPlaying: this.introVideo });
+            CKVideo.prefetch(CONFIG.VIDEO_SOURCES.good, { whenPlaying: this.introVideo });
 
             // Bắt sự kiện gần hết video mở đầu
             if (this.introVideo) {
@@ -288,21 +278,6 @@
             }
         },
 
-        setupVideoFallback(videoEl, pathList) {
-            if (!videoEl || !pathList || pathList.length === 0) return;
-            let currentIdx = 0;
-            videoEl.src = pathList[0];
-
-            videoEl.addEventListener('error', () => {
-                currentIdx++;
-                if (currentIdx < pathList.length) {
-                    console.warn(`🔄 Thử tải đường dẫn dự phòng cho video: ${pathList[currentIdx]}`);
-                    videoEl.src = pathList[currentIdx];
-                    videoEl.load();
-                }
-            });
-        },
-
         playIntro() {
             if (!this.introVideo) return;
             this.introEndHandlerTriggered = false;
@@ -325,6 +300,13 @@
                 switchStage('game');
                 MinigameScene.start();
             });
+            // Mini-game không có video → tải trước TRỌN 2 video hậu quả (bậc theo băng thông đã đo)
+            // để khi bấm nhánh là phát ngay, kể cả mạng yếu. Tự dừng nếu có video khác đang phát.
+            // Khoảng rảnh có thể ngắn → ưu tiên 12s đầu của MỖI nhánh trước, rồi mới tải trọn
+            CKVideo.warm(CONFIG.VIDEO_SOURCES.bad, { seconds: 12 });
+            CKVideo.warm(CONFIG.VIDEO_SOURCES.good, { seconds: 12 });
+            CKVideo.warm(CONFIG.VIDEO_SOURCES.bad);
+            CKVideo.warm(CONFIG.VIDEO_SOURCES.good);
         },
 
         playOutro(branch) {
@@ -338,67 +320,47 @@
                 return;
             }
 
-            // Determine which preloaded video and path list to use
-            const preloadEl = branch === 'good' ? this.preloadGood : this.preloadBad;
-            const paths = branch === 'good' ? CONFIG.VIDEO_PATHS.good : CONFIG.VIDEO_PATHS.bad;
+            const sources = branch === 'good' ? CONFIG.VIDEO_SOURCES.good : CONFIG.VIDEO_SOURCES.bad;
 
-            // Try to use preloaded video src if it's ready
-            let srcToUse = null;
-            if (preloadEl && preloadEl.readyState >= 2 && preloadEl.src) {
-                srcToUse = preloadEl.src;
+            // Dọn error handler cũ (tránh tích luỹ listener khi chơi lại)
+            if (this._outroErrorHandler) {
+                this.outroVideo.removeEventListener('error', this._outroErrorHandler);
             }
+            this._outroErrorHandler = () => {
+                console.warn('⚠️ Video hậu quả không tải được (HLS lẫn MP4) — chuyển sang tổng kết');
+                this.onOutroEnded();
+            };
+            this.outroVideo.addEventListener('error', this._outroErrorHandler);
 
-            // Clean up any previous error listeners on outroVideo to prevent accumulation
-            const oldOnError = this._outroErrorHandler;
-            if (oldOnError) {
-                this.outroVideo.removeEventListener('error', oldOnError);
-            }
-
-            if (srcToUse) {
-                // Use the preloaded src directly
-                this.outroVideo.src = srcToUse;
-            } else {
-                // Fallback: set src from path list and load
-                let fallbackIdx = 0;
-                this.outroVideo.src = paths[0];
-
-                this._outroErrorHandler = () => {
-                    fallbackIdx++;
-                    if (fallbackIdx < paths.length) {
-                        console.warn(`🔄 Thử tải đường dẫn dự phòng: ${paths[fallbackIdx]}`);
-                        this.outroVideo.src = paths[fallbackIdx];
-                        this.outroVideo.load();
-                    } else {
-                        // All paths failed — go to summary
-                        console.warn('⚠️ Tất cả đường dẫn video outro đều thất bại');
-                        this.onOutroEnded();
-                    }
-                };
-                this.outroVideo.addEventListener('error', this._outroErrorHandler);
-            }
-
-            this.outroVideo.load();
-            this.outroVideo.currentTime = 0;
-
-            // Safety fallback: if video doesn't play within 5s, skip to summary
+            // Safety: sau 20s mà video vẫn chưa phát được (mạng quá yếu) → sang tổng kết.
+            // Huỷ ngay khi video bắt đầu phát để không cắt ngang video đang chạy.
             clearTimeout(this._outroFallbackTimer);
             this._outroFallbackTimer = setTimeout(() => {
-                if (!this._outroEnded) {
+                if (!this._outroEnded && !(this.outroVideo.currentTime > 0.1)) {
                     console.warn('⚠️ Outro video timeout — skipping to summary');
                     this.onOutroEnded();
                 }
-            }, 5000);
+            }, 20000);
+            this.outroVideo.addEventListener('playing', () => clearTimeout(this._outroFallbackTimer), { once: true });
 
-            // Attempt to play
+            // Gắn nguồn (HLS ABR → MP4) rồi play() NGAY trong call stack của click để giữ quyền autoplay có tiếng
+            CKVideo.load(this.outroVideo, sources).catch(() => { /* đã xử lý qua sự kiện 'error' */ });
+            try { this.outroVideo.currentTime = 0; } catch (e) { /* chưa có metadata */ }
             const playPromise = this.outroVideo.play();
             if (playPromise !== undefined) {
                 playPromise.catch(e => {
-                    console.warn('Outro play err:', e);
-                    // If play fails, go to summary after a short delay
-                    if (!this._outroEnded) {
-                        clearTimeout(this._outroFallbackTimer);
-                        setTimeout(() => this.onOutroEnded(), 500);
+                    console.warn('Outro play err:', e && e.name);
+                    if (this._outroEnded) return;
+                    if (e && e.name === 'NotAllowedError') {
+                        // Trình duyệt chặn autoplay → thử lại ở lần tương tác kế tiếp
+                        const resume = () => { this.outroVideo.play().catch(() => {}); };
+                        document.addEventListener('click', resume, { once: true, capture: true });
+                        return;
                     }
+                    // Chưa có dữ liệu khi gọi play() → thử lại khi có thể phát
+                    this.outroVideo.addEventListener('canplay', () => {
+                        this.outroVideo.play().catch(() => {});
+                    }, { once: true });
                 });
             }
         },
@@ -1041,7 +1003,7 @@
             `;
 
             this.card.innerHTML = `
-                <img src="../image/z8014995224177_069f99816bf77dda5fed3feb153a6c0e-removebg-preview.png" alt="CyberKnight" style="width: 140px; margin-top: -8px; filter: drop-shadow(0 6px 16px rgba(0, 102, 255, 0.18)); animation: icon-bounce 2s ease-in-out infinite;">
+                <img src="../image/z8014995224177_069f99816bf77dda5fed3feb153a6c0e-removebg-preview.webp" alt="CyberKnight" style="width: 140px; margin-top: -8px; filter: drop-shadow(0 6px 16px rgba(0, 102, 255, 0.18)); animation: icon-bounce 2s ease-in-out infinite;">
                 <div class="summary-icon-badge">${badgeIcon}</div>
                 <h2 class="summary-title">${titleText}</h2>
                 <div class="summary-reward-box">

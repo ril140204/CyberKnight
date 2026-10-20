@@ -7,12 +7,14 @@
     <title>CyberKnight — Level 2: Kết Bạn Online — Người Bạn Mới (Ghép Cửa Bảo Vệ Căn Cứ)</title>
 
     <!-- Google Fonts -->
+    <!-- Tải sớm hls.js (ưu tiên cao) để video khởi động nhanh trên mạng yếu -->
+    <link rel="preload" href="/assets/vendor/hls.light.min.js" as="script">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 
     <!-- Canvas Confetti CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js" defer></script>
 
     <!-- Level 2 Stylesheet -->
     <link rel="stylesheet" href="level2.css">
@@ -52,7 +54,7 @@
             <div class="floating-sparkle circle" style="left:88%;animation-duration:15s;animation-delay:4s;"></div>
 
             <!-- CyberKnight Logo -->
-            <img src="../image/z8014995224177_069f99816bf77dda5fed3feb153a6c0e-removebg-preview.png" alt="CyberKnight Logo" class="overlay-brand-logo">
+            <img src="../image/z8014995224177_069f99816bf77dda5fed3feb153a6c0e-removebg-preview.webp" alt="CyberKnight Logo" class="overlay-brand-logo">
 
             <div class="cyber-badge">LEVEL 2 • KẾT BẠN ONLINE</div>
             <h1 class="cyber-title">KẾT BẠN ONLINE — NGƯỜI BẠN MỚI</h1>
@@ -104,10 +106,10 @@
             <div class="deco-shield deco-shield-4">⭐</div>
 
             <!-- CyberKnight Character Logo (Left) -->
-            <img src="../image/z8014995224177_069f99816bf77dda5fed3feb153a6c0e-removebg-preview.png" alt="CyberKnight" class="character-logo-left">
+            <img src="../image/z8014995224177_069f99816bf77dda5fed3feb153a6c0e-removebg-preview.webp" alt="CyberKnight" class="character-logo-left">
 
             <!-- SigmaBloom Brand Logo (Right corner) -->
-            <img src="../image/z8014995365895_a3eb178f5f7a17a45925b55e43e202be-removebg-preview.png" alt="SigmaBloom" class="brand-logo-right">
+            <img src="../image/z8014995365895_a3eb178f5f7a17a45925b55e43e202be-removebg-preview.webp" alt="SigmaBloom" class="brand-logo-right">
 
             <!-- Container Game Ghép Cửa Bảo Vệ Căn Cứ -->
             <div id="door-puzzle-container" class="door-puzzle-arena"></div>
@@ -199,18 +201,16 @@
 
         <!-- (particle-canvas đã lược bỏ — chỉ dùng canvas-confetti CDN ở level2.js) -->
 
-        <!-- Preload 2 video hậu quả ngầm để chuyển cảnh tức thì không bị giật lag -->
-        <!-- preload="metadata" thay vì "auto" để chỉ load duration + 1 frame đầu (tiết kiệm RAM), không load full file -->
-        <video id="preload-bad" preload="metadata" style="display:none;"></video>
-        <video id="preload-good" preload="metadata" style="display:none;"></video>
-
     </div>
 
     <!-- Door Puzzle Module (UMD — exposes window.DoorPuzzleGame) -->
-    <script src="door-puzzle.js"></script>
+    <script src="door-puzzle.js" defer></script>
+
+    <!-- Bộ nạp video dùng chung (HLS thích ứng + MP4 fallback) -->
+    <script src="/assets/video-loader.js" defer></script>
 
     <!-- Script điều khiển Level 2 -->
-    <script src="level2.js"></script>
+    <script src="level2.js" defer></script>
 </body>
 
 </html>

@@ -1067,7 +1067,7 @@
     <nav class="navbar" id="navbar">
         <!-- Left: CyberKnight -->
         <div class="flex items-center gap-3">
-            <img src="image/z8014995365895_a3eb178f5f7a17a45925b55e43e202be-removebg-preview.png" alt="CyberKnight" class="nav-character animate-float-slow">
+            <img src="image/z8014995365895_a3eb178f5f7a17a45925b55e43e202be-removebg-preview.webp" alt="CyberKnight" class="nav-character animate-float-slow">
             <span class="font-bold text-lg text-primary hidden sm:block" style="font-family: 'Space Grotesk'">SIGMABLOOM</span>
         </div>
         
@@ -1082,7 +1082,7 @@
         
         <!-- Right: Logo + Button -->
         <div class="flex items-center gap-4">
-            <img src="image/z8014995224177_069f99816bf77dda5fed3feb153a6c0e-removebg-preview.png" alt="Sigmabloom Logo" class="logo-img animate-float-slow hidden md:block">
+            <img src="image/z8014995224177_069f99816bf77dda5fed3feb153a6c0e-removebg-preview.webp" alt="Sigmabloom Logo" class="logo-img animate-float-slow hidden md:block">
             <!-- Auth Buttons (khi chưa đăng nhập) -->
             <div id="authButtons" class="hidden md:flex items-center gap-3">
                 <button class="btn-secondary" style="padding: 10px 22px; font-size:0.9rem;" onclick="openLoginModal()">
@@ -1298,7 +1298,7 @@
                     
                     <!-- Character Image - Sigmabloom with 3D Float -->
                     <div class="float-3d">
-                        <img src="image/z8014995224177_069f99816bf77dda5fed3feb153a6c0e-removebg-preview.png" alt="Sigmabloom Character" class="character-img" style="max-height: 580px; filter: drop-shadow(0 30px 60px rgba(0, 102, 255, 0.35));">
+                        <img src="image/z8014995224177_069f99816bf77dda5fed3feb153a6c0e-removebg-preview.webp" alt="Sigmabloom Character" class="character-img" style="max-height: 580px; filter: drop-shadow(0 30px 60px rgba(0, 102, 255, 0.35));">
                     </div>
                     
                     <!-- Floating Shield -->
@@ -1321,7 +1321,7 @@
                 
                 <!-- CyberKnight Logo - Small -->
                 <div style="animation: slideInRight 0.8s ease">
-                    <img src="image/z8014995365895_a3eb178f5f7a17a45925b55e43e202be-removebg-preview.png" alt="CyberKnight" class="h-20 mb-4 opacity-70">
+                    <img src="image/z8014995365895_a3eb178f5f7a17a45925b55e43e202be-removebg-preview.webp" alt="CyberKnight" class="h-20 mb-4 opacity-70">
                 </div>
                 
                 <!-- Slogan -->
@@ -1617,7 +1617,7 @@
                 <div class="absolute -bottom-20 -left-20 w-60 h-60 bg-cyan-100 rounded-full blur-3xl"></div>
                 
                 <!-- Logo in CTA -->
-                <img src="image/z8014995224177_069f99816bf77dda5fed3feb153a6c0e-removebg-preview.png" alt="Sigmabloom" class="h-20 mx-auto mb-8">
+                <img src="image/z8014995224177_069f99816bf77dda5fed3feb153a6c0e-removebg-preview.webp" alt="Sigmabloom" class="h-20 mx-auto mb-8">
                 
                 <h2 class="text-4xl lg:text-5xl font-bold mb-6 relative">
                     <span class="text-gray-800">Sẵn sàng trở thành</span><br>
@@ -1772,7 +1772,7 @@
             <div class="grid md:grid-cols-4 gap-12 mb-12">
                 <div>
                     <div class="flex items-center gap-3 mb-6">
-                        <img src="image/z8014995224177_069f99816bf77dda5fed3feb153a6c0e-removebg-preview.png" alt="Sigmabloom" class="h-12">
+                        <img src="image/z8014995224177_069f99816bf77dda5fed3feb153a6c0e-removebg-preview.webp" alt="Sigmabloom" class="h-12">
                         <div>
                             <div class="font-bold text-lg text-primary" style="font-family: 'Space Grotesk'">SIGMABLOOM</div>
                             <div class="text-xs text-gray-500">Think Twice, Click Right</div>
@@ -3251,6 +3251,41 @@
                 showToast('❌ Không thể kết nối tới máy chủ khởi động game!');
             }
         }
+
+        /**
+         * Tải trước tài nguyên của level khi người dùng rê chuột / chạm / focus vào nút chơi
+         * (hls.js, video-loader, CSS/JS level, playlist video mở đầu) → mở level nhanh hơn trên mạng yếu.
+         * Dùng <link rel="prefetch"> (ưu tiên thấp, không tranh băng thông với trang).
+         */
+        const _prefetchedUrls = new Set();
+        function _prefetchUrl(url) {
+            if (_prefetchedUrls.has(url)) return;
+            _prefetchedUrls.add(url);
+            const l = document.createElement('link');
+            l.rel = 'prefetch';
+            l.href = url;
+            document.head.appendChild(l);
+        }
+        const LEVEL_EXTRA_SCRIPTS = { 1: ['safety-catch.js'], 2: ['door-puzzle.js'], 3: ['key-audit.js', 'permission-game.js'], 4: ['photo-scenes.js', 'photo-board.js'] };
+        window.prefetchLevelAssets = function(levelId) {
+            levelId = Number(levelId);
+            if (Number.isNaN(levelId)) return;
+            ['/assets/vendor/hls.light.min.js', '/assets/video-loader.js'].forEach(_prefetchUrl);
+            _prefetchUrl(`/video/level${levelId}/hls/${levelId >= 3 ? 'scene1' : 'intro'}/master.m3u8`);
+            // CSS/JS của level qua level guard: level 0 miễn phí tải được ngay; level khác cần cookie
+            // levelAccess (chỉ có sau khi bấm Chơi) nên không prefetch để tránh request 401 vô ích.
+            if (levelId === 0) {
+                [`/level0/level0.css`, `/level0/level0.js`, ...(LEVEL_EXTRA_SCRIPTS[0] || []).map((f) => `/level0/${f}`)].forEach(_prefetchUrl);
+            }
+        };
+        ['mouseover', 'touchstart', 'focusin'].forEach((ev) => {
+            document.addEventListener(ev, (e) => {
+                const btn = e.target && e.target.closest ? e.target.closest('[onclick*="selectAndPlayLevel"], [data-dd-level]') : null;
+                if (!btn) return;
+                const m = /level(\d+)/i.exec(btn.getAttribute('onclick') || '') || [null, btn.getAttribute('data-dd-level')];
+                if (m && m[1] != null) window.prefetchLevelAssets(m[1]);
+            }, { passive: true });
+        });
 
         /**
          * Intercept level play — derive levelId and forward to playLevel(levelId)

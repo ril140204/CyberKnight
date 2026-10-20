@@ -45,7 +45,7 @@
    cd "C:\Users\ASUS\OneDrive\Máy tính\EXEWEB"
    npm run test:all
    ```
-   (Nếu MySQL không chạy trên local, integration test sẽ skip — đây là expected.)
+   (Integration test cần `backend/.env` trỏ tới Supabase — xem README mục Thiết lập CSDL.)
 
 ---
 
@@ -79,13 +79,13 @@ sudo bash /root/bootstrap-server.sh \
 Script sẽ:
 - Cập nhật hệ thống
 - Tạo user `deployer`
-- Cài Nginx, MySQL, Node 22 LTS, PM2, fail2ban, unattended-upgrades
-- Tạo database `sigmabloom` + 3 user MySQL
+- Cài Nginx, Node 22 LTS, PM2, postgresql-client-17 (pg_dump), fail2ban, unattended-upgrades
+- (DB chạy trên Supabase — không cài DB server)
 - Tạo thư mục `/opt/cyberknight`, `/var/backups/cyberknight`
 - **Tạo `/etc/nginx/includes/nginx-proxy-params.conf`**
 - Cấu hình Nginx `server_tokens off`
 
-> Script sẽ **dừng ở bước `mysql_secure_installation`** — nhấn Enter để làm theo checklist.
+> Script không còn bước MySQL. Chuẩn bị sẵn chuỗi kết nối Supabase (`DATABASE_URL`, `DIRECT_URL`) cho bước tạo `.env`.
 
 **Sau khi script kết thúc, KHÔNG đóng cửa sổ root.**
 
@@ -177,12 +177,11 @@ NODE_ENV=production
 PORT=5000
 FRONTEND_URL=https://<TEN_MIEN>
 
-# Database
-DB_HOST=localhost
-DB_PORT=3306
-DB_USER=sigmabloom_app
-DB_PASSWORD=<APP_PW>          # Lấy từ bước bootstrap (đã lưu)
-DB_NAME=sigmabloom
+# Database — Supabase PostgreSQL (Project Settings → Database → Connection string)
+DATABASE_URL="postgresql://postgres.<PROJECT_REF>:<DB_PASSWORD>@aws-0-<REGION>.pooler.supabase.com:6543/postgres"
+DIRECT_URL="postgresql://postgres.<PROJECT_REF>:<DB_PASSWORD>@aws-0-<REGION>.pooler.supabase.com:5432/postgres"
+DB_SCHEMA=production
+DB_SSL=true
 
 # JWT Secrets — SINH 3 LỆNH RIÊNG:
 #   node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
@@ -222,13 +221,7 @@ PRIVACY_EMAIL=privacy@<TEN_MIEN>
 ### D.3. Tạo `.env.migrate` (cho update script)
 
 ```bash
-nano backend/.env.migrate
-chmod 600 backend/.env.migrate
-```
-
-```env
-DB_USER=sigmabloom_migrate
-DB_PASSWORD=<MIG_PW>   # Lấy từ bước bootstrap
+# (Không còn cần backend/.env.migrate — migration dùng DIRECT_URL trong backend/.env)
 ```
 
 ### D.4. Cài dependencies + setup DB
@@ -238,18 +231,16 @@ DB_PASSWORD=<MIG_PW>   # Lấy từ bước bootstrap
 cd /opt/cyberknight/backend
 npm ci --omit=dev
 
-# Chạy migrations:
-cd /opt/cyberknight
-DB_USER=sigmabloom_migrate DB_PASSWORD=<MIG_PW> npm run setup-db
+# Chạy migrations (tạo schema DB_SCHEMA trên Supabase + seed admin):
+cd /opt/cyberknight/backend
+npm run setup-db
 ```
 
 **Kết quả mong đợi:**
 ```
-✅ Kết nối MySQL thành công!
-✅ Đã tạo database gốc và bảng cơ bản!
-✅ Đã áp dụng migration 002_*.sql!
-...
-🎉 Setup cơ sở dữ liệu hoàn tất!
+✅ Kết nối PostgreSQL thành công (db=postgres, schema=production)
+✅ Đã áp dụng migration 001_init_schema.sql
+🎉 Đã chạy 1 migration mới.
 ✅ Đã khởi tạo tài khoản Admin mẫu!
 ```
 
@@ -350,15 +341,8 @@ sudo certbot renew --dry-run
 ### E.7. Thiết lập backup
 
 ```bash
-# Tạo file xác thật MySQL:
-nano ~/.my.cnf
-chmod 600 ~/.my.cnf
-```
-
-```ini
-[mysqldump]
-user=sigmabloom_backup
-password=<BK_PW>   # Lấy từ bước bootstrap
+# Backup dùng pg_dump với DIRECT_URL trong backend/.env — cần postgresql-client-17:
+pg_dump --version   # 17.x
 ```
 
 ```bash
@@ -486,11 +470,9 @@ sudo systemctl status certbot.timer
 |------|-----------|--------|
 | `NODE_ENV` | Có | `production` |
 | `PORT` | Không | Mặc định `5000` |
-| `DB_HOST` | Có | `127.0.0.1` |
-| `DB_PORT` | Có | `3306` |
-| `DB_USER` | Có | `sigmabloom_app` |
-| `DB_PASSWORD` | Có | Mật khẩu app user |
-| `DB_NAME` | Có | `sigmabloom` |
+| `DATABASE_URL` | Có | Supabase transaction pooler (:6543) |
+| `DIRECT_URL` | Có | Supabase session pooler (:5432) — migration/backup |
+| `DB_SCHEMA` | Không | Schema ứng dụng (mặc định `local`; production nên đặt `production`) |
 | `JWT_SECRET` | Có | ≥ 32 ký tự ngẫu nhiên |
 | `JWT_EXPIRES_IN` | Không | `15m` |
 | `JWT_REFRESH_SECRET` | Có | ≥ 32 ký tự, **khác** JWT_SECRET |

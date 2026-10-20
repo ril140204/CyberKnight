@@ -6,12 +6,14 @@
     <title>CyberKnight — Level 4: Bức Ảnh Có Quá Nhiều Bí Mật</title>
 
     <!-- Google Fonts -->
+    <!-- Tải sớm hls.js (ưu tiên cao) để video khởi động nhanh trên mạng yếu -->
+    <link rel="preload" href="/assets/vendor/hls.light.min.js" as="script">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
 
     <!-- Canvas Confetti CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js" defer></script>
 
     <!-- Level 4 Stylesheet -->
     <link rel="stylesheet" href="level4.css">
@@ -48,7 +50,7 @@
             <div class="floating-sparkle star" style="left:70%;animation-duration:14s;animation-delay:2s;"></div>
             <div class="floating-sparkle circle" style="left:88%;animation-duration:15s;animation-delay:4s;"></div>
 
-            <img src="../image/z8014995224177_069f99816bf77dda5fed3feb153a6c0e-removebg-preview.png" alt="CyberKnight Logo" class="overlay-brand-logo">
+            <img src="../image/z8014995224177_069f99816bf77dda5fed3feb153a6c0e-removebg-preview.webp" alt="CyberKnight Logo" class="overlay-brand-logo">
 
             <div class="cyber-badge">LEVEL 4 • BỨC ẢNH CÓ QUÁ NHIỀU BÍ MẬT</div>
             <h1 class="cyber-title">BỨC ẢNH CÓ QUÁ NHIỀU BÍ MẬT</h1>
@@ -67,7 +69,7 @@
         <div id="stage-scene1" class="stage">
             <div class="video-ambient-backdrop"></div>
             <div class="video-container">
-                <video id="video-scene1" class="video-player" playsinline preload="auto" muted></video>
+                <video id="video-scene1" class="video-player" playsinline preload="none" muted></video>
                 <div class="video-loading-spinner hidden"></div>
                 <div class="video-loading-slow hidden">Mạng hơi chậm, chờ chút nhé</div>
             </div>
@@ -76,7 +78,7 @@
         <div id="stage-scene2" class="stage">
             <div class="video-ambient-backdrop"></div>
             <div class="video-container">
-                <video id="video-scene2" class="video-player" playsinline preload="auto" muted></video>
+                <video id="video-scene2" class="video-player" playsinline preload="none" muted></video>
                 <div class="video-loading-spinner hidden"></div>
                 <div class="video-loading-slow hidden">Mạng hơi chậm, chờ chút nhé</div>
             </div>
@@ -85,7 +87,7 @@
         <div id="stage-reveal" class="stage">
             <div class="video-ambient-backdrop"></div>
             <div class="video-container">
-                <video id="video-reveal" class="video-player" playsinline preload="auto" muted></video>
+                <video id="video-reveal" class="video-player" playsinline preload="none" muted></video>
                 <div class="video-loading-spinner hidden"></div>
                 <div class="video-loading-slow hidden">Mạng hơi chậm, chờ chút nhé</div>
             </div>
@@ -94,7 +96,7 @@
         <div id="stage-scene3" class="stage">
             <div class="video-ambient-backdrop"></div>
             <div class="video-container">
-                <video id="video-scene3" class="video-player" playsinline preload="auto" muted></video>
+                <video id="video-scene3" class="video-player" playsinline preload="none" muted></video>
                 <div class="video-loading-spinner hidden"></div>
                 <div class="video-loading-slow hidden">Mạng hơi chậm, chờ chút nhé</div>
             </div>
@@ -103,7 +105,7 @@
         <div id="stage-scene4" class="stage">
             <div class="video-ambient-backdrop"></div>
             <div class="video-container">
-                <video id="video-scene4" class="video-player" playsinline preload="auto" muted></video>
+                <video id="video-scene4" class="video-player" playsinline preload="none" muted></video>
                 <div class="video-loading-spinner hidden"></div>
                 <div class="video-loading-slow hidden">Mạng hơi chậm, chờ chút nhé</div>
             </div>
@@ -112,7 +114,7 @@
         <div id="stage-scene5" class="stage">
             <div class="video-ambient-backdrop"></div>
             <div class="video-container">
-                <video id="video-scene5" class="video-player" playsinline preload="auto" muted></video>
+                <video id="video-scene5" class="video-player" playsinline preload="none" muted></video>
                 <div class="video-loading-spinner hidden"></div>
                 <div class="video-loading-slow hidden">Mạng hơi chậm, chờ chút nhé</div>
             </div>
@@ -136,8 +138,8 @@
             <div class="deco-blob deco-blob-2"></div>
             <div class="deco-blob deco-blob-3"></div>
 
-            <img src="../image/z8014995224177_069f99816bf77dda5fed3feb153a6c0e-removebg-preview.png" alt="CyberKnight" class="character-logo-left">
-            <img src="../image/z8014995365895_a3eb178f5f7a17a45925b55e43e202be-removebg-preview.png" alt="SigmaBloom" class="brand-logo-right">
+            <img src="../image/z8014995224177_069f99816bf77dda5fed3feb153a6c0e-removebg-preview.webp" alt="CyberKnight" class="character-logo-left">
+            <img src="../image/z8014995365895_a3eb178f5f7a17a45925b55e43e202be-removebg-preview.webp" alt="SigmaBloom" class="brand-logo-right">
 
             <div id="photofind-container" class="photofind-container"></div>
         </div>
@@ -196,12 +198,13 @@
     </div>
 
     <!-- Photo Scenes (SVG inline) -->
-    <script src="photo-scenes.js"></script>
+    <script src="photo-scenes.js" defer></script>
 
     <!-- Photo Board (Shared Image + Hotspot Component) -->
-    <script src="photo-board.js"></script>
+    <script src="photo-board.js" defer></script>
 
     <!-- Script điều khiển Level 4 -->
-    <script src="level4.js?v=18"></script>
+    <script src="/assets/video-loader.js" defer></script>
+    <script src="level4.js?v=19" defer></script>
 </body>
 </html>

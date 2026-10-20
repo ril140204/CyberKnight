@@ -6,7 +6,7 @@
  *   + JWT_SECRET, JWT_REFRESH_SECRET, LEVEL_ACCESS_SECRET >= 32 ký tự, không chứa chuỗi yếu, không trùng nhau
  *   + SEPAY_API_KEY không được để trống
  *   + BANK_BIN, BANK_ACCOUNT, BANK_NAME không được để trống
- *   + DB_PASSWORD không được để trống
+ *   + DATABASE_URL (PostgreSQL) không được để trống
  *   + FRONTEND_URL phải là https://
  *   + SEED_ADMIN_PASSWORD nếu có phải đủ mạnh (>= 12 ký tự, đủ 4 loại ký tự, không trong danh sách yếu)
  * - Development:
@@ -74,8 +74,8 @@ function validateProductionBanking(env, errors) {
 }
 
 function validateProductionDbAndUrl(env, errors) {
-  if (!env.DB_PASSWORD) {
-    errors.push('DB_PASSWORD không được để trống trong môi trường production.');
+  if (!env.DATABASE_URL && !env.DB_PASSWORD) {
+    errors.push('DATABASE_URL (hoặc DB_PASSWORD) không được để trống trong môi trường production.');
   }
 
   const frontendUrl = (env.FRONTEND_URL || '').trim();

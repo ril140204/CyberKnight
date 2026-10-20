@@ -21,6 +21,7 @@ const express = require('express');
 const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
+const compression = require('compression');
 const jwt = require('jsonwebtoken');
 
 // ── Cấu hình dotenv nạp .env từ đúng thư mục backend ────────────
@@ -205,7 +206,7 @@ app.use((req, res, next) => {
   }
 
   const path_ = req.path;
-  if (/^\/backend|^\/\.|^\/node_modules/.test(path_)) {
+  if (/^\/backend|^\/\.|^\/node_modules|^\/video-src/.test(path_)) {
     return res.status(403).send('Not found');
   }
   const extMatch = path_.match(/\.[^.]+$/);
@@ -218,19 +219,55 @@ app.use((req, res, next) => {
   next();
 });
 
+// ── 5b. Gzip cho HTML/CSS/JS/JSON/playlist (KHÔNG nén video/ảnh — đã nén sẵn) ─────
+// Giúp hls.js 346 KB → ~108 KB, CSS/JS level giảm ~70% — quan trọng với mạng yếu.
+app.use(
+  compression({
+    threshold: 1024,
+    filter: (req, res) => {
+      if (/\.(ts|mp4|m4s|png|jpg|jpeg|webp|gif|woff2?|glb)$/i.test(req.path)) return false;
+      return compression.filter(req, res);
+    },
+  })
+);
+
 // ── 6. Static assets (public) ─────────────────────────────────
 const rootDir = process.env.EXEWEB_ROOT
   ? path.resolve(process.env.EXEWEB_ROOT)
   : path.join(__dirname, '../../');
 
-for (const mount of [
-  { url: '/assets', dir: 'assets' },
-  { url: '/image', dir: 'image' },
-  { url: '/video', dir: 'video' },
-]) {
+// Cache tĩnh:
+//  - /video: segment HLS (.ts) & MP4 không đổi theo tên → cache 30 ngày; playlist .m3u8 cache 1 giờ
+//    (express.static hỗ trợ Range request → tua/stream được). Production nên để Nginx phục vụ
+//    /video/ trực tiếp từ đĩa (xem deploy/nginx.conf.example) để Node không phải stream file lớn.
+const STATIC_MOUNTS = [
+  { url: '/assets', dir: 'assets', opts: { maxAge: '1d', etag: true } },
+  { url: '/image', dir: 'image', opts: { maxAge: '7d', etag: true } },
+  {
+    url: '/video',
+    dir: 'video',
+    opts: {
+      maxAge: '30d',
+      immutable: true,
+      etag: true,
+      lastModified: true,
+      acceptRanges: true,
+      setHeaders(res, filePath) {
+        if (filePath.endsWith('.m3u8')) {
+          res.setHeader('Content-Type', 'application/vnd.apple.mpegurl');
+          res.setHeader('Cache-Control', 'public, max-age=3600');
+        } else if (filePath.endsWith('.ts')) {
+          res.setHeader('Content-Type', 'video/mp2t');
+        }
+      },
+    },
+  },
+];
+
+for (const mount of STATIC_MOUNTS) {
   const resolved = path.join(rootDir, mount.dir);
   if (fs.existsSync(resolved)) {
-    app.use(mount.url, express.static(resolved));
+    app.use(mount.url, express.static(resolved, mount.opts));
   }
 }
 
@@ -331,7 +368,9 @@ function serveStaticLevelFile(res, levelId, filePath, levelDir) {
     }
     return res.status(404).type('text/plain').send('Not found');
   }
-  res.set('Cache-Control', 'private, no-store');
+  // private, no-cache: trình duyệt được lưu bản riêng nhưng PHẢI hỏi lại server mỗi lần dùng
+  // → request vẫn đi qua level guard (bảo mật như cũ), nhưng file không đổi chỉ tốn 304, không tốn bytes.
+  res.set('Cache-Control', 'private, no-cache');
   return res.sendFile(filePath);
 }
 
@@ -500,13 +539,13 @@ const server = app.listen(PORT, () => {
 
 // ── Graceful shutdown ─────────────────────────────────────────
 const shutdown = async (signal) => {
-  console.log(`\n🛑 Nhận tín hiệu ${signal}. Đang đóng server & kết nối MySQL...`);
+  console.log(`\n🛑 Nhận tín hiệu ${signal}. Đang đóng server & kết nối PostgreSQL...`);
   server.close(async () => {
     try {
       await db.end();
-      console.log('✅ Đã đóng MySQL Pool thành công.');
+      console.log('✅ Đã đóng PostgreSQL Pool thành công.');
     } catch (err) {
-      console.error('❌ Lỗi khi đóng MySQL pool:', err.message);
+      console.error('❌ Lỗi khi đóng PostgreSQL pool:', err.message);
     }
     process.exit(0);
   });

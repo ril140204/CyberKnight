@@ -58,7 +58,7 @@ async function register(req, res) {
 
     // Kiểm tra trùng lặp email
     const [existingEmail] = await conn.query(
-      'SELECT id FROM users WHERE email = ?', [cleanEmail]
+      'SELECT id FROM users WHERE LOWER(email) = LOWER(?)', [cleanEmail]
     );
     if (existingEmail.length > 0) {
       await conn.rollback();
@@ -71,7 +71,7 @@ async function register(req, res) {
 
     // Kiểm tra trùng lặp username
     const [existingUser] = await conn.query(
-      'SELECT id FROM users WHERE username = ?', [cleanUsername]
+      'SELECT id FROM users WHERE LOWER(username) = LOWER(?)', [cleanUsername]
     );
     if (existingUser.length > 0) {
       await conn.rollback();
@@ -138,7 +138,7 @@ async function register(req, res) {
     if (conn) await conn.rollback();
     console.error('❌ Lỗi register:', err);
 
-    if (err.code === 'ER_DUP_ENTRY') {
+    if (db.isDuplicateError(err)) {
       return res.status(409).json({
         success: false,
         message: 'Tên đăng nhập hoặc email đã tồn tại!',
@@ -177,7 +177,7 @@ async function login(req, res) {
   try {
     // Tìm user theo email hoặc username
     const [rows] = await db.query(
-      `SELECT * FROM users WHERE (LOWER(email) = ? OR LOWER(username) = ?) AND is_active = 1`,
+      `SELECT * FROM users WHERE (LOWER(email) = ? OR LOWER(username) = ?) AND is_active = TRUE`,
       [identifier, identifier]
     );
 
@@ -320,7 +320,7 @@ async function refresh(req, res) {
 
     // Lấy thông tin user
     const [users] = await db.query(
-      'SELECT id, username, email, level, first_name, last_name, points, birth_year, role FROM users WHERE id = ? AND is_active = 1',
+      'SELECT id, username, email, level, first_name, last_name, points, birth_year, role FROM users WHERE id = ? AND is_active = TRUE',
       [decoded.id]
     );
 
@@ -427,7 +427,7 @@ async function getMe(req, res) {
   try {
     const [rows] = await db.query(
       `SELECT id, first_name, last_name, username, email, birth_year, level, points, avatar_url, created_at, last_login, role
-       FROM users WHERE id = ? AND is_active = 1`,
+       FROM users WHERE id = ? AND is_active = TRUE`,
       [req.user.id]
     );
 
@@ -482,7 +482,7 @@ async function checkUsername(req, res) {
   }
 
   try {
-    const [rows] = await db.query('SELECT id FROM users WHERE username = ?', [username]);
+    const [rows] = await db.query('SELECT id FROM users WHERE LOWER(username) = LOWER(?)', [username]);
     return res.json({
       available: rows.length === 0,
     });
@@ -525,7 +525,7 @@ async function changePassword(req, res) {
 
     // 1. Lấy password hash hiện tại của user
     const [users] = await conn.query(
-      'SELECT password FROM users WHERE id = ? AND is_active = 1',
+      'SELECT password FROM users WHERE id = ? AND is_active = TRUE',
       [userId]
     );
     if (users.length === 0) {

@@ -6,10 +6,10 @@
 # Exit 0 = tất cả green. Exit 1 = có ít nhất 1 lỗi nghiêm trọng.
 #
 # Cách dùng:
-#   sudo bash deploy/postdeploy-check.sh [--domain <TEN_MIEN>] [--db-password <pw>] [--skip-public] [--skip-db]
+#   sudo bash deploy/postdeploy-check.sh [--domain <TEN_MIEN>] [--skip-public] [--skip-db]
 #   sudo bash deploy/postdeploy-check.sh --self-test   # dry-run với stub commands
 #
-# Yêu cầu: curl, ss, mysql, openssl, stat, grep, awk, date (đều có sẵn trên Ubuntu).
+# Yêu cầu: curl, ss, node, openssl, stat, grep, awk, date (DB check dùng backend/src/config/db.js).
 # Chạy với quyền root hoặc deployer (sudo cho một số lệnh).
 # =============================================================================
 
@@ -28,7 +28,7 @@ C_RESET='\033[0m'
 DOMAIN=""                   # optional, set by --domain
 DB_PASSWORD=""              # optional, set by --db-password; otherwise read from .env
 SKIP_PUBLIC=false           # skip public HTTPS checks (no domain given)
-SKIP_DB=false               # skip MySQL checks
+SKIP_DB=false               # skip PostgreSQL checks
 SELF_TEST=false             # --self-test mode: mock external tools
 
 # Paths (can be overridden via env vars for sandbox testing)
@@ -59,9 +59,9 @@ Usage: $0 [OPTIONS]
 
 Options:
   --domain <DOMAIN>     Ten mien chinh (VD: tenmiencuaban.vn)
-  --db-password <PW>    Mat khau sigmabloom_app (neu khong truyen, doc tu .env)
+  --db-password <PW>    (khong con dung — DB la Supabase, doc DATABASE_URL tu .env)
   --skip-public         Bo qua kiem tra HTTPS / security headers
-  --skip-db             Bo qua kiem tra MySQL
+  --skip-db             Bo qua kiem tra PostgreSQL (Supabase)
   --self-test           Chai nut external commands (curl/mysql/ss) bang stub
   -h, --help            Hien thị trợ giúp
 EOF
@@ -173,7 +173,7 @@ log_info "=== POST-DEPLOY CHECK — CyberKnight / Sigmabloom ==="
 echo ""
 
 MISSING_TOOLS=""
-for tool in curl ss mysql stat grep awk date; do
+for tool in curl ss node stat grep awk date; do
   if ! command -v "$tool" &>/dev/null; then
     MISSING_TOOLS="$MISSING_TOOLS $tool"
   fi
@@ -257,6 +257,7 @@ if [[ -x "$PM2_BIN" ]] || command -v pm2 &>/dev/null; then
       read -r PM2_STATUS_RAW PM2_PID PM2_RESTARTS <<< "$PM2_JSON_OUT"
     fi
   fi
+  if [[ -z "$PM2_STATUS_RAW" ]]; then
     # Fallback: pm2 show text output
     PM2_TEXT=$(pm2 show cyberknight 2>/dev/null || true)
     if [[ -n "$PM2_TEXT" ]]; then
@@ -470,80 +471,71 @@ else
 fi
 
 # ════════════════════════════════════════════════════════════════════════════════
-# 9 & 10 & 11. MYSQL
+# 9 & 10 & 11. POSTGRESQL (SUPABASE) — qua backend/src/config/db.js, không cần psql
 # ════════════════════════════════════════════════════════════════════════════════
 echo ""
-echo -e "${C_BOLD}--- 9. MySQL Connection ---${C_RESET}"
+echo -e "${C_BOLD}--- 9. PostgreSQL (Supabase) Connection ---${C_RESET}"
 
 if [[ "$SKIP_DB" == "true" ]]; then
-  log_warn "Skipping MySQL checks (--skip-db)"
-  record "MYSQL_CONN"  "WARN" "Skipped: --skip-db"
-  record "MYSQL_TABLES" "WARN" "Skipped: --skip-db"
-  record "MYSQL_USERS"  "WARN" "Skipped: --skip-db"
+  log_warn "Skipping DB checks (--skip-db)"
+  record "PG_CONN"   "WARN" "Skipped: --skip-db"
+  record "PG_TABLES" "WARN" "Skipped: --skip-db"
+  record "PG_ADMIN"  "WARN" "Skipped: --skip-db"
 else
-  # Read DB password from .env if not provided
-  if [[ -z "$DB_PASSWORD" ]]; then
-    if [[ -f "$ENV_FILE" ]]; then
-      DB_PASSWORD=$(grep '^DB_PASSWORD=' "$ENV_FILE" 2>/dev/null | cut -d= -f2- | tr -d '"' | tr -d "'" || true)
-    fi
-  fi
-
-  if [[ -z "$DB_PASSWORD" ]]; then
-    log_warn "DB password not available — skipping MySQL checks"
-    record "MYSQL_CONN"  "WARN" "DB password not provided"
-    record "MYSQL_TABLES" "WARN" "DB password not provided"
-    record "MYSQL_USERS"  "WARN" "DB password not provided"
+  PG_BACKEND_DIR="$(cd "$(dirname "$ENV_FILE")" 2>/dev/null && pwd || echo "")"
+  if [[ -z "$PG_BACKEND_DIR" || ! -f "$PG_BACKEND_DIR/src/config/db.js" ]]; then
+    log_warn "backend/src/config/db.js not found next to $ENV_FILE — skipping DB checks"
+    record "PG_CONN"   "WARN" "backend not found"
+    record "PG_TABLES" "WARN" "backend not found"
+    record "PG_ADMIN"  "WARN" "backend not found"
   else
-    # 9. MySQL SELECT 1
-    MYSQL_OUT=$(mysql -u sigmabloom_app -p"${DB_PASSWORD}" -e "SELECT 1 AS test" 2>&1 || true)
-    if echo "$MYSQL_OUT" | grep -q "1"; then
-      run_check "MYSQL_CONN" "mysql -u sigmabloom_app -e 'SELECT 1' = 1" "PASS"
+    PG_OUT=$(cd "$PG_BACKEND_DIR" && DB_SKIP_STARTUP_CHECK=true timeout 30 node -e '
+      const db = require("./src/config/db");
+      (async () => {
+        const [[one]] = await db.query("SELECT 1 AS ok");
+        const [[t]] = await db.query("SELECT COUNT(*)::int AS cnt FROM information_schema.tables WHERE table_schema = ?", [db.SCHEMA]);
+        const [[a]] = await db.query("SELECT COUNT(*)::int AS cnt FROM users WHERE role = ? AND is_active = TRUE", ["admin"]);
+        console.log(`ok=${one.ok} schema=${db.SCHEMA} tables=${t.cnt} admins=${a.cnt}`);
+        await db.end();
+      })().catch((e) => { console.log("ERROR " + e.message); process.exit(1); });
+    ' 2>&1 || true)
+
+    if echo "$PG_OUT" | grep -q "^ok=1"; then
+      PG_SCHEMA=$(echo "$PG_OUT" | sed -n 's/.*schema=\([^ ]*\).*/\1/p')
+      run_check "PG_CONN" "PostgreSQL SELECT 1 OK (schema \"${PG_SCHEMA}\")" "PASS"
+
+      # 10. Table count (schema ứng dụng có 10 bảng kể cả schema_migrations)
+      TABLE_COUNT=$(echo "$PG_OUT" | sed -n 's/.*tables=\([0-9]*\).*/\1/p')
+      if [[ "${TABLE_COUNT:-0}" -ge 10 ]]; then
+        run_check "PG_TABLES" "schema ${PG_SCHEMA} has ${TABLE_COUNT} tables (expected >= 10)" "PASS"
+      elif [[ "${TABLE_COUNT:-0}" -gt 0 ]]; then
+        run_check "PG_TABLES" "schema ${PG_SCHEMA} has ${TABLE_COUNT} tables (warn: < 10 — run npm run setup-db)" "WARN"
+      else
+        run_check "PG_TABLES" "schema ${PG_SCHEMA} is empty — run npm run setup-db" "FAIL"
+      fi
+
+      # 11. Admin account exists
+      ADMIN_COUNT=$(echo "$PG_OUT" | sed -n 's/.*admins=\([0-9]*\).*/\1/p')
+      if [[ "${ADMIN_COUNT:-0}" -ge 1 ]]; then
+        run_check "PG_ADMIN" "${ADMIN_COUNT} active admin account(s)" "PASS"
+      else
+        run_check "PG_ADMIN" "No active admin account — set SEED_ADMIN_PASSWORD and run npm run setup-db" "WARN"
+      fi
     else
-      run_check "MYSQL_CONN" "MySQL connection FAILED: $MYSQL_OUT" "FAIL"
-    fi
-
-    # 10. Table count
-    TABLE_COUNT=$(mysql -u sigmabloom_app -p"${DB_PASSWORD}" sigmabloom \
-      -e "SELECT COUNT(*) AS cnt FROM information_schema.tables WHERE table_schema='sigmabloom'" \
-      2>/dev/null | tail -1 | tr -d '[:space:]' || echo "0")
-
-    if [[ "$TABLE_COUNT" -ge 15 ]]; then
-      run_check "MYSQL_TABLES" "sigmabloom has ${TABLE_COUNT} tables (expected ~20)" "PASS"
-    elif [[ "$TABLE_COUNT" -gt 0 ]]; then
-      run_check "MYSQL_TABLES" "sigmabloom has ${TABLE_COUNT} tables (warn: < 15)" "WARN"
-    else
-      run_check "MYSQL_TABLES" "sigmabloom has ${TABLE_COUNT} tables (warn: DB may be empty)" "WARN"
-    fi
-
-    # 11. 3 DB users exist
-    DB_USER_COUNT=$(mysql -u sigmabloom_app -p"${DB_PASSWORD}" mysql \
-      -e "SELECT COUNT(*) FROM mysql.user WHERE user LIKE 'sigmabloom%'" \
-      2>/dev/null | tail -1 | tr -d '[:space:]' || echo "0")
-
-    if [[ "$DB_USER_COUNT" == "3" ]]; then
-      run_check "MYSQL_USERS" "3 sigmabloom DB users found" "PASS"
-    elif [[ "$DB_USER_COUNT" -gt 0 ]]; then
-      run_check "MYSQL_USERS" "${DB_USER_COUNT} sigmabloom DB users (expected 3)" "WARN"
-    else
-      run_check "MYSQL_USERS" "No sigmabloom DB users found" "FAIL"
+      run_check "PG_CONN" "PostgreSQL connection FAILED: ${PG_OUT}" "FAIL"
+      record "PG_TABLES" "WARN" "Skipped: no DB connection"
+      record "PG_ADMIN"  "WARN" "Skipped: no DB connection"
     fi
   fi
 
-  # ════════════════════════════════════════════════════════════════════════════
-  # 12. MySQL bind-address
-  # ════════════════════════════════════════════════════════════════════════════
+  # 12. DB không chạy cục bộ: không được có MySQL/PostgreSQL lắng nghe public
   echo ""
-  echo -e "${C_BOLD}--- 12. MySQL Bind Address ---${C_RESET}"
-
-  MYSQL_BIND=$(ss -tlnp 2>/dev/null | grep ':3306' | grep -v '::' || true)
-
-  if [[ -z "$MYSQL_BIND" ]]; then
-    log_warn "  MySQL not listening on port 3306 (may be socket-only)"
-    record "MYSQL_BIND" "WARN" "MySQL not detected on TCP 3306"
-  elif echo "$MYSQL_BIND" | grep -q "127.0.0.1:3306"; then
-    run_check "MYSQL_BIND" "MySQL bound to 127.0.0.1:3306 only — secure" "PASS"
+  echo -e "${C_BOLD}--- 12. No local DB exposed ---${C_RESET}"
+  LOCAL_DB=$(ss -tlnp 2>/dev/null | grep -E ':(3306|5432)\b' | grep -vE '127\.0\.0\.1|::1' || true)
+  if [[ -z "$LOCAL_DB" ]]; then
+    run_check "DB_BIND" "No DB port (3306/5432) exposed on public interfaces" "PASS"
   else
-    run_check "MYSQL_BIND" "MySQL NOT bound to 127.0.0.1 only: $MYSQL_BIND" "FAIL"
+    run_check "DB_BIND" "A DB port is exposed publicly: $LOCAL_DB" "FAIL"
   fi
 fi
 

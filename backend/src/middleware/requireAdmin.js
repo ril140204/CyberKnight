@@ -3,7 +3,7 @@
  * Dùng cho các route cần kiểm tra quyền admin (ví dụ: /api/admin/*)
  *
  * Kiểm tra cả req.user (từ auth middleware) và truy vấn lại DB để đảm bảo
- * role vẫn là admin và tài khoản đang hoạt động (is_active = 1).
+ * role vẫn là admin và tài khoản đang hoạt động (is_active = TRUE).
  */
 
 const db = require('../config/db');

@@ -23,6 +23,14 @@
 # LƯU Ý: Chỉ bỏ comment các khối SSL bên dưới khi đã có certificate.
 # ============================================================
 
+# ── Mạng yếu: bật TCP BBR trên VPS (giảm nghẽn/rớt gói, tăng tốc 3G/4G chập chờn) ──
+# Thêm vào /etc/sysctl.d/99-cyberknight.conf rồi `sysctl --system`:
+#   net.core.default_qdisc = fq
+#   net.ipv4.tcp_congestion_control = bbr
+#   net.ipv4.tcp_notsent_lowat = 16384
+# (bootstrap-server.sh đã tự làm bước này)
+# Trong khối server 443 (sau certbot) đảm bảo có:  listen 443 ssl http2;
+
 # ── Rate-limit zones ────────────────────────────────────────────
 # authStrict: login/register/forgot/reset — 30r/m burst 30
 limit_req_zone $binary_remote_addr zone=authStrict:10m rate=30r/m;
@@ -65,7 +73,7 @@ server {
     }
 
     # Sensitive directories
-    location ~* ^/(backend|node_modules|\.git|\.claude|\.cursor|_claude|_cursor|deploy|logs)/ {
+    location ~* ^/(backend|node_modules|\.git|\.claude|\.cursor|_claude|_cursor|deploy|logs|video-src|scripts)/ {
         return 404;
     }
 
@@ -98,6 +106,48 @@ server {
         proxy_pass http://127.0.0.1:5000;
     }
 
+    # ── VIDEO: phục vụ TRỰC TIẾP từ đĩa, không qua Node ─────────
+    # Repo trên VPS nằm ở /opt/cyberknight (đổi `root` nếu khác).
+    # HLS (video/<level>/hls/<name>/*.m3u8 + *.ts) + MP4 fallback.
+    # sendfile + Range → tua/stream mượt; cache dài vì segment bất biến.
+    location ^~ /video/ {
+        root /opt/cyberknight;
+        sendfile on;
+        tcp_nopush on;
+        tcp_nodelay on;
+        aio threads;
+        # Giữ kết nối lâu: HLS tải hàng chục segment nhỏ liên tiếp — tránh bắt tay TCP/TLS lại
+        keepalive_timeout 75s;
+        keepalive_requests 1000;
+        open_file_cache max=2000 inactive=10m;
+        open_file_cache_valid 60s;
+        add_header Accept-Ranges bytes;
+
+        # Playlist: cache ngắn (có thể encode lại), nén gzip
+        location ~* \.m3u8$ {
+            types { application/vnd.apple.mpegurl m3u8; }
+            default_type application/vnd.apple.mpegurl;
+            add_header Cache-Control "public, max-age=3600";
+            gzip on;
+            gzip_types application/vnd.apple.mpegurl;
+        }
+        # Segment TS / MP4: cache 30 ngày
+        location ~* \.(ts|mp4)$ {
+            types { video/mp2t ts; video/mp4 mp4; }
+            add_header Cache-Control "public, max-age=2592000, immutable";
+        }
+    }
+
+    # ── Static nhẹ (JS/CSS/ảnh) — cũng phục vụ trực tiếp ───────
+    location ^~ /assets/ {
+        root /opt/cyberknight;
+        add_header Cache-Control "public, max-age=86400";
+    }
+    location ^~ /image/ {
+        root /opt/cyberknight;
+        add_header Cache-Control "public, max-age=604800";
+    }
+
     # ── Proxy mặc định tới Node.js ───────────────────────────
     location / {
         include /etc/nginx/includes/nginx-proxy-params.conf;
@@ -122,5 +172,5 @@ server {
 #     include /etc/letsencrypt/options-ssl-nginx.conf;
 #     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 #
-#     # (Sao chép toàn bộ location{} từ khối HTTP ở trên vào đây)
+#     # (Sao chép toàn bộ location{} từ khối HTTP ở trên vào đây — kể cả /video/, /assets/, /image/)
 # }

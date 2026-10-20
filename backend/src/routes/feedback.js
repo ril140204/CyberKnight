@@ -26,7 +26,7 @@ async function getUserFromToken(token, secret) {
     const decoded = jwt.verify(token, secret);
     if (!decoded?.id) return null;
     const [users] = await db.query(
-      'SELECT id, username, email, first_name, last_name FROM users WHERE id = ? AND is_active = 1',
+      'SELECT id, username, email, first_name, last_name FROM users WHERE id = ? AND is_active = TRUE',
       [decoded.id]
     );
     return users[0] || null;

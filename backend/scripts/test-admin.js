@@ -7,7 +7,7 @@
  * 1. Chặn truy cập không xác thực (Unauthenticated) → 401 Unauthorized trên toàn bộ Admin API.
  * 2. Chặn token có chữ ký giả mạo / không hợp lệ (Tampered JWT) → 401/403.
  * 3. Chặn người dùng thường (role = 'user') → 403 Forbidden.
- * 4. Chặn tài khoản bị vô hiệu hóa (is_active = 0) → 401 Account Disabled.
+ * 4. Chặn tài khoản bị vô hiệu hóa (is_active = FALSE) → 401 Account Disabled.
  * 5. Chống leo thang đặc quyền (Privilege Escalation): Token tự phong role='admin' nhưng DB là 'user' → 403 Forbidden.
  * 6. Admin hợp lệ lấy thống kê tổng quan (GET /api/admin/stats) với đầy đủ 6 chỉ số.
  * 7. Admin quản lý người dùng: danh sách phân trang (GET /api/admin/users) và chi tiết user (GET /api/admin/users/:id).
@@ -183,8 +183,8 @@ async function run() {
     }, { transaction_id: 1 });
     assert(studentReconcileRes.status === 403, `Học sinh thường bị từ chối 403 khi gọi /api/admin/payments/reconcile (HTTP ${studentReconcileRes.status})`);
 
-    // ── 4. Kiểm tra tài khoản bị vô hiệu hóa (is_active = 0) ──
-    console.log('\n── 4. Kiểm tra phòng vệ tài khoản bị khóa (is_active = 0) ──');
+    // ── 4. Kiểm tra tài khoản bị vô hiệu hóa (is_active = FALSE) ──
+    console.log('\n── 4. Kiểm tra phòng vệ tài khoản bị khóa (is_active = FALSE) ──');
     const [disabledUserInsert] = await db.query(
       `INSERT INTO users (first_name, last_name, username, email, password, role, is_active, birth_year)
        VALUES ('Disabled', 'Admin', ?, ?, 'hash123', 'admin', 0, 2000)`,
@@ -366,7 +366,7 @@ async function run() {
     const testOrderCode = `CKREC${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
     const [orderInsert] = await db.query(
       `INSERT INTO orders (order_code, user_id, package_id, amount, status, payment_method, expires_at)
-       VALUES (?, ?, 'pack_5_10', 79000, 'pending', 'vietqr', DATE_ADD(NOW(), INTERVAL 1 DAY))`,
+       VALUES (?, ?, 'pack_5_10', 79000, 'pending', 'vietqr', NOW() + INTERVAL '1 day')`,
       [testOrderCode, studentId]
     );
     const testOrderId = orderInsert.insertId;
@@ -462,17 +462,17 @@ async function run() {
     console.log('\n── 13. Dọn dẹp dữ liệu kiểm thử (Clean-up) ──');
     try {
       if (createdUserIds.length > 0) {
-        await db.query('DELETE FROM admin_audit_log WHERE target_user_id IN (?)', [createdUserIds]);
-        await db.query('DELETE FROM user_entitlements WHERE user_id IN (?)', [createdUserIds]);
+        await db.query('DELETE FROM admin_audit_log WHERE target_user_id = ANY(?)', [createdUserIds]);
+        await db.query('DELETE FROM user_entitlements WHERE user_id = ANY(?)', [createdUserIds]);
       }
       if (createdTxIds.length > 0) {
-        await db.query('DELETE FROM payment_transactions WHERE id IN (?)', [createdTxIds]);
+        await db.query('DELETE FROM payment_transactions WHERE id = ANY(?)', [createdTxIds]);
       }
       if (createdOrderIds.length > 0) {
-        await db.query('DELETE FROM orders WHERE id IN (?)', [createdOrderIds]);
+        await db.query('DELETE FROM orders WHERE id = ANY(?)', [createdOrderIds]);
       }
       if (createdUserIds.length > 0) {
-        await db.query('DELETE FROM users WHERE id IN (?)', [createdUserIds]);
+        await db.query('DELETE FROM users WHERE id = ANY(?)', [createdUserIds]);
       }
       console.log('  🧹 Đã dọn dẹp sạch sẽ toàn bộ bản ghi kiểm thử.');
     } catch (cleanErr) {

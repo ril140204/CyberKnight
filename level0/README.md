@@ -26,7 +26,7 @@ Level 0 là một trải nghiệm 4 stages nối tiếp, liền mạch, full vie
 
 ### 1.1 Nguyên tắc cốt lõi
 - **Không bao giờ để màn hình đen giữa các stage:** Mọi chuyển cảnh đều dùng **Freeze-Frame Crossfade**: chụp frame của thẻ `<video>` / game lên `<canvas id="freeze-canvas">`, set `opacity: 1`, đợi 60ms cho render ổn định, chuyển DOM stage, rồi fade out freeze-frame canvas (120ms).
-- **Prefetch 2 video hậu quả ngầm:** Ngay khi vào Stage 2, cả 2 file video (`bad.mp4` và `good.mp4`) được tải ngầm qua thẻ `<video id="preload-bad">` và `<video id="preload-good">` → Đảm bảo khi người chơi bấm nút, video phát ngay tức khắc không bị giật lag loading.
+- **Video qua `CKVideo` (`/assets/video-loader.js`):** HLS thích ứng (hls.js, 360p/480p/720p theo băng thông) → HLS native (Safari) → MP4 720p. Intro được gắn nguồn ngay khi mở trang; 2 nhánh hậu quả chỉ được **prefetch playlist** (vài KB, không tải segment) để không tranh băng thông với intro trên mạng yếu.
 - **Synthesized Audio:** Tích hợp bộ phát âm thanh Web Audio API (`AudioSynth`) tự động tổng hợp sóng âm cho tiếng tick, scanner hum, warning siren, glitch explosion và victory chime — không phụ thuộc vào file âm thanh rời bên ngoài, không lo lỗi 404 mạng.
 
 ---
@@ -36,10 +36,10 @@ Level 0 là một trải nghiệm 4 stages nối tiếp, liền mạch, full vie
 ```
 EXEWEB/
 ├── video/
-│   └── level 0/
-│       ├── Vd tình huống.mp4   (và hardlink: intro.mp4)
-│       ├── hậu quả xấu .mp4    (và hardlink: bad.mp4)
-│       └── hậu quả tốt .mp4    (và hardlink: good.mp4)
+│   └── level0/
+│       ├── intro.mp4, bad.mp4, good.mp4        (720p ~1.2 Mbps, faststart — fallback)
+│       └── hls/{intro,bad,good}/master.m3u8    (HLS 720p/480p/360p, segment 4s)
+│       (nguồn gốc nằm ở video-src/level0/, encode bằng scripts/encode-videos.sh)
 └── level0/
     ├── level0.html            ← DOM 4 stages, canvas overlay & responsive layout
     ├── level0.css             ← Cyberpunk + Neo-Brutalism tokens & 60fps animations

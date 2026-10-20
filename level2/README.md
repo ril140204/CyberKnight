@@ -38,7 +38,7 @@
 ### 1.1 Nguyên tắc cốt lõi
 
 - **Freeze-Frame Crossfade**: Không bao giờ để màn hình đen khi chuyển cảnh
-- **Prefetch 2 video hậu quả**: `bad.mp4` (nhánh open) và `good.mp4` (nhánh closed)
+- **Video qua `CKVideo`** (HLS thích ứng → MP4 fallback); 2 nhánh `bad`/`good` chỉ prefetch playlist
 - **`stopAllVideos()`**: Gọi ở mọi chuyển stage + replay — tránh chồng tiếng
 - **Synthesized Audio (AudioSynth)**: 100% offline, không tải file MP3 bên ngoài
 - **Chống vỡ nét video 720p**: `object-fit: contain` + `ambient backdrop`
@@ -76,10 +76,10 @@ level2/
 ├── door-puzzle.js       # ~880 dòng: Modular Data-Driven DoorPuzzleEngine class (UMD wrapper, expose window.DoorPuzzleGame)
 ├── README.md            # Tài liệu kỹ thuật này
 │
-└── ../video/level 2/    # Thư mục chứa video (cần tạo)
-    ├── gioi thieu.mp4   # Video mở đầu (tên tiếng Việt có dấu, ~30s)
-    ├── hau qua xau.mp4  # Video hậu quả nhánh open (mở cửa — xấu) (~45s)
-    └── hau qua tot.mp4  # Video hậu quả nhánh closed (giữ đóng — tốt) (~45s)
+└── ../video/level2/     # Video đã encode (scripts/encode-videos.sh từ video-src/level2/)
+    ├── intro.mp4        # "gioi thieu.mp4" gốc → 720p fallback  (+ hls/intro/master.m3u8)
+    ├── bad.mp4          # "hau qua xau.mp4" gốc — nhánh open    (+ hls/bad/master.m3u8)
+    └── good.mp4         # "hau qua tot.mp4" gốc — nhánh closed  (+ hls/good/master.m3u8)
     #
     # Lưu ý: Tên file có thể là Tiếng Việt (gioi thieu, hau qua xau, hau qua tot)
     # hoặc Tiếng Anh (intro, bad, good) — game hỗ trợ cả 2 thông qua VIDEO_PATHS
@@ -332,7 +332,7 @@ window.addEventListener('level2:complete', (event) => {
 
 ## 10. Video Assets (Cần tạo)
 
-> ⚠️ **Cảnh báo**: Các file video dưới đây **CHƯA TỒN TẠI** trong thư mục `video/level 2/`. Cần tạo hoặc cung cấp:
+> ✅ Các video đã có trong `video/level2/` (MP4 720p + HLS). Tên gốc tiếng Việt nằm ở `video-src/level2/`:
 
 | File | Mô tả | Thời lượng | Nhánh |
 |---|---|---|---|

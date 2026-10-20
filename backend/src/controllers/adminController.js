@@ -25,7 +25,7 @@ const { buildEntitlements } = require('./catalogController');
  */
 async function getStats(req, res) {
   try {
-    const [totalUsers] = await db.query('SELECT COUNT(*) AS cnt FROM users WHERE is_active = 1');
+    const [totalUsers] = await db.query('SELECT COUNT(*) AS cnt FROM users WHERE is_active = TRUE');
     const [totalPaidOrders] = await db.query(
       "SELECT COUNT(*) AS cnt FROM orders WHERE status = 'paid'"
     );
@@ -35,7 +35,7 @@ async function getStats(req, res) {
     );
     const [todayUsers] = await db.query(
       `SELECT COUNT(*) AS cnt FROM users
-       WHERE is_active = 1 AND DATE(created_at) = CURDATE()`
+       WHERE is_active = TRUE AND created_at::date = CURRENT_DATE`
     );
     const [totalMismatches] = await db.query(
       "SELECT COUNT(*) AS cnt FROM payment_transactions WHERE match_status IN ('no_order', 'underpaid', 'error')"
@@ -75,16 +75,16 @@ async function listUsers(req, res) {
   const search = (req.query.search || '').trim();
 
   try {
-    let countQuery = 'SELECT COUNT(*) AS total FROM users WHERE is_active = 1';
+    let countQuery = 'SELECT COUNT(*) AS total FROM users WHERE is_active = TRUE';
     let dataQuery = `
       SELECT id, username, email, role, level, points, created_at, last_login
       FROM users
-      WHERE is_active = 1
+      WHERE is_active = TRUE
     `;
     const params = [];
 
     if (search) {
-      const searchCondition = ' AND (username LIKE ? OR email LIKE ?)';
+      const searchCondition = ' AND (username ILIKE ? OR email ILIKE ?)';
       countQuery += searchCondition;
       dataQuery += searchCondition;
       const searchPattern = `%${search}%`;
@@ -229,7 +229,7 @@ async function grantEntitlement(req, res) {
   try {
     // Kiểm tra user tồn tại
     const [users] = await db.query(
-      'SELECT id FROM users WHERE id = ? AND is_active = 1',
+      'SELECT id FROM users WHERE id = ? AND is_active = TRUE',
       [userId]
     );
     if (users.length === 0) {
@@ -252,9 +252,9 @@ async function grantEntitlement(req, res) {
     await db.query(
       `INSERT INTO user_entitlements (user_id, package_id, source, expires_at)
        VALUES (?, ?, 'admin_grant', ?)
-       ON DUPLICATE KEY UPDATE
+       ON CONFLICT (user_id, package_id) DO UPDATE SET
          source = 'admin_grant',
-         expires_at = VALUES(expires_at)`,
+         expires_at = EXCLUDED.expires_at`,
       [userId, packageId, expiresAtValue]
     );
 
@@ -373,7 +373,7 @@ async function listAdminOrders(req, res) {
     }
 
     if (search) {
-      whereConditions.push('(o.order_code LIKE ? OR u.username LIKE ? OR u.email LIKE ?)');
+      whereConditions.push('(o.order_code ILIKE ? OR u.username ILIKE ? OR u.email ILIKE ?)');
       const pattern = `%${search}%`;
       params.push(pattern, pattern, pattern);
     }
@@ -543,8 +543,7 @@ async function grantPackageDirect(req, res) {
 
     if (!targetUserId && email) {
       const [userRows] = await db.query(
-        'SELECT id FROM users WHERE email = ? AND is_active = 1',
-        [email.trim()]
+        'SELECT id FROM users WHERE LOWER(email) = LOWER(?) AND is_active = TRUE', [email.trim()]
       );
       if (userRows.length > 0) {
         targetUserId = userRows[0].id;
@@ -560,7 +559,7 @@ async function grantPackageDirect(req, res) {
 
     // Kiểm tra user có tồn tại và active
     const [targetUser] = await db.query(
-      'SELECT id, username, email FROM users WHERE id = ? AND is_active = 1',
+      'SELECT id, username, email FROM users WHERE id = ? AND is_active = TRUE',
       [targetUserId]
     );
 
@@ -575,7 +574,7 @@ async function grantPackageDirect(req, res) {
     await db.query(
       `INSERT INTO user_entitlements (user_id, package_id, source, granted_at, expires_at)
        VALUES (?, ?, 'admin_grant', NOW(), NULL)
-       ON DUPLICATE KEY UPDATE
+       ON CONFLICT (user_id, package_id) DO UPDATE SET
          source = 'admin_grant',
          granted_at = NOW(),
          expires_at = NULL`,
@@ -774,8 +773,8 @@ async function reconcileTransaction(req, res) {
       await conn.query(
         `INSERT INTO user_entitlements (user_id, package_id, order_id, source, granted_at, expires_at)
          VALUES (?, ?, ?, 'purchase', NOW(), NULL)
-         ON DUPLICATE KEY UPDATE
-           order_id = VALUES(order_id),
+         ON CONFLICT (user_id, package_id) DO UPDATE SET
+           order_id = EXCLUDED.order_id,
            source = 'purchase',
            granted_at = NOW(),
            expires_at = NULL`,

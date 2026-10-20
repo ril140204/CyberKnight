@@ -99,7 +99,7 @@ async function getCatalogMe(req, res) {
   try {
     // Lấy user info cơ bản
     const [users] = await db.query(
-      `SELECT id, username, role FROM users WHERE id = ? AND is_active = 1`,
+      `SELECT id, username, role FROM users WHERE id = ? AND is_active = TRUE`,
       [req.user.id]
     );
 

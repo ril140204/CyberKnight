@@ -38,10 +38,11 @@
 
 ```
 EXEWEB/
-├── assets/                     # Assets dùng chung (audio, 3D models, safe.js, quests.json)
+├── assets/                     # Assets dùng chung (video-loader.js, vendor/hls.light.min.js, 3D models, safe.js, quests.json)
 ├── backend/                    # Backend RESTful API & Server
-│   ├── migrations/             # Database migrations (002 đến 007)
-│   ├── scripts/                # Automated test suites & utilities
+│   ├── migrations/             # PostgreSQL migrations (001_init_schema.sql, ...)
+│   ├── legacy-mysql/           # Schema/migration MySQL cũ (chỉ tham khảo)
+│   ├── scripts/                # Test suites, migrate-mysql-to-pg.js, utilities
 │   ├── src/
 │   │   ├── config/             # Cấu hình Database, Catalog, Setup
 │   │   ├── controllers/        # Điều hướng nghiệp vụ (Auth, Admin, Game, Payments, Level)
@@ -56,7 +57,10 @@ EXEWEB/
 ├── level2/                     # Màn chơi Level 2 (Protected)
 ├── level3/                     # Màn chơi Level 3 (Protected)
 ├── level4/                     # Màn chơi Level 4 (Protected)
-├── deploy/                     # File triển khai production (Nginx, PM2, backup, SQL)
+├── video/                      # Video đã encode: level<N>/<name>.mp4 (720p) + level<N>/hls/<name>/ (HLS 360/480/720p)
+├── video-src/                  # Video GỐC (gitignored) — nguồn cho scripts/encode-videos.sh
+├── scripts/encode-videos.sh    # ffmpeg: video-src/ → video/ (MP4 faststart + HLS ABR)
+├── deploy/                     # File triển khai production (Nginx, PM2, backup pg_dump)
 ├── admin.html                  # Giao diện Quản trị viên (Audit log, Orders, Grant)
 ├── payment.html                # Trang thanh toán dự phòng
 ├── reset-password.html         # Trang đặt lại mật khẩu an toàn
@@ -73,7 +77,8 @@ EXEWEB/
   curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
   sudo apt-get install -y nodejs
   ```
-- **MySQL Server:** v8.0 hoặc v8.4 (InnoDB, utf8mb4).
+- **PostgreSQL trên Supabase:** tạo project tại [supabase.com](https://supabase.com), lấy 2 chuỗi kết nối ở *Project Settings → Database → Connection string* (Transaction pooler cổng 6543 và Session pooler cổng 5432). **Không cần cài DB cục bộ.**
+- **ffmpeg** (chỉ khi cần encode lại video): `brew install ffmpeg` / `apt install ffmpeg`.
 
 ### 1. Cấu hình Biến Môi Trường (`backend/.env`)
 Sao chép file mẫu và điền giá trị thật:
@@ -89,7 +94,10 @@ nano backend/.env    # hoặc editor bạn quen dùng
 | `PORT` | Không | Cổng server (mặc định 5000) |
 | `NODE_ENV` | Có (prod) | `development` hoặc `production` |
 | `FRONTEND_URL` | Có | URL trang chủ (production phải `https://`) |
-| `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` | Có | Kết nối MySQL |
+| `DATABASE_URL` | Có | Chuỗi kết nối PostgreSQL (Supabase **transaction pooler**, cổng 6543) — dùng lúc chạy app |
+| `DIRECT_URL` | Có | Chuỗi kết nối **session pooler** (cổng 5432) — dùng cho `npm run setup-db` và `pg_dump` |
+| `DB_SCHEMA` | Không | Schema chứa bảng ứng dụng (mặc định `local`; mỗi môi trường một schema trong cùng project Supabase) |
+| `DB_SSL` | Không | `true` (mặc định khi host không phải localhost) |
 | `JWT_SECRET` | Có | Secret JWT access token (≥ 32 ký tự, sinh bằng `node -e "..."`) |
 | `JWT_REFRESH_SECRET` | Có | Secret JWT refresh token (≥ 32 ký tự, **khác** JWT_SECRET) |
 | `LEVEL_ACCESS_SECRET` | Có | Secret cookie levelAccess (≥ 32 ký tự, **khác** 2 secret trên) |
@@ -111,11 +119,20 @@ node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
 
 > ⚠️ **KHÔNG** copy secret mẫu từ tài liệu vào production. Startup check sẽ từ chối khởi động nếu phát hiện secret yếu/mặc định/trùng nhau.
 
-### 2. Thiết lập Cơ Sở Dữ Liệu
+### 2. Thiết lập Cơ Sở Dữ Liệu (Supabase PostgreSQL)
 ```bash
 cd backend
-npm run setup-db
+npm run setup-db          # tạo schema DB_SCHEMA, chạy migrations/*.sql (ghi nhận trong schema_migrations), seed admin
 ```
+- Migration là file SQL PostgreSQL trong `backend/migrations/` (hiện tại `001_init_schema.sql`). Runner chạy mỗi file trong 1 transaction với `search_path` = `DB_SCHEMA`, nên **không ghi tên schema cứng trong SQL**.
+- Lớp `backend/src/config/db.js` giữ API kiểu mysql2 (`db.query('... ?', [..])`, `insertId`, `affectedRows`, `getConnection()`), tự chuyển `?` → `$n`, tự gắn schema vào tên bảng và thêm `RETURNING id` cho INSERT. SQL mới phải viết theo **PostgreSQL** (`ON CONFLICT`, `ILIKE`, `NOW() - INTERVAL '1 hour'`, `is_active = TRUE`).
+- Thêm bảng mới: tạo file `backend/migrations/00N_<ten>.sql` **và** thêm tên bảng vào `APP_TABLES` trong `db.js`.
+- Chuyển dữ liệu từ MySQL cũ (chạy một lần, nơi còn truy cập được MySQL):
+  ```bash
+  cd backend
+  MYSQL_HOST=127.0.0.1 MYSQL_USER=root MYSQL_PASSWORD=... MYSQL_DATABASE=sigmabloom npm run migrate-data   # thêm --dry-run để xem trước
+  ```
+- SQL MySQL cũ được giữ lại để tham khảo trong `backend/legacy-mysql/`.
 
 ### 3. Khởi Chạy Máy Chủ
 ```bash
@@ -126,6 +143,50 @@ npm run dev
 npm start
 ```
 Truy cập trang web tại: `http://localhost:5000`
+
+---
+
+## 🎬 Video & Streaming (HLS thích ứng)
+
+Video của các level được phát qua `assets/video-loader.js` (`window.CKVideo`): **HLS thích ứng** bằng hls.js (tự đổi 360p/480p/720p theo băng thông, chỉ tải trước ~20–30 giây), HLS native trên Safari/iOS, và **MP4 720p** làm fallback cuối. Mỗi level chỉ chuẩn bị trước *cảnh kế tiếp* (nạp playlist, chưa tải segment) nên không còn tranh băng thông như cách preload toàn bộ trước đây.
+
+| | Trước | Sau |
+|--|--|--|
+| Bitrate | 8–10 Mbps (1080p/720p) | 720p ≈1.2 Mbps · 480p ≈0.7 · 360p ≈0.42 · **240p ≈0.25 Mbps** (segment 2s, bắt đầu phát sau ~60 KB) |
+| Dung lượng `video/` | ≈ 1 GB | ≈ 306 MB (4 bậc HLS + MP4) |
+| Preload | 3–6 video cùng lúc, `preload="auto"` | chỉ cảnh/nhánh kế tiếp: playlist + segment đầu bậc 240p (~60 KB) |
+| Khởi động | tải file 8 Mbps từ đầu | hls.js luôn bắt đầu ở 240p (~57 KB/segment 2s) rồi leo bậc theo băng thông đo được |
+| Trang level | script CDN chặn parse, hls.js tải sau cùng, logo PNG 388 KB | `<link rel=preload>` hls.js, mọi script `defer`, gzip (hls.js 346 → 108 KB), logo WebP 56 KB |
+
+**Đo trên Chrome giả lập mạng (cache trống, tính từ lúc DOM sẵn sàng tới khi video phát):**
+
+| Mạng giả lập | Trước vòng tối ưu trang | Sau |
+|--|--|--|
+| 3G yếu — 400 kbps, RTT 400 ms | 22,3 s | **7,2 s**, giữ 240p, 0 frame rớt |
+| 3G — 1 Mbps, RTT 200 ms | 9,2 s | **3,2 s**, lên 360p, không giật |
+| 4G yếu — 2,5 Mbps, RTT 100 ms | 4,0 s | **1,6 s**, lên 720p, không giật |
+
+**Tải trước có kiểm soát (`CKVideo.warm`)** — tận dụng các "khoảng rảnh" không có video đang phát:
+
+| Khoảng rảnh | Tải trước gì |
+|--|--|
+| Màn "Bắt đầu" (level 3/4) | 10 s đầu cảnh 1 ở 240p (~250 KB) |
+| Mini-game / door puzzle (level 0/1/2) | 12 s đầu của **mỗi** nhánh hậu quả trước, rồi tải trọn từng nhánh |
+| Câu hỏi giữa các cảnh (level 3/4) | trọn cảnh video kế tiếp |
+| Trang chủ: rê chuột / chạm vào nút chơi | hls.js, video-loader, playlist video mở đầu (`<link rel="prefetch">`) |
+
+Nguyên tắc của `warm()`: tải **tuần tự** từng segment ở **bậc mà ABR sẽ chọn** (theo băng thông hls.js đã đo, trong ngân sách `navigator.connection`: 2G/saveData → 240p 8 s; 3G → ≤360p; khác → ≤480p); **tự dừng** ngay khi có video bắt đầu phát và tiếp tục khi video dừng; video đã warm **trọn** sẽ phát khóa ở đúng bậc đó → 0 byte mạng, không thể giật. Đo (Chrome, 3G 1 Mbps): 12 s đầu của 2 nhánh level 0 sẵn sàng sau 17 s, trọn 2 nhánh sau 60 s; bấm nhánh → phát sau 320 ms, 21/21 segment từ cache.
+
+**Thêm / thay video:**
+```bash
+# 1. Đặt file gốc vào video-src/level<N>/   (thư mục này KHÔNG commit)
+# 2. Thêm dòng "level<N>/<name>|level<N>/<file goc>.mp4" vào MANIFEST trong scripts/encode-videos.sh
+# 3. Encode (idempotent; FORCE=1 để encode lại; JOBS=2 giảm tải CPU)
+npm run encode:videos
+# → video/level<N>/<name>.mp4  +  video/level<N>/hls/<name>/master.m3u8
+# 4. Trong level<N>.js tham chiếu: { hls: '/video/level<N>/hls/<name>/master.m3u8', mp4: '/video/level<N>/<name>.mp4' }
+```
+Trên production, Nginx phục vụ `/video/`, `/assets/`, `/image/` trực tiếp từ đĩa với `sendfile`, keep-alive dài + cache dài (xem `deploy/nginx.conf.example`); Express cũng đặt `Cache-Control` tương đương khi chạy không có Nginx. VPS nên bật **TCP BBR** (`bootstrap-server.sh` bước 11 tự làm) — giúp rõ rệt với 3G/4G rớt gói.
 
 ---
 
@@ -209,7 +270,7 @@ Sau khi deploy thành công, tham khảo các tài liệu sau để vận hành 
 
 **Quick checklist sau mỗi deploy:**
 ```bash
-bash deploy/postdeploy-check.sh --domain <TEN_MIEN> --db-password "$DB_PASSWORD"
+bash deploy/postdeploy-check.sh --domain <TEN_MIEN>
 ```
 
 ---

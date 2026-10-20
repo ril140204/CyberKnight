@@ -29,3 +29,6 @@ _cursor/
 *.tar.gz
 repomix-output.xml
 repomix/
+
+# Video gốc (chỉ dùng để encode, không commit)
+video-src/
