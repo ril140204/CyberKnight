@@ -175,10 +175,23 @@ if (process.env.CORS_ORIGINS) {
     });
 }
 
+/**
+ * Request cùng origin (Origin == scheme://host của chính request, ví dụ khi vào bằng
+ * tên miền tuỳ chỉnh www.cyberknight.store) luôn hợp lệ, không phụ thuộc CORS_ORIGINS.
+ * `trust proxy` đã bật nên req.protocol lấy từ X-Forwarded-Proto của Heroku/Nginx.
+ */
+function isSameOrigin(req, origin) {
+  const host = req.get('host');
+  return Boolean(host) && origin === `${req.protocol}://${host}`;
+}
+function isAllowedOrigin(req, origin) {
+  return !origin || allowedOrigins.includes(origin) || isSameOrigin(req, origin);
+}
+
 // Chặn origin không hợp lệ với mã 403 thay vì ném lỗi Error (tránh mã 500)
 app.use((req, res, next) => {
   const origin = req.headers.origin;
-  if (!origin || allowedOrigins.includes(origin)) {
+  if (isAllowedOrigin(req, origin)) {
     return next();
   }
   return res.status(403).json({
@@ -188,15 +201,10 @@ app.use((req, res, next) => {
   });
 });
 
-app.use(
-  cors({
-    origin: (origin, cb) => {
-      if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
-      return cb(null, false);
-    },
-    credentials: true,
-  })
-);
+app.use((req, res, next) => cors({
+  origin: (origin, cb) => cb(null, isAllowedOrigin(req, origin)),
+  credentials: true,
+})(req, res, next));
 
 // ── 5a. File định danh site cho crawler & bộ lọc phishing ─────
 // robots.txt / sitemap.xml / security.txt: site minh bạch, có đầu mối liên hệ — tín hiệu tin cậy
