@@ -17,14 +17,14 @@
   <header class="bg-white/80 backdrop-blur-sm border-b border-indigo-100 sticky top-0 z-10">
     <div class="max-w-xl mx-auto px-4 py-3 flex items-center justify-between">
       <div class="flex items-center gap-2">
-        <span class="text-2xl">🛡️</span>
+        <img src="/image/favicon.svg" alt="" class="w-7 h-8" width="28" height="32">
         <div>
-          <div class="font-bold text-indigo-900 text-sm leading-none">CyberKnight Shield</div>
-          <div class="text-xs text-indigo-400 mt-0.5">Sigmabloom Platform</div>
+          <div class="font-bold text-indigo-900 text-sm leading-none">CyberKnight</div>
+          <div class="text-xs text-indigo-400 mt-0.5">by Sigmabloom</div>
         </div>
       </div>
-      <a href="/" class="text-sm text-indigo-600 hover:text-indigo-800 font-medium">
-        ← Quay lại
+      <a href="/" class="text-sm text-indigo-600 hover:text-indigo-800 font-medium flex items-center gap-1">
+        <svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-arrow-left"></use></svg> Quay lại
       </a>
     </div>
   </header>
@@ -34,7 +34,7 @@
 
     <div class="text-center mb-6">
       <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-100 text-amber-700 text-xs font-bold mb-3">
-        💰 YÊU CẦU HOÀN TIỀN
+        <svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-wallet"></use></svg> YÊU CẦU HOÀN TIỀN
       </div>
       <h1 class="text-xl font-extrabold text-indigo-950 mb-2">Chính Sách Hoàn Tiền</h1>
       <p class="text-sm text-slate-500">Xem chi tiết tại <a href="/terms" class="underline text-indigo-600">Điều khoản sử dụng</a>, Mục 5.</p>
@@ -45,19 +45,19 @@
       <h2 class="text-sm font-bold text-amber-800 uppercase tracking-wide mb-4">Điều kiện hoàn tiền</h2>
       <div class="space-y-3 text-sm">
         <div class="flex gap-3">
-          <span class="text-green-500 font-bold text-lg shrink-0">✅</span>
+          <svg class="icon text-green-500 text-lg mt-0.5" aria-hidden="true"><use href="/assets/icons.svg#i-circle-check"></use></svg>
           <p class="text-slate-700">Trong vòng <strong>7 ngày</strong> kể từ ngày thanh toán thành công.</p>
         </div>
         <div class="flex gap-3">
-          <span class="text-green-500 font-bold text-lg shrink-0">✅</span>
+          <svg class="icon text-green-500 text-lg mt-0.5" aria-hidden="true"><use href="/assets/icons.svg#i-circle-check"></use></svg>
           <p class="text-slate-700">Bạn <strong>chưa sử dụng quá 20%</strong> nội dung gói đã mua.</p>
         </div>
         <div class="flex gap-3">
-          <span class="text-red-500 font-bold text-lg shrink-0">❌</span>
+          <svg class="icon text-red-500 text-lg mt-0.5" aria-hidden="true"><use href="/assets/icons.svg#i-circle-x"></use></svg>
           <p class="text-slate-700">Sau 7 ngày <strong>hoặc</strong> đã dùng &gt; 20% = <strong>không hoàn tiền</strong>.</p>
         </div>
         <div class="flex gap-3">
-          <span class="text-red-500 font-bold text-lg shrink-0">❌</span>
+          <svg class="icon text-red-500 text-lg mt-0.5" aria-hidden="true"><use href="/assets/icons.svg#i-circle-x"></use></svg>
           <p class="text-slate-700">Tài khoản vi phạm <a href="/terms" class="underline">Điều khoản sử dụng</a> = không hoàn.</p>
         </div>
       </div>
@@ -118,7 +118,7 @@
 
         <button type="submit" id="refundSubmitBtn"
           class="w-full py-3 bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-white font-bold rounded-xl text-sm shadow transition">
-          💰 Gửi yêu cầu hoàn tiền
+          <svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-send"></use></svg> Gửi yêu cầu hoàn tiền
         </button>
 
         <p class="text-xs text-center text-slate-400">
@@ -181,7 +181,7 @@
         errEl.classList.remove('hidden');
       } finally {
         btn.disabled = false;
-        btn.textContent = '💰 Gửi yêu cầu hoàn tiền';
+        btn.innerHTML = '<svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-send"></use></svg> Gửi yêu cầu hoàn tiền';
       }
     });
   </script>

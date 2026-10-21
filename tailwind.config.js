@@ -5,6 +5,9 @@ module.exports = {
     './payment.html',
     './admin.html',
     './reset-password.html',
+    './privacy.html',
+    './terms.html',
+    './refund.html',
     './assets/*.js',
     // Không quét level*/ vì game levels không dùng Tailwind
   ],

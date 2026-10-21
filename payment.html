@@ -49,7 +49,7 @@
             position: relative;
         }
         .package-card.recommended::before {
-            content: '⭐ Phổ biến nhất';
+            content: 'Phổ biến nhất';
             position: absolute;
             top: -14px;
             left: 50%;
@@ -116,7 +116,7 @@
     <!-- Simple top nav -->
     <nav class="w-full px-6 py-4 flex items-center justify-between">
         <a href="index.html" class="font-heading text-white text-xl font-black tracking-tight flex items-center gap-2">
-            🛡️ CyberKnight
+            <img src="/image/favicon.svg" alt="" class="w-7 h-8" width="28" height="32"> CyberKnight
         </a>
         <div class="flex items-center gap-4">
             <a href="index.html" class="nav-link text-sm">Trang chủ</a>
@@ -130,7 +130,7 @@
         <!-- Page header -->
         <div class="text-center mb-10">
             <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-300 text-xs font-black tracking-wider uppercase mb-4">
-                <span>💳</span> THANH TOÁN
+                <svg class="icon text-sm" aria-hidden="true"><use href="/assets/icons.svg#i-credit-card"></use></svg> THANH TOÁN
             </div>
             <h1 class="font-heading text-3xl md:text-4xl font-black text-white mb-3" id="pageTitle">
                 Nâng cấp tài khoản
@@ -153,13 +153,13 @@
 
         <!-- Error state -->
         <div id="errorState" class="hidden text-center py-10">
-            <div class="text-4xl mb-4">⚠️</div>
+            <div class="text-4xl mb-4 flex justify-center text-amber-300"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-triangle-alert"></use></svg></div>
             <p class="text-red-300 font-semibold" id="errorMsg">Đã xảy ra lỗi.</p>
         </div>
 
         <!-- Order result (shown after buy) -->
         <div id="orderResult" class="card p-8 text-center hidden fade-in">
-            <div class="text-5xl mb-4" id="orderEmoji">✅</div>
+            <div class="text-5xl mb-4 flex justify-center text-emerald-500" id="orderEmoji"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-circle-check"></use></svg></div>
             <h2 class="font-heading text-2xl font-black text-gray-900 mb-2" id="orderTitle">Đơn hàng đã được tạo!</h2>
             <p class="text-gray-600 text-sm mb-6" id="orderMsg">Vui lòng thanh toán để kích hoạt gói.</p>
 
@@ -189,18 +189,18 @@
                     —
                 </div>
                 <a href="#" target="_blank" rel="noopener noreferrer" id="qrLink" class="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700 font-semibold underline">
-                    Mở QR trong tab mới ↗
+                    Mở QR trong tab mới <svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-external-link"></use></svg>
                 </a>
             </div>
 
             <button onclick="resetOrder()" class="mt-4 text-gray-500 hover:text-gray-700 text-sm font-semibold transition">
-                ← Quay lại danh sách gói
+                <svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-arrow-left"></use></svg> Quay lại danh sách gói
             </button>
         </div>
 
         <!-- Login prompt -->
         <div id="loginPrompt" class="card p-8 text-center hidden">
-            <div class="text-5xl mb-4">🔐</div>
+            <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-3xl"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-lock-keyhole"></use></svg></div>
             <h2 class="font-heading text-xl font-black text-gray-900 mb-2">Bạn cần đăng nhập để mua gói</h2>
             <p class="text-gray-600 text-sm mb-6">Vui lòng đăng nhập trước khi thực hiện thanh toán.</p>
             <a href="index.html#login" class="inline-flex px-8 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-black shadow-lg hover:shadow-xl transition">
@@ -340,7 +340,7 @@
             const tagColor = isRecommended
                 ? 'bg-purple-100 text-purple-800'
                 : 'bg-blue-100 text-blue-800';
-            const tagText  = isRecommended ? '👑 Premium Vĩnh Viễn' : '📦 Gói Level';
+            const tagText  = isRecommended ? '<svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-crown"></use></svg> Premium Vĩnh Viễn' : '<svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-package"></use></svg> Gói Level';
 
             const card = document.createElement('div');
             card.className = `package-card p-6 flex flex-col gap-4 fade-in ${isRecommended ? 'recommended' : ''}`;
@@ -360,12 +360,12 @@
                 </div>
                 <ul class="space-y-1.5 text-xs text-gray-600">
                     ${pkg.id === 'premium' ? `
-                        <li class="flex items-center gap-1.5"><span class="text-green-500">✔</span> Truy cập TẤT CẢ level</li>
-                        <li class="flex items-center gap-1.5"><span class="text-green-500">✔</span> Không giới hạn thời gian</li>
-                        <li class="flex items-center gap-1.5"><span class="text-green-500">✔</span> Ưu tiên truy cập level mới</li>
+                        <li class="flex items-center gap-1.5"><svg class="icon text-green-500" aria-hidden="true"><use href="/assets/icons.svg#i-check"></use></svg> Truy cập TẤT CẢ level</li>
+                        <li class="flex items-center gap-1.5"><svg class="icon text-green-500" aria-hidden="true"><use href="/assets/icons.svg#i-check"></use></svg> Không giới hạn thời gian</li>
+                        <li class="flex items-center gap-1.5"><svg class="icon text-green-500" aria-hidden="true"><use href="/assets/icons.svg#i-check"></use></svg> Ưu tiên truy cập level mới</li>
                     ` : `
-                        <li class="flex items-center gap-1.5"><span class="text-green-500">✔</span> Truy cập các level trong gói</li>
-                        <li class="flex items-center gap-1.5"><span class="text-green-500">✔</span> Thời hạn 1 năm</li>
+                        <li class="flex items-center gap-1.5"><svg class="icon text-green-500" aria-hidden="true"><use href="/assets/icons.svg#i-check"></use></svg> Truy cập các level trong gói</li>
+                        <li class="flex items-center gap-1.5"><svg class="icon text-green-500" aria-hidden="true"><use href="/assets/icons.svg#i-check"></use></svg> Thời hạn 1 năm</li>
                     `}
                 </ul>
                 <button
@@ -374,7 +374,7 @@
                     onclick="handleBuy('${escapeHtml(pkg.id)}')"
                     ${!isLoggedIn ? 'disabled title="Cần đăng nhập trước"' : ''}
                 >
-                    ${!isLoggedIn ? '🔒 Đăng nhập để mua' : 'MUA NGAY'}
+                    ${!isLoggedIn ? '<svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-lock"></use></svg> Đăng nhập để mua' : 'MUA NGAY'}
                 </button>
             `;
 
@@ -414,7 +414,7 @@
             showOrderResult(json.data);
 
         } catch (err) {
-            alert('❌ ' + (err.message || 'Đã xảy ra lỗi. Vui lòng thử lại.'));
+            alert((err.message || 'Đã xảy ra lỗi. Vui lòng thử lại.'));
             allBtns.forEach(b => b.disabled = false);
         }
     }
@@ -452,7 +452,7 @@
                 <p class="text-xs text-gray-600 mb-1">Tài khoản: <strong>${escapeHtml(data.qr.accountNumber)}</strong> ${data.qr.bankBin ? `(${escapeHtml(data.qr.bankBin)})` : ''}</p>
                 <p class="text-xs text-gray-600 mb-3">Tên: ${escapeHtml(data.qr.accountName || '—')}</p>
                 <a href="index.html" class="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700 font-semibold underline">
-                    ← Quay lại trang chủ
+                    <svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-arrow-left"></use></svg> Quay lại trang chủ
                 </a>
             `;
         }
