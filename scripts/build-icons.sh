@@ -25,3 +25,5 @@ tar -xzf "$TMP"/lucide-static-*.tgz -C "$TMP/lucide"
 tar -xzf "$TMP"/simple-icons-*.tgz -C "$TMP/si"
 
 python3 -I "$ROOT/scripts/build-icons.py" "$TMP/lucide/package/icons" "$TMP/si/package/icons" "$ROOT/assets/icons.svg"
+# Đổi ?v= trong các trang để trình duyệt tải sprite mới ngay (không dùng bản cache 1 ngày)
+python3 -I "$ROOT/scripts/stamp-assets.py"

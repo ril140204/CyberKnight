@@ -16,13 +16,19 @@ shopping-cart wallet credit-card user link landmark file-text globe external-lin
 circle-dollar-sign
 """.split()
 
+# Kiểu nét nằm NGAY TRONG sprite: thiếu CSS (trình duyệt còn giữ bản CSS cũ, CSS tải lỗi) icon vẫn là nét
+# màu chữ, không bị tô đen đặc. Biến CSS cho phép chỉnh từ trang: --icon-fill (vd. ngôi sao đặc), --icon-stroke.
+G_STYLE = ('fill:var(--icon-fill,none);stroke:currentColor;stroke-width:var(--icon-stroke,2);'
+           'stroke-linecap:round;stroke-linejoin:round')
+
 lucide_dir, si_dir, out = sys.argv[1:4]
 symbols = []
 for name in LUCIDE:
     svg = open(f'{lucide_dir}/{name}.svg', encoding='utf-8').read()
     body = re.search(r'<svg[^>]*>(.*)</svg>', svg, re.S).group(1)
+    body = re.sub(r'<!--.*?-->', '', body, flags=re.S)
     body = re.sub(r'\s+', ' ', body).replace(' />', '/>').strip()
-    symbols.append(f'<symbol id="i-{name}" viewBox="0 0 24 24">{body}</symbol>')
+    symbols.append(f'<symbol id="i-{name}" viewBox="0 0 24 24"><g style="{G_STYLE}">{body}</g></symbol>')
 
 tiktok = open(f'{si_dir}/tiktok.svg', encoding='utf-8').read()
 path = re.search(r'<path d="([^"]+)"', tiktok).group(1)

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex,nofollow">
   <title>CyberKnight — Bảng Quản Trị Hệ Thống</title>
-  <link rel="stylesheet" href="/assets/tailwind.css">
+  <link rel="stylesheet" href="/assets/tailwind.css?v=be46b625">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
@@ -27,7 +27,7 @@
       </div>
     </div>
     <div class="flex items-center gap-4">
-      <a href="/" class="text-sm text-slate-300 hover:text-cyan-400 transition-colors"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-arrow-left"></use></svg> Về Trang Chủ</a>
+      <a href="/" class="text-sm text-slate-300 hover:text-cyan-400 transition-colors"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-arrow-left"></use></svg> Về Trang Chủ</a>
       <div id="adminUserBadge" class="hidden items-center gap-2 bg-slate-800/80 px-3 py-1.5 rounded-full border border-slate-700 text-xs">
         <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
         <span id="adminUsername" class="font-semibold text-slate-200">Admin</span>
@@ -40,7 +40,7 @@
   <div id="loginOverlay" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4">
     <div class="glass-card rounded-2xl max-w-md w-full p-8 shadow-2xl border border-slate-700">
       <div class="text-center mb-6">
-        <span class="w-16 h-16 mx-auto mb-3 rounded-2xl bg-cyan-500/15 text-cyan-400 flex items-center justify-center text-3xl"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-lock-keyhole"></use></svg></span>
+        <span class="w-16 h-16 mx-auto mb-3 rounded-2xl bg-cyan-500/15 text-cyan-400 flex items-center justify-center text-3xl"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-lock-keyhole"></use></svg></span>
         <h2 class="text-2xl font-bold text-white">Đăng Nhập Quản Trị</h2>
         <p class="text-sm text-slate-400 mt-1">Chỉ dành cho tài khoản có vai trò Quản trị viên (Admin)</p>
       </div>
@@ -67,42 +67,42 @@
     <!-- Stats Row -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
       <div class="glass-card rounded-2xl p-4 border border-slate-800 flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center text-xl font-bold"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-users"></use></svg></div>
+        <div class="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center text-xl font-bold"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-users"></use></svg></div>
         <div>
           <p class="text-[11px] text-slate-400">Tổng Thành Viên</p>
           <h3 id="statUsers" class="text-xl font-extrabold text-white mt-0.5">--</h3>
         </div>
       </div>
       <div class="glass-card rounded-2xl p-4 border border-slate-800 flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-xl font-bold"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-rocket"></use></svg></div>
+        <div class="w-10 h-10 rounded-xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-xl font-bold"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-rocket"></use></svg></div>
         <div>
           <p class="text-[11px] text-slate-400">Hôm Nay</p>
           <h3 id="statTodayUsers" class="text-xl font-extrabold text-cyan-300 mt-0.5">--</h3>
         </div>
       </div>
       <div class="glass-card rounded-2xl p-4 border border-slate-800 flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xl font-bold"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-shopping-cart"></use></svg></div>
+        <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xl font-bold"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-shopping-cart"></use></svg></div>
         <div>
           <p class="text-[11px] text-slate-400">Đơn Đã Trả</p>
           <h3 id="statPaidOrders" class="text-xl font-extrabold text-emerald-400 mt-0.5">--</h3>
         </div>
       </div>
       <div class="glass-card rounded-2xl p-4 border border-slate-800 flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-teal-500/20 text-teal-400 flex items-center justify-center text-xl font-bold"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-wallet"></use></svg></div>
+        <div class="w-10 h-10 rounded-xl bg-teal-500/20 text-teal-400 flex items-center justify-center text-xl font-bold"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-wallet"></use></svg></div>
         <div>
           <p class="text-[11px] text-slate-400">Doanh Thu</p>
           <h3 id="statRevenue" class="text-xl font-extrabold text-teal-300 mt-0.5">--</h3>
         </div>
       </div>
       <div class="glass-card rounded-2xl p-4 border border-slate-800 flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center text-xl font-bold"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-star"></use></svg></div>
+        <div class="w-10 h-10 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center text-xl font-bold"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-star"></use></svg></div>
         <div>
           <p class="text-[11px] text-slate-400">Gói Active</p>
           <h3 id="statEntitlements" class="text-xl font-extrabold text-purple-300 mt-0.5">--</h3>
         </div>
       </div>
       <div class="glass-card rounded-2xl p-4 border border-slate-800 flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center text-xl font-bold"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-triangle-alert"></use></svg></div>
+        <div class="w-10 h-10 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center text-xl font-bold"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-triangle-alert"></use></svg></div>
         <div>
           <p class="text-[11px] text-slate-400">Cần Đối Soát</p>
           <h3 id="statMismatches" class="text-xl font-extrabold text-rose-400 mt-0.5">--</h3>
@@ -113,23 +113,23 @@
     <!-- Navigation Tabs -->
     <div class="flex border-b border-slate-800 gap-2 overflow-x-auto pb-1">
       <button type="button" onclick="switchTab('orders')" id="tabBtn-orders" class="px-4 py-2.5 font-semibold text-xs sm:text-sm border-b-2 border-cyan-400 text-cyan-400 whitespace-nowrap transition-colors">
-        <svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-file-text"></use></svg> Quản Lý Đơn Hàng
+        <svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-file-text"></use></svg> Quản Lý Đơn Hàng
       </button>
       <button type="button" onclick="switchTab('transactions')" id="tabBtn-transactions" class="px-4 py-2.5 font-semibold text-xs sm:text-sm border-b-2 border-transparent text-slate-400 hover:text-slate-200 whitespace-nowrap transition-colors">
-        <svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-credit-card"></use></svg> Giao Dịch Ngân Hàng
+        <svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-credit-card"></use></svg> Giao Dịch Ngân Hàng
       </button>
       <button type="button" onclick="switchTab('mismatches')" id="tabBtn-mismatches" class="px-4 py-2.5 font-semibold text-xs sm:text-sm border-b-2 border-transparent text-slate-400 hover:text-slate-200 whitespace-nowrap transition-colors flex items-center gap-1.5">
-        <svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-triangle-alert"></use></svg> Đối Soát Giao Dịch Lỗi
+        <svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-triangle-alert"></use></svg> Đối Soát Giao Dịch Lỗi
         <span id="mismatchesCountBadge" class="hidden px-1.5 py-0.5 text-[10px] rounded-full bg-rose-500 text-white font-bold">0</span>
       </button>
       <button type="button" onclick="switchTab('grant')" id="tabBtn-grant" class="px-4 py-2.5 font-semibold text-xs sm:text-sm border-b-2 border-transparent text-slate-400 hover:text-slate-200 whitespace-nowrap transition-colors">
-        <svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-gift"></use></svg> Cấp Quyền Thủ Công
+        <svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-gift"></use></svg> Cấp Quyền Thủ Công
       </button>
       <button type="button" onclick="switchTab('audit')" id="tabBtn-audit" class="px-4 py-2.5 font-semibold text-xs sm:text-sm border-b-2 border-transparent text-slate-400 hover:text-slate-200 whitespace-nowrap transition-colors">
-        <svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-scroll-text"></use></svg> Nhật Ký Hoạt Động
+        <svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-scroll-text"></use></svg> Nhật Ký Hoạt Động
       </button>
       <button type="button" onclick="switchTab('users')" id="tabBtn-users" class="px-4 py-2.5 font-semibold text-xs sm:text-sm border-b-2 border-transparent text-slate-400 hover:text-slate-200 whitespace-nowrap transition-colors">
-        <svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-user"></use></svg> Danh Sách Thành Viên
+        <svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-user"></use></svg> Danh Sách Thành Viên
       </button>
     </div>
 
@@ -148,7 +148,7 @@
           </select>
           <button type="button" onclick="loadOrders(1)" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-sm font-semibold transition-colors">Lọc</button>
         </div>
-        <button type="button" onclick="loadOrders(currentOrderPage)" class="text-sm text-cyan-400 hover:underline"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-refresh-cw"></use></svg> Làm mới</button>
+        <button type="button" onclick="loadOrders(currentOrderPage)" class="text-sm text-cyan-400 hover:underline"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-refresh-cw"></use></svg> Làm mới</button>
       </div>
 
       <div class="glass-card rounded-2xl overflow-hidden border border-slate-800">
@@ -177,7 +177,7 @@
     <section id="tabContent-transactions" class="hidden space-y-4">
       <div class="flex justify-between items-center">
         <h3 class="text-base font-bold text-white">Lịch Sử Webhook / Giao Dịch Đã Nhận</h3>
-        <button type="button" onclick="loadTransactions(1)" class="text-sm text-cyan-400 hover:underline"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-refresh-cw"></use></svg> Làm mới</button>
+        <button type="button" onclick="loadTransactions(1)" class="text-sm text-cyan-400 hover:underline"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-refresh-cw"></use></svg> Làm mới</button>
       </div>
       <div class="glass-card rounded-2xl overflow-hidden border border-slate-800">
         <div class="overflow-x-auto">
@@ -206,11 +206,11 @@
       <div class="flex justify-between items-center">
         <div>
           <h3 class="text-base font-bold text-white flex items-center gap-2">
-            <svg class="icon text-amber-400" aria-hidden="true"><use href="/assets/icons.svg#i-triangle-alert"></use></svg> Giao Dịch Chờ Đối Soát & Khớp Đơn
+            <svg class="icon text-amber-400" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-triangle-alert"></use></svg> Giao Dịch Chờ Đối Soát & Khớp Đơn
           </h3>
           <p class="text-xs text-slate-400 mt-0.5">Các giao dịch chuyển thiếu tiền (underpaid), không có mã đơn (no_order) hoặc gặp lỗi khớp.</p>
         </div>
-        <button type="button" onclick="loadMismatches()" class="text-sm text-cyan-400 hover:underline"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-refresh-cw"></use></svg> Làm mới</button>
+        <button type="button" onclick="loadMismatches()" class="text-sm text-cyan-400 hover:underline"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-refresh-cw"></use></svg> Làm mới</button>
       </div>
       <div class="glass-card rounded-2xl overflow-hidden border border-slate-800">
         <div class="overflow-x-auto">
@@ -237,7 +237,7 @@
     <!-- TAB 4: CẤP QUYỀN THỦ CÔNG -->
     <section id="tabContent-grant" class="hidden space-y-6">
       <div class="glass-card rounded-2xl p-6 border border-slate-800 max-w-xl">
-        <h3 class="text-lg font-bold text-white mb-2"><svg class="icon text-cyan-400" aria-hidden="true"><use href="/assets/icons.svg#i-gift"></use></svg> Cấp Quyền Học Tập Trực Tiếp (Admin Grant)</h3>
+        <h3 class="text-lg font-bold text-white mb-2"><svg class="icon text-cyan-400" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-gift"></use></svg> Cấp Quyền Học Tập Trực Tiếp (Admin Grant)</h3>
         <p class="text-xs text-slate-400 mb-6">Cấp quyền mở khóa màn chơi vĩnh viễn cho học sinh gặp sự cố chuyển khoản hoặc được ban quản trị tặng học bổng.</p>
 
         <form onsubmit="handleGrantSubmit(event)" class="space-y-4">
@@ -270,11 +270,11 @@
       <div class="flex justify-between items-center">
         <div>
           <h3 class="text-base font-bold text-white flex items-center gap-2">
-            <svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-scroll-text"></use></svg> Nhật Ký Hoạt Động Quản Trị (Admin Audit Log)
+            <svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-scroll-text"></use></svg> Nhật Ký Hoạt Động Quản Trị (Admin Audit Log)
           </h3>
           <p class="text-xs text-slate-400 mt-0.5">Lưu vết toàn bộ thao tác cấp gói, thu hồi quyền và đối soát giao dịch.</p>
         </div>
-        <button type="button" onclick="loadAuditLogs(1)" class="text-sm text-cyan-400 hover:underline"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-refresh-cw"></use></svg> Làm mới</button>
+        <button type="button" onclick="loadAuditLogs(1)" class="text-sm text-cyan-400 hover:underline"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-refresh-cw"></use></svg> Làm mới</button>
       </div>
       <div class="glass-card rounded-2xl overflow-hidden border border-slate-800">
         <div class="overflow-x-auto">
@@ -303,7 +303,7 @@
     <section id="tabContent-users" class="hidden space-y-4">
       <div class="flex justify-between items-center">
         <h3 class="text-base font-bold text-white">Danh Sách Thành Viên Hệ Thống</h3>
-        <button type="button" onclick="loadUsers(1)" class="text-sm text-cyan-400 hover:underline"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-refresh-cw"></use></svg> Làm mới</button>
+        <button type="button" onclick="loadUsers(1)" class="text-sm text-cyan-400 hover:underline"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-refresh-cw"></use></svg> Làm mới</button>
       </div>
       <div class="glass-card rounded-2xl overflow-hidden border border-slate-800">
         <div class="overflow-x-auto">
@@ -334,7 +334,7 @@
     <div class="glass-card rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-700 space-y-4">
       <div class="flex justify-between items-center border-b border-slate-800 pb-3">
         <h3 class="text-base font-bold text-white flex items-center gap-2">
-          <svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-link"></use></svg> Đối Soát & Khớp Giao Dịch
+          <svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-link"></use></svg> Đối Soát & Khớp Giao Dịch
         </h3>
         <button type="button" onclick="closeReconcileModal()" class="text-slate-400 hover:text-white text-xl leading-none">&times;</button>
       </div>
@@ -644,7 +644,7 @@
             else badge.classList.add('hidden');
           }
           if (list.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-emerald-400"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-party-popper"></use></svg> Tuyệt vời! Hiện không có giao dịch nào bị lỗi hay chuyển thiếu tiền.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-emerald-400"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-party-popper"></use></svg> Tuyệt vời! Hiện không có giao dịch nào bị lỗi hay chuyển thiếu tiền.</td></tr>';
             return;
           }
           tbody.innerHTML = list.map(t => {
@@ -667,7 +667,7 @@
                 <td class="p-3.5">${statusBadge}</td>
                 <td class="p-3.5 text-center">
                   <button type="button" data-action="reconcile" data-tx-id="${safeTxId}" data-amount="${safeAmount}" data-content="${safeContent}" class="px-3 py-1 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-semibold rounded-lg text-xs shadow transition-all">
-                    <svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-link"></use></svg> Khớp Đơn
+                    <svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-link"></use></svg> Khớp Đơn
                   </button>
                 </td>
               </tr>

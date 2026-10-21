@@ -47,7 +47,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/assets/tailwind.css">
+    <link rel="stylesheet" href="/assets/tailwind.css?v=be46b625">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -1136,7 +1136,7 @@
 
         /* Icon dùng class .icon (định nghĩa trong assets/tailwind-input.css) */
         .icon-container { color: #0066FF; }
-        .icon-container .icon { stroke-width: 1.75; }
+        .icon-container .icon { --icon-stroke: 1.75; }
         #toast[data-variant="error"] { background: #DC2626; }
         #toast[data-variant="warning"] { background: #B45309; }
 
@@ -1292,34 +1292,34 @@
                     <div class="px-4 py-3 border-b border-gray-100">
                         <div class="flex items-center justify-between">
                             <div class="text-sm font-bold text-gray-800 truncate" id="dropdownName">Người dùng</div>
-                            <span id="userBadgeHeader" class="hidden text-[10px] px-2 py-0.5 rounded-full font-bold bg-amber-100 text-amber-800"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-crown"></use></svg> Premium</span>
+                            <span id="userBadgeHeader" class="hidden text-[10px] px-2 py-0.5 rounded-full font-bold bg-amber-100 text-amber-800"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-crown"></use></svg> Premium</span>
                         </div>
                         <div class="text-xs text-gray-500 truncate" id="dropdownEmail">email@example.com</div>
                     </div>
                     <!-- Mục Gói của tôi -->
                     <div class="px-3 py-2 border-b border-gray-100 bg-gray-50/70 rounded-xl my-1" id="myPackagesDropdownSection">
                         <div class="flex items-center justify-between mb-1">
-                            <span class="text-[10px] font-black uppercase tracking-wider text-gray-400"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-shield-check"></use></svg> Gói của tôi</span>
+                            <span class="text-[10px] font-black uppercase tracking-wider text-gray-400"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-shield-check"></use></svg> Gói của tôi</span>
                             <span id="myPackagesCount" class="text-[10px] text-primary font-bold"></span>
                         </div>
                         <div id="myPackagesList" class="text-xs text-gray-700 space-y-1">
                             <span class="text-gray-400 italic text-[11px]">Chưa đăng ký gói trả phí</span>
                         </div>
                         <button type="button" onclick="openPricingModal()" class="mt-2 w-full py-1.5 px-2 bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-500 hover:to-yellow-600 text-white rounded-lg text-xs font-bold text-center block shadow-sm transition">
-                            <svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-zap"></use></svg> Nâng cấp / Mua gói
+                            <svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-zap"></use></svg> Nâng cấp / Mua gói
                         </button>
                     </div>
                     <a href="/admin.html" id="adminDropdownLink" data-admin-only class="w-full text-left px-4 py-2.5 text-sm text-purple-600 font-bold hover:bg-purple-50 rounded-xl transition flex items-center gap-2">
-                        <svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-shield-check"></use></svg> Trang Quản Trị
+                        <svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-shield-check"></use></svg> Trang Quản Trị
                     </a>
                     <button type="button" onclick="openLevelSelectModal()" class="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 rounded-xl transition flex items-center gap-2">
-                        <svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-gamepad-2"></use></svg> Chọn màn chơi
+                        <svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-gamepad-2"></use></svg> Chọn màn chơi
                     </button>
                     <button type="button" onclick="openMyOrdersModal()" class="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 rounded-xl transition flex items-center gap-2">
-                        <svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-scroll-text"></use></svg> Lịch sử đơn hàng
+                        <svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-scroll-text"></use></svg> Lịch sử đơn hàng
                     </button>
                     <button type="button" onclick="logout()" class="w-full text-left px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 rounded-xl transition flex items-center gap-2">
-                        <svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-log-out"></use></svg> Đăng xuất
+                        <svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-log-out"></use></svg> Đăng xuất
                     </button>
                 </div>
             </div>
@@ -1339,7 +1339,7 @@
                     <div class="bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border-2 border-blue-100 p-3.5 flex flex-col gap-2.5">
                         <div class="px-2 pt-1 pb-2 text-[11px] font-extrabold text-blue-600 tracking-wider uppercase border-b border-blue-100/80 flex items-center justify-between">
                             <span class="flex items-center gap-1.5">
-                                <span><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-gamepad-2"></use></svg></span> CHỌN MÀN CHƠI
+                                <span><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-gamepad-2"></use></svg></span> CHỌN MÀN CHƠI
                             </span>
                             <span class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full text-[10px] font-bold">5 Cấp độ</span>
                         </div>
@@ -1347,7 +1347,7 @@
                         <!-- Option Level 0 -->
                         <button type="button" data-dd-level="0" onclick="selectAndPlayLevel('/level0/level0.html')" class="w-full text-left p-3 rounded-xl hover:bg-gradient-to-r hover:from-amber-50 hover:to-orange-50 transition-all border border-transparent hover:border-amber-200 flex items-center gap-3.5 group/item">
                             <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-2xl shadow-md group-hover/item:scale-110 group-hover/item:rotate-3 transition-transform flex-shrink-0">
-                                <svg class="icon text-white" aria-hidden="true"><use href="/assets/icons.svg#i-gift"></use></svg>
+                                <svg class="icon text-white" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-gift"></use></svg>
                             </div>
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-center justify-between gap-1">
@@ -1363,7 +1363,7 @@
                         <!-- Option Level 1 -->
                         <button type="button" data-dd-level="1" onclick="selectAndPlayLevel('/level1/level1.html')" class="w-full text-left p-3 rounded-xl hover:bg-gradient-to-r hover:from-blue-50 hover:to-cyan-50 transition-all border border-transparent hover:border-blue-200 flex items-center gap-3.5 group/item">
                             <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-2xl shadow-md group-hover/item:scale-110 group-hover/item:-rotate-3 transition-transform flex-shrink-0">
-                                <svg class="icon text-white" aria-hidden="true"><use href="/assets/icons.svg#i-shield-check"></use></svg>
+                                <svg class="icon text-white" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-shield-check"></use></svg>
                             </div>
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-center justify-between gap-1">
@@ -1379,7 +1379,7 @@
                         <!-- Option Level 2 -->
                         <button type="button" data-dd-level="2" onclick="selectAndPlayLevel('/level2/level2.html')" class="w-full text-left p-3 rounded-xl hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 transition-all border border-transparent hover:border-purple-200 flex items-center gap-3.5 group/item">
                             <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-2xl shadow-md group-hover/item:scale-110 group-hover/item:rotate-3 transition-transform flex-shrink-0">
-                                <svg class="icon text-white" aria-hidden="true"><use href="/assets/icons.svg#i-door-open"></use></svg>
+                                <svg class="icon text-white" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-door-open"></use></svg>
                             </div>
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-center justify-between gap-1">
@@ -1395,7 +1395,7 @@
                         <!-- Option Level 3 -->
                         <button type="button" data-dd-level="3" onclick="selectAndPlayLevel('/level3/level3.html')" class="w-full text-left p-3 rounded-xl hover:bg-gradient-to-r hover:from-amber-50 hover:to-yellow-50 transition-all border border-transparent hover:border-amber-300 flex items-center gap-3.5 group/item">
                             <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-yellow-500 flex items-center justify-center text-2xl shadow-md group-hover/item:scale-110 group-hover/item:-rotate-3 transition-transform flex-shrink-0">
-                                <svg class="icon text-white" aria-hidden="true"><use href="/assets/icons.svg#i-key-round"></use></svg>
+                                <svg class="icon text-white" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-key-round"></use></svg>
                             </div>
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-center justify-between gap-1">
@@ -1411,7 +1411,7 @@
                         <!-- Option Level 4 -->
                         <button type="button" data-dd-level="4" onclick="selectAndPlayLevel('/level4/level4.html')" class="w-full text-left p-3 rounded-xl hover:bg-gradient-to-r hover:from-pink-50 hover:to-rose-50 transition-all border border-transparent hover:border-rose-300 flex items-center gap-3.5 group/item">
                             <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center text-2xl shadow-md group-hover/item:scale-110 group-hover/item:rotate-3 transition-transform flex-shrink-0">
-                                <svg class="icon text-white" aria-hidden="true"><use href="/assets/icons.svg#i-camera"></use></svg>
+                                <svg class="icon text-white" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-camera"></use></svg>
                             </div>
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-center justify-between gap-1">
@@ -1458,7 +1458,7 @@
                         <div class="text-[11px] text-gray-500">by Sigmabloom</div>
                     </div>
                 </div>
-                <button type="button" onclick="closeMobileMenu()" class="w-11 h-11 -mr-2 flex items-center justify-center rounded-xl text-gray-500 hover:bg-gray-100 text-2xl" aria-label="Đóng menu"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-x"></use></svg></button>
+                <button type="button" onclick="closeMobileMenu()" class="w-11 h-11 -mr-2 flex items-center justify-center rounded-xl text-gray-500 hover:bg-gray-100 text-2xl" aria-label="Đóng menu"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-x"></use></svg></button>
             </div>
 
             <!-- Thông tin tài khoản (đã đăng nhập) -->
@@ -1471,11 +1471,11 @@
             </div>
 
             <nav class="flex flex-col gap-1" aria-label="Điều hướng">
-                <a href="#home" class="mobile-menu-link"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-house"></use></svg> Trang chủ</a>
-                <a href="#features" class="mobile-menu-link"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-sparkles"></use></svg> Tính năng</a>
-                <a href="#updates" class="mobile-menu-link"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-newspaper"></use></svg> Cập nhật</a>
-                <a href="#tips" class="mobile-menu-link"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-shield-check"></use></svg> Mẹo an toàn</a>
-                <a href="#contact" class="mobile-menu-link"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-mail"></use></svg> Liên hệ</a>
+                <a href="#home" class="mobile-menu-link"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-house"></use></svg> Trang chủ</a>
+                <a href="#features" class="mobile-menu-link"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-sparkles"></use></svg> Tính năng</a>
+                <a href="#updates" class="mobile-menu-link"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-newspaper"></use></svg> Cập nhật</a>
+                <a href="#tips" class="mobile-menu-link"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-shield-check"></use></svg> Mẹo an toàn</a>
+                <a href="#contact" class="mobile-menu-link"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-mail"></use></svg> Liên hệ</a>
             </nav>
 
             <div class="mt-auto pt-5 flex flex-col gap-3">
@@ -1488,10 +1488,10 @@
                     <button type="button" class="btn-primary w-full" style="padding: 12px 12px;" onclick="closeMobileMenu(); openRegisterModal();">Đăng ký</button>
                 </div>
                 <div data-user-only class="flex flex-col gap-1 border-t border-gray-100 pt-3">
-                    <button type="button" class="mobile-menu-link w-full text-left" onclick="closeMobileMenu(); openPricingModal();"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-zap"></use></svg> Nâng cấp / Mua gói</button>
-                    <button type="button" class="mobile-menu-link w-full text-left" onclick="closeMobileMenu(); openMyOrdersModal();"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-scroll-text"></use></svg> Lịch sử đơn hàng</button>
-                    <a href="/admin.html" data-admin-only class="mobile-menu-link text-purple-600"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-shield-check"></use></svg> Trang quản trị</a>
-                    <button type="button" class="mobile-menu-link w-full text-left text-red-500" onclick="closeMobileMenu(); logout();"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-log-out"></use></svg> Đăng xuất</button>
+                    <button type="button" class="mobile-menu-link w-full text-left" onclick="closeMobileMenu(); openPricingModal();"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-zap"></use></svg> Nâng cấp / Mua gói</button>
+                    <button type="button" class="mobile-menu-link w-full text-left" onclick="closeMobileMenu(); openMyOrdersModal();"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-scroll-text"></use></svg> Lịch sử đơn hàng</button>
+                    <a href="/admin.html" data-admin-only class="mobile-menu-link text-purple-600"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-shield-check"></use></svg> Trang quản trị</a>
+                    <button type="button" class="mobile-menu-link w-full text-left text-red-500" onclick="closeMobileMenu(); logout();"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-log-out"></use></svg> Đăng xuất</button>
                 </div>
             </div>
         </aside>
@@ -1601,7 +1601,7 @@
                 </div>
 
                 <p class="text-xs sm:text-sm text-gray-500 max-w-lg mx-auto lg:mx-0" style="animation: slideInUp 1.2s cubic-bezier(0.22, 1, 0.36, 1)">
-                    <svg class="icon text-emerald-600" aria-hidden="true"><use href="/assets/icons.svg#i-shield-check"></use></svg> Không quảng cáo · Không nhắn tin với người lạ · CyberKnight không bao giờ hỏi mật khẩu hay mã OTP
+                    <svg class="icon text-emerald-600" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-shield-check"></use></svg> Không quảng cáo · Không nhắn tin với người lạ · CyberKnight không bao giờ hỏi mật khẩu hay mã OTP
                 </p>
             </div>
         </div>
@@ -1655,37 +1655,37 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-8">
                 <div class="feature-card reveal" style="transition-delay: 0.05s">
-                    <div class="icon-container"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-clapperboard"></use></svg></div>
+                    <div class="icon-container"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-clapperboard"></use></svg></div>
                     <h3 class="text-xl lg:text-2xl font-bold text-gray-800 mb-3">Học qua tình huống thật</h3>
                     <p class="text-gray-600">Video ngắn về chuyện trẻ hay gặp: quà lạ trên mạng, link "nhận thưởng", người bạn mới quen, quyền camera – micro, ảnh đăng lên mạng.</p>
                 </div>
 
                 <div class="feature-card reveal" style="transition-delay: 0.1s;">
-                    <div class="icon-container"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-gamepad-2"></use></svg></div>
+                    <div class="icon-container"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-gamepad-2"></use></svg></div>
                     <h3 class="text-xl lg:text-2xl font-bold text-gray-800 mb-3">Mini-game tương tác</h3>
                     <p class="text-gray-600">Soi hộp quà tìm mã độc, phân loại tin nhắn an toàn, ghép cửa bảo vệ, kéo-thả chìa khóa quyền truy cập, tìm thông tin bị lộ trong ảnh.</p>
                 </div>
 
                 <div class="feature-card reveal" style="transition-delay: 0.15s;">
-                    <div class="icon-container"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-split"></use></svg></div>
+                    <div class="icon-container"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-split"></use></svg></div>
                     <h3 class="text-xl lg:text-2xl font-bold text-gray-800 mb-3">Lựa chọn có hậu quả</h3>
                     <p class="text-gray-600">Con tự quyết định và xem điều gì xảy ra sau mỗi lựa chọn, rồi rút ra bài học để lần sau phản xạ đúng.</p>
                 </div>
 
                 <div class="feature-card reveal" style="transition-delay: 0.2s;">
-                    <div class="icon-container"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-award"></use></svg></div>
+                    <div class="icon-container"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-award"></use></svg></div>
                     <h3 class="text-xl lg:text-2xl font-bold text-gray-800 mb-3">Huy hiệu sau mỗi màn</h3>
                     <p class="text-gray-600">Hoàn thành màn chơi nhận huy hiệu hiệp sĩ và bảng tóm tắt kiến thức để ôn lại cùng bố mẹ, thầy cô.</p>
                 </div>
 
                 <div class="feature-card reveal" style="transition-delay: 0.25s;">
-                    <div class="icon-container"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-smartphone"></use></svg></div>
+                    <div class="icon-container"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-smartphone"></use></svg></div>
                     <h3 class="text-xl lg:text-2xl font-bold text-gray-800 mb-3">Chơi trên mọi thiết bị</h3>
                     <p class="text-gray-600">Chạy ngay trên trình duyệt máy tính, máy tính bảng và điện thoại. Video tự chỉnh chất lượng theo tốc độ mạng.</p>
                 </div>
 
                 <div class="feature-card reveal" style="transition-delay: 0.3s;">
-                    <div class="icon-container"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-users-round"></use></svg></div>
+                    <div class="icon-container"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-users-round"></use></svg></div>
                     <h3 class="text-xl lg:text-2xl font-bold text-gray-800 mb-3">An toàn cho trẻ</h3>
                     <p class="text-gray-600">Không quảng cáo, không có tính năng nhắn tin với người lạ. Trẻ dưới 13 tuổi nên nhờ bố mẹ, thầy cô tạo tài khoản.</p>
                 </div>
@@ -1773,7 +1773,7 @@
                 <div class="lg:col-span-3 grid grid-cols-1 gap-4">
                     <div class="tip-card reveal">
                         <div class="flex items-start gap-4">
-                            <div class="w-12 h-12 shrink-0 rounded-xl bg-gradient-to-br from-blue-400 to-cyan-400 flex items-center justify-center text-2xl text-white" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-lock-keyhole"></use></svg></div>
+                            <div class="w-12 h-12 shrink-0 rounded-xl bg-gradient-to-br from-blue-400 to-cyan-400 flex items-center justify-center text-2xl text-white" aria-hidden="true"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-lock-keyhole"></use></svg></div>
                             <div class="min-w-0">
                                 <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-1.5">Mật khẩu và mã OTP là bí mật</h3>
                                 <p class="text-gray-600 text-sm sm:text-base">Không đưa mật khẩu hay mã OTP cho bất kỳ ai, kể cả người tự xưng là bạn bè, thầy cô hay "nhân viên game". CyberKnight không bao giờ hỏi những thông tin này qua tin nhắn, email hay điện thoại.</p>
@@ -1783,7 +1783,7 @@
 
                     <div class="tip-card reveal" style="transition-delay: 0.1s">
                         <div class="flex items-start gap-4">
-                            <div class="w-12 h-12 shrink-0 rounded-xl bg-gradient-to-br from-amber-400 to-orange-400 flex items-center justify-center text-2xl text-white" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-gift"></use></svg></div>
+                            <div class="w-12 h-12 shrink-0 rounded-xl bg-gradient-to-br from-amber-400 to-orange-400 flex items-center justify-center text-2xl text-white" aria-hidden="true"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-gift"></use></svg></div>
                             <div class="min-w-0">
                                 <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-1.5">Quà miễn phí bất ngờ? Soi kỹ trước</h3>
                                 <p class="text-gray-600 text-sm sm:text-base">Lời mời "nhận quà", "kim cương miễn phí", "trúng thưởng" kèm đồng hồ đếm ngược thường là bẫy. Đừng điền địa chỉ nhà hay số điện thoại — hãy hỏi bố mẹ trước khi bấm.</p>
@@ -1793,7 +1793,7 @@
 
                     <div class="tip-card reveal" style="transition-delay: 0.2s">
                         <div class="flex items-start gap-4">
-                            <div class="w-12 h-12 shrink-0 rounded-xl bg-gradient-to-br from-pink-400 to-rose-400 flex items-center justify-center text-2xl text-white" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-camera"></use></svg></div>
+                            <div class="w-12 h-12 shrink-0 rounded-xl bg-gradient-to-br from-pink-400 to-rose-400 flex items-center justify-center text-2xl text-white" aria-hidden="true"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-camera"></use></svg></div>
                             <div class="min-w-0">
                                 <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-1.5">Nhìn – Che – Hỏi trước khi đăng ảnh</h3>
                                 <p class="text-gray-600 text-sm sm:text-base">Một bức ảnh có thể lộ tên trường, lớp, địa chỉ, số điện thoại. Nhìn kỹ, che thông tin riêng tư và hỏi người lớn nếu chưa chắc.</p>
@@ -1859,7 +1859,7 @@
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-12">
                 <!-- Contact Form -->
                 <div class="glass-strong rounded-3xl p-5 sm:p-8 reveal-left min-w-0">
-                    <h3 class="text-xl sm:text-2xl font-bold text-gray-800 mb-5 sm:mb-6 flex items-center gap-2"><svg class="icon text-primary" aria-hidden="true"><use href="/assets/icons.svg#i-mail-check"></use></svg> Gửi tin nhắn cho chúng tôi</h3>
+                    <h3 class="text-xl sm:text-2xl font-bold text-gray-800 mb-5 sm:mb-6 flex items-center gap-2"><svg class="icon text-primary" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-mail-check"></use></svg> Gửi tin nhắn cho chúng tôi</h3>
                     <form class="space-y-5" id="contactForm">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
@@ -1870,7 +1870,7 @@
                             <div>
                                 <div class="flex items-center justify-between mb-2">
                                     <label for="contactEmail" class="text-gray-600 font-medium">Email</label>
-                                    <span id="contactEmailHint" class="text-xs text-blue-600 font-medium hidden"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-lock"></use></svg> Đã liên kết tài khoản</span>
+                                    <span id="contactEmailHint" class="text-xs text-blue-600 font-medium hidden"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-lock"></use></svg> Đã liên kết tài khoản</span>
                                 </div>
                                 <input type="email" id="contactEmail" placeholder="email@example.com"
                                     class="w-full px-4 py-3 rounded-xl bg-white border border-gray-200 text-gray-800 focus:border-primary focus:ring-2 focus:ring-blue-100 focus:outline-none transition">
@@ -1893,7 +1893,7 @@
                         </div>
                         <button type="submit" id="contactSubmitBtn" class="btn-primary w-full text-lg py-4">
                             <span class="flex items-center justify-center gap-2">
-                                <svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-send"></use></svg> Gửi tin nhắn
+                                <svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-send"></use></svg> Gửi tin nhắn
                             </span>
                         </button>
                     </form>
@@ -1905,7 +1905,7 @@
                     <div class="feature-card" style="padding: 20px;">
                         <div class="flex items-center gap-4">
                             <div class="w-12 h-12 sm:w-14 sm:h-14 shrink-0 rounded-2xl bg-gradient-to-br from-blue-400 to-cyan-400 flex items-center justify-center text-2xl" aria-hidden="true">
-                                <svg class="icon text-white" aria-hidden="true"><use href="/assets/icons.svg#i-mail"></use></svg>
+                                <svg class="icon text-white" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-mail"></use></svg>
                             </div>
                             <div class="min-w-0">
                                 <h3 class="font-bold text-gray-800">Email</h3>
@@ -1917,7 +1917,7 @@
                     <div class="feature-card" style="padding: 20px;">
                         <div class="flex items-center gap-4">
                             <div class="w-12 h-12 sm:w-14 sm:h-14 shrink-0 rounded-2xl bg-gradient-to-br from-green-400 to-emerald-400 flex items-center justify-center text-2xl" aria-hidden="true">
-                                <svg class="icon text-white" aria-hidden="true"><use href="/assets/icons.svg#i-phone"></use></svg>
+                                <svg class="icon text-white" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-phone"></use></svg>
                             </div>
                             <div class="min-w-0">
                                 <h3 class="font-bold text-gray-800">Điện thoại</h3>
@@ -1929,7 +1929,7 @@
                     <div class="feature-card" style="padding: 20px;">
                         <div class="flex items-center gap-4">
                             <div class="w-12 h-12 sm:w-14 sm:h-14 shrink-0 rounded-2xl bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center text-2xl" aria-hidden="true">
-                                <svg class="icon text-white" aria-hidden="true"><use href="/assets/icons.svg#i-map-pin"></use></svg>
+                                <svg class="icon text-white" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-map-pin"></use></svg>
                             </div>
                             <div class="min-w-0">
                                 <h3 class="font-bold text-gray-800">Địa chỉ</h3>
@@ -1942,7 +1942,7 @@
                     <div class="feature-card" style="padding: 20px;">
                         <div class="flex items-center gap-4">
                             <div class="w-12 h-12 sm:w-14 sm:h-14 shrink-0 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-400 flex items-center justify-center text-2xl" aria-hidden="true">
-                                <svg class="icon text-white" aria-hidden="true"><use href="/assets/icons.svg#i-clock"></use></svg>
+                                <svg class="icon text-white" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-clock"></use></svg>
                             </div>
                             <div class="min-w-0">
                                 <h3 class="font-bold text-gray-800">Giờ làm việc</h3>
@@ -1953,7 +1953,7 @@
 
                     <!-- Social Links -->
                     <a href="https://www.tiktok.com/@cyberknight_hiepsimang" target="_blank" rel="noopener noreferrer" class="glass-strong rounded-3xl p-5 flex items-center gap-4 sm:col-span-2 lg:col-span-1 hover:border-blue-300 transition-colors">
-                        <span class="w-12 h-12 sm:w-14 sm:h-14 shrink-0 rounded-2xl bg-gradient-to-br from-pink-500 via-purple-500 to-orange-400 flex items-center justify-center text-white text-2xl shadow-lg" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-tiktok"></use></svg></span>
+                        <span class="w-12 h-12 sm:w-14 sm:h-14 shrink-0 rounded-2xl bg-gradient-to-br from-pink-500 via-purple-500 to-orange-400 flex items-center justify-center text-white text-2xl shadow-lg" aria-hidden="true"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-tiktok"></use></svg></span>
                         <span class="min-w-0">
                             <span class="block font-bold text-gray-800">TikTok chính thức</span>
                             <span class="block text-gray-600 text-sm break-all">@cyberknight_hiepsimang</span>
@@ -2010,7 +2010,7 @@
 
             <div class="pt-6 border-t border-blue-200 flex flex-col md:flex-row md:items-center md:justify-between gap-3 text-sm text-gray-600 text-center md:text-left">
                 <p>© 2026 Sigmabloom · CyberKnight – Hiệp Sĩ Mạng</p>
-                <p class="max-w-xl"><svg class="icon text-emerald-600" aria-hidden="true"><use href="/assets/icons.svg#i-shield-check"></use></svg> CyberKnight không bao giờ yêu cầu mật khẩu, mã OTP hay chuyển khoản qua tin nhắn, email hoặc điện thoại.</p>
+                <p class="max-w-xl"><svg class="icon text-emerald-600" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-shield-check"></use></svg> CyberKnight không bao giờ yêu cầu mật khẩu, mã OTP hay chuyển khoản qua tin nhắn, email hoặc điện thoại.</p>
             </div>
         </div>
     </footer>
@@ -2024,7 +2024,7 @@
             <div class="flex justify-between items-start mb-6 pb-4 border-b border-blue-100">
                 <div>
                     <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 text-primary text-xs font-black tracking-wide uppercase mb-2">
-                        <span><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-gamepad-2"></use></svg></span> CHỌN MÀN CHƠI CYBERKNIGHT
+                        <span><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-gamepad-2"></use></svg></span> CHỌN MÀN CHƠI CYBERKNIGHT
                     </div>
                     <h3 class="text-xl sm:text-2xl md:text-3xl font-black text-gray-900 font-heading">
                         CON MUỐN BẮT ĐẦU VỚI MÀN NÀO?
@@ -2033,10 +2033,10 @@
                         Mỗi màn chơi là một chuyến phiêu lưu bảo vệ bản thân và rèn luyện kỹ năng an toàn số!
                     </p>
                     <p class="text-xs text-blue-800 bg-blue-50 border border-blue-100 rounded-lg px-3 py-2 mt-3 flex items-start gap-2">
-                        <svg class="icon text-sm mt-px" aria-hidden="true"><use href="/assets/icons.svg#i-shield-check"></use></svg> <span>Các màn chơi là tình huống <b>mô phỏng</b> để học — không có quà hay phần thưởng thật, game không bao giờ hỏi mật khẩu, OTP hay thông tin ngân hàng.</span>
+                        <svg class="icon text-sm mt-px" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-shield-check"></use></svg> <span>Các màn chơi là tình huống <b>mô phỏng</b> để học — không có quà hay phần thưởng thật, game không bao giờ hỏi mật khẩu, OTP hay thông tin ngân hàng.</span>
                     </p>
                 </div>
-                <button type="button" onclick="closeLevelSelectModal()" class="w-10 h-10 rounded-full bg-gray-100 hover:bg-red-50 hover:text-red-500 text-gray-500 flex items-center justify-center text-xl font-bold transition flex-shrink-0" title="Đóng" aria-label="Đóng"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-x"></use></svg></button>
+                <button type="button" onclick="closeLevelSelectModal()" class="w-10 h-10 rounded-full bg-gray-100 hover:bg-red-50 hover:text-red-500 text-gray-500 flex items-center justify-center text-xl font-bold transition flex-shrink-0" title="Đóng" aria-label="Đóng"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-x"></use></svg></button>
             </div>
 
             <!-- Grid 2 Level Cards -->
@@ -2050,10 +2050,10 @@
                                 <span class="px-2.5 py-1 rounded-lg bg-amber-100 text-amber-800 text-xs font-black tracking-wider whitespace-nowrap">LEVEL 0 • CƠ BẢN</span>
                                 <span class="level-badge-area"></span>
                             </div>
-                            <span class="text-xs text-gray-500 font-semibold whitespace-nowrap inline-flex items-center gap-1"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-clock"></use></svg> 2–3 phút</span>
+                            <span class="text-xs text-gray-500 font-semibold whitespace-nowrap inline-flex items-center gap-1"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-clock"></use></svg> 2–3 phút</span>
                         </div>
                         <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-3xl shadow-lg mb-4 group-hover:scale-110 group-hover:rotate-6 transition-transform">
-                            <svg class="icon text-white" aria-hidden="true"><use href="/assets/icons.svg#i-gift"></use></svg>
+                            <svg class="icon text-white" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-gift"></use></svg>
                         </div>
                         <h4 class="text-xl font-black text-gray-900 mb-2">Hộp Quà Bí Ẩn</h4>
                         <p class="text-gray-600 text-sm mb-4 leading-relaxed">
@@ -2061,13 +2061,13 @@
                         </p>
                         <div class="space-y-2 mb-6 text-xs text-gray-700">
                             <div class="flex items-center gap-2">
-                                <svg class="icon text-amber-500 text-base" aria-hidden="true"><use href="/assets/icons.svg#i-check"></use></svg> Cạo lớp phủ tìm manh mối ẩn
+                                <svg class="icon text-amber-500 text-base" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-check"></use></svg> Cạo lớp phủ tìm manh mối ẩn
                             </div>
                             <div class="flex items-center gap-2">
-                                <svg class="icon text-amber-500 text-base" aria-hidden="true"><use href="/assets/icons.svg#i-check"></use></svg> Nhận diện cảnh báo mã độc
+                                <svg class="icon text-amber-500 text-base" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-check"></use></svg> Nhận diện cảnh báo mã độc
                             </div>
                             <div class="flex items-center gap-2">
-                                <svg class="icon text-amber-500 text-base" aria-hidden="true"><use href="/assets/icons.svg#i-check"></use></svg> Quyết định Nhận hay Không Nhận
+                                <svg class="icon text-amber-500 text-base" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-check"></use></svg> Quyết định Nhận hay Không Nhận
                             </div>
                         </div>
                     </div>
@@ -2086,10 +2086,10 @@
                                 <span class="px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800 text-xs font-black tracking-wider whitespace-nowrap">LEVEL 1 • MỚI</span>
                                 <span class="level-badge-area"></span>
                             </div>
-                            <span class="text-xs text-gray-500 font-semibold whitespace-nowrap inline-flex items-center gap-1"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-clock"></use></svg> 3–4 phút</span>
+                            <span class="text-xs text-gray-500 font-semibold whitespace-nowrap inline-flex items-center gap-1"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-clock"></use></svg> 3–4 phút</span>
                         </div>
                         <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-3xl shadow-lg mb-4 group-hover:scale-110 group-hover:-rotate-6 transition-transform">
-                            <svg class="icon text-white" aria-hidden="true"><use href="/assets/icons.svg#i-shield-check"></use></svg>
+                            <svg class="icon text-white" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-shield-check"></use></svg>
                         </div>
                         <h4 class="text-xl font-black text-gray-900 mb-2">Lớp Trưởng Gửi Link Nhận Quà</h4>
                         <p class="text-gray-600 text-sm mb-4 leading-relaxed">
@@ -2097,13 +2097,13 @@
                         </p>
                         <div class="space-y-2 mb-6 text-xs text-gray-700">
                             <div class="flex items-center gap-2">
-                                <svg class="icon text-blue-500 text-base" aria-hidden="true"><use href="/assets/icons.svg#i-check"></use></svg> Game phân loại vật phẩm rơi vào 2 giỏ
+                                <svg class="icon text-blue-500 text-base" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-check"></use></svg> Game phân loại vật phẩm rơi vào 2 giỏ
                             </div>
                             <div class="flex items-center gap-2">
-                                <svg class="icon text-blue-500 text-base" aria-hidden="true"><use href="/assets/icons.svg#i-check"></use></svg> Bảo vệ thông tin cá nhân & địa chỉ nhà
+                                <svg class="icon text-blue-500 text-base" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-check"></use></svg> Bảo vệ thông tin cá nhân & địa chỉ nhà
                             </div>
                             <div class="flex items-center gap-2">
-                                <svg class="icon text-blue-500 text-base" aria-hidden="true"><use href="/assets/icons.svg#i-check"></use></svg> 3 Nhánh kết cục hậu quả độc lập (A/B/C)
+                                <svg class="icon text-blue-500 text-base" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-check"></use></svg> 3 Nhánh kết cục hậu quả độc lập (A/B/C)
                             </div>
                         </div>
                     </div>
@@ -2122,10 +2122,10 @@
                                 <span class="px-2.5 py-1 rounded-lg bg-purple-100 text-purple-800 text-xs font-black tracking-wider whitespace-nowrap">LEVEL 2 • MỚI</span>
                                 <span class="level-badge-area"></span>
                             </div>
-                            <span class="text-xs text-gray-500 font-semibold whitespace-nowrap inline-flex items-center gap-1"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-clock"></use></svg> 4–5 phút</span>
+                            <span class="text-xs text-gray-500 font-semibold whitespace-nowrap inline-flex items-center gap-1"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-clock"></use></svg> 4–5 phút</span>
                         </div>
                         <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-3xl shadow-lg mb-4 group-hover:scale-110 group-hover:rotate-6 transition-transform">
-                            <svg class="icon text-white" aria-hidden="true"><use href="/assets/icons.svg#i-door-open"></use></svg>
+                            <svg class="icon text-white" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-door-open"></use></svg>
                         </div>
                         <h4 class="text-xl font-black text-gray-900 mb-2">Kết Bạn Online — Người Bạn Mới</h4>
                         <p class="text-gray-600 text-sm mb-4 leading-relaxed">
@@ -2133,13 +2133,13 @@
                         </p>
                         <div class="space-y-2 mb-6 text-xs text-gray-700">
                             <div class="flex items-center gap-2">
-                                <svg class="icon text-purple-500 text-base" aria-hidden="true"><use href="/assets/icons.svg#i-check"></use></svg> Nhận diện nguy cơ khi kết bạn online
+                                <svg class="icon text-purple-500 text-base" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-check"></use></svg> Nhận diện nguy cơ khi kết bạn online
                             </div>
                             <div class="flex items-center gap-2">
-                                <svg class="icon text-purple-500 text-base" aria-hidden="true"><use href="/assets/icons.svg#i-check"></use></svg> Ghép Cửa Bảo Vệ Căn Cứ an toàn số
+                                <svg class="icon text-purple-500 text-base" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-check"></use></svg> Ghép Cửa Bảo Vệ Căn Cứ an toàn số
                             </div>
                             <div class="flex items-center gap-2">
-                                <svg class="icon text-purple-500 text-base" aria-hidden="true"><use href="/assets/icons.svg#i-check"></use></svg> 2 Nhánh quyết định xử lý tình huống thông minh
+                                <svg class="icon text-purple-500 text-base" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-check"></use></svg> 2 Nhánh quyết định xử lý tình huống thông minh
                             </div>
                         </div>
                     </div>
@@ -2159,10 +2159,10 @@
                                 <span class="px-2.5 py-1 rounded-lg bg-amber-100 text-amber-800 text-xs font-black tracking-wider whitespace-nowrap">LEVEL 3 • MỚI</span>
                                 <span class="level-badge-area"></span>
                             </div>
-                            <span class="text-xs text-gray-500 font-semibold whitespace-nowrap inline-flex items-center gap-1"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-clock"></use></svg> 6–8 phút</span>
+                            <span class="text-xs text-gray-500 font-semibold whitespace-nowrap inline-flex items-center gap-1"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-clock"></use></svg> 6–8 phút</span>
                         </div>
                         <div class="flex items-center gap-3 mb-3">
-                            <div class="w-12 h-12 shrink-0 rounded-xl bg-gradient-to-br from-amber-500 to-yellow-500 flex items-center justify-center text-2xl text-white shadow-md"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-key-round"></use></svg></div>
+                            <div class="w-12 h-12 shrink-0 rounded-xl bg-gradient-to-br from-amber-500 to-yellow-500 flex items-center justify-center text-2xl text-white shadow-md"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-key-round"></use></svg></div>
                             <div>
                                 <h4 class="text-lg font-black text-gray-900">Bốn Chìa Khóa Bí Mật</h4>
                                 <p class="text-xs text-gray-500 font-semibold uppercase tracking-wider">Quyền truy cập thông minh</p>
@@ -2173,13 +2173,13 @@
                         </p>
                         <div class="space-y-2 text-sm text-gray-700 mb-4">
                             <div class="flex items-center gap-2">
-                                <svg class="icon text-amber-500 text-base" aria-hidden="true"><use href="/assets/icons.svg#i-check"></use></svg> 5 video ngắn + 3 tình huống quyết định trung lập
+                                <svg class="icon text-amber-500 text-base" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-check"></use></svg> 5 video ngắn + 3 tình huống quyết định trung lập
                             </div>
                             <div class="flex items-center gap-2">
-                                <svg class="icon text-amber-500 text-base" aria-hidden="true"><use href="/assets/icons.svg#i-check"></use></svg> Mini-game kéo-thả 4 chìa × 3 nhân vật
+                                <svg class="icon text-amber-500 text-base" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-check"></use></svg> Mini-game kéo-thả 4 chìa × 3 nhân vật
                             </div>
                             <div class="flex items-center gap-2">
-                                <svg class="icon text-amber-500 text-base" aria-hidden="true"><use href="/assets/icons.svg#i-check"></use></svg> Recap an toàn mạng + huy hiệu "Người Giữ Chìa Khóa"
+                                <svg class="icon text-amber-500 text-base" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-check"></use></svg> Recap an toàn mạng + huy hiệu "Người Giữ Chìa Khóa"
                             </div>
                         </div>
                     </div>
@@ -2199,10 +2199,10 @@
                                 <span class="px-2.5 py-1 rounded-lg bg-rose-100 text-rose-800 text-xs font-black tracking-wider whitespace-nowrap">LEVEL 4 • MỚI NHẤT</span>
                                 <span class="level-badge-area"></span>
                             </div>
-                            <span class="text-xs text-gray-500 font-semibold whitespace-nowrap inline-flex items-center gap-1"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-clock"></use></svg> 4–5 phút</span>
+                            <span class="text-xs text-gray-500 font-semibold whitespace-nowrap inline-flex items-center gap-1"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-clock"></use></svg> 4–5 phút</span>
                         </div>
                         <div class="flex items-center gap-3 mb-3">
-                            <div class="w-12 h-12 shrink-0 rounded-xl bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center text-2xl text-white shadow-md"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-camera"></use></svg></div>
+                            <div class="w-12 h-12 shrink-0 rounded-xl bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center text-2xl text-white shadow-md"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-camera"></use></svg></div>
                             <div>
                                 <h4 class="text-lg font-black text-gray-900">Bức Ảnh Có Quá Nhiều Bí Mật</h4>
                                 <p class="text-xs text-gray-500 font-semibold uppercase tracking-wider">An toàn khi chia sẻ ảnh</p>
@@ -2213,13 +2213,13 @@
                         </p>
                         <div class="space-y-2 text-sm text-gray-700 mb-4">
                             <div class="flex items-center gap-2">
-                                <svg class="icon text-rose-500 text-base" aria-hidden="true"><use href="/assets/icons.svg#i-check"></use></svg> 5 video + 1 clip reveal xen kẽ tương tác
+                                <svg class="icon text-rose-500 text-base" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-check"></use></svg> 5 video + 1 clip reveal xen kẽ tương tác
                             </div>
                             <div class="flex items-center gap-2">
-                                <svg class="icon text-rose-500 text-base" aria-hidden="true"><use href="/assets/icons.svg#i-check"></use></svg> Tìm 3 thông tin bị lộ trong ảnh (Q1)
+                                <svg class="icon text-rose-500 text-base" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-check"></use></svg> Tìm 3 thông tin bị lộ trong ảnh (Q1)
                             </div>
                             <div class="flex items-center gap-2">
-                                <svg class="icon text-rose-500 text-base" aria-hidden="true"><use href="/assets/icons.svg#i-check"></use></svg> Mini-game "Thám tử tìm bí mật" + huy hiệu Thám Tử Ảnh An Toàn
+                                <svg class="icon text-rose-500 text-base" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-check"></use></svg> Mini-game "Thám tử tìm bí mật" + huy hiệu Thám Tử Ảnh An Toàn
                             </div>
                         </div>
                     </div>
@@ -2237,7 +2237,7 @@
         <!-- Floating Top Controls Bar -->
         <div class="game-fullscreen-top-controls">
             <button type="button" onclick="switchLevelFromGame()" class="game-fullscreen-switch-btn" title="Đổi sang màn chơi khác" aria-label="Đổi màn chơi">
-                <svg class="icon text-base" aria-hidden="true"><use href="/assets/icons.svg#i-gamepad-2"></use></svg><span>Đổi màn</span>
+                <svg class="icon text-base" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-gamepad-2"></use></svg><span>Đổi màn</span>
             </button>
             <button type="button" onclick="closeGameModal()" class="game-fullscreen-close-btn" title="Thoát trò chơi (ESC)" aria-label="Thoát trò chơi">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -2267,15 +2267,15 @@
             <div class="flex justify-between items-center mb-6 sm:mb-8">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center">
-                        <svg class="icon text-white" aria-hidden="true"><use href="/assets/icons.svg#i-lock-keyhole"></use></svg>
+                        <svg class="icon text-white" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-lock-keyhole"></use></svg>
                     </div>
                     <h3 id="loginTitle" class="text-2xl font-bold text-gray-800" style="font-family:'Space Grotesk'">Đăng nhập</h3>
                 </div>
-                <button type="button" onclick="closeLoginModal()" aria-label="Đóng" class="text-2xl text-gray-400 hover:text-gray-800 transition w-9 h-9 flex items-center justify-center rounded-full hover:bg-gray-100"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-x"></use></svg></button>
+                <button type="button" onclick="closeLoginModal()" aria-label="Đóng" class="text-2xl text-gray-400 hover:text-gray-800 transition w-9 h-9 flex items-center justify-center rounded-full hover:bg-gray-100"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-x"></use></svg></button>
             </div>
 
             <!-- Welcome text -->
-            <p class="text-gray-500 mb-6 sm:mb-8 text-sm">Chào mừng trở lại, CyberKnight! <svg class="icon text-amber-500" aria-hidden="true"><use href="/assets/icons.svg#i-hand"></use></svg></p>
+            <p class="text-gray-500 mb-6 sm:mb-8 text-sm">Chào mừng trở lại, CyberKnight! <svg class="icon text-amber-500" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-hand"></use></svg></p>
 
             <!-- Form -->
             <form id="loginForm" class="space-y-5" onsubmit="handleLogin(event)">
@@ -2283,7 +2283,7 @@
                 <div>
                     <label class="block text-gray-700 font-medium mb-2 text-sm">Email hoặc Tên đăng nhập</label>
                     <div class="relative">
-                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg flex"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-mail"></use></svg></span>
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg flex"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-mail"></use></svg></span>
                         <input type="text" id="loginEmail" placeholder="email@example.com hoặc username..."
                             class="w-full pl-12 pr-4 py-3.5 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:border-primary focus:ring-2 focus:ring-blue-100 focus:outline-none transition text-base sm:text-sm"
                             required>
@@ -2294,11 +2294,11 @@
                 <div>
                     <label class="block text-gray-700 font-medium mb-2 text-sm">Mật khẩu</label>
                     <div class="relative">
-                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg flex"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-lock"></use></svg></span>
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg flex"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-lock"></use></svg></span>
                         <input type="password" id="loginPassword" placeholder="Nhập mật khẩu..."
                             class="w-full pl-12 pr-12 py-3.5 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:border-primary focus:ring-2 focus:ring-blue-100 focus:outline-none transition text-base sm:text-sm"
                             required>
-                        <button type="button" onclick="togglePassword('loginPassword', this)" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition text-lg flex" aria-label="Hiện/ẩn mật khẩu"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-eye"></use></svg></button>
+                        <button type="button" onclick="togglePassword('loginPassword', this)" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition text-lg flex" aria-label="Hiện/ẩn mật khẩu"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-eye"></use></svg></button>
                     </div>
                 </div>
 
@@ -2313,12 +2313,12 @@
 
                 <!-- Error msg -->
                 <div id="loginError" class="hidden bg-red-50 border border-red-200 text-red-600 rounded-xl px-4 py-3 text-sm flex items-center gap-2">
-                    <svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-circle-x"></use></svg> <span id="loginErrorMsg">Email hoặc mật khẩu không đúng!</span>
+                    <svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-circle-x"></use></svg> <span id="loginErrorMsg">Email hoặc mật khẩu không đúng!</span>
                 </div>
 
                 <!-- Submit -->
                 <button type="submit" id="loginSubmitBtn" class="btn-primary w-full py-4 text-base mt-2 flex items-center justify-center gap-2">
-                    <span id="loginBtnText" class="flex items-center justify-center gap-2"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-rocket"></use></svg> Đăng nhập</span>
+                    <span id="loginBtnText" class="flex items-center justify-center gap-2"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-rocket"></use></svg> Đăng nhập</span>
                     <span id="loginBtnSpinner" class="hidden w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
                 </button>
             </form>
@@ -2347,14 +2347,14 @@
             <div class="flex justify-between items-center mb-6 sm:mb-8">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-green-400 to-cyan-400 flex items-center justify-center">
-                        <svg class="icon text-white" aria-hidden="true"><use href="/assets/icons.svg#i-sparkles"></use></svg>
+                        <svg class="icon text-white" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-sparkles"></use></svg>
                     </div>
                     <h3 id="registerTitle" class="text-2xl font-bold text-gray-800" style="font-family:'Space Grotesk'">Tạo tài khoản</h3>
                 </div>
-                <button type="button" onclick="closeRegisterModal()" aria-label="Đóng" class="text-2xl text-gray-400 hover:text-gray-800 transition w-9 h-9 flex items-center justify-center rounded-full hover:bg-gray-100"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-x"></use></svg></button>
+                <button type="button" onclick="closeRegisterModal()" aria-label="Đóng" class="text-2xl text-gray-400 hover:text-gray-800 transition w-9 h-9 flex items-center justify-center rounded-full hover:bg-gray-100"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-x"></use></svg></button>
             </div>
 
-            <p class="text-gray-500 mb-6 sm:mb-8 text-sm">Gia nhập đội CyberKnight ngay hôm nay! <svg class="icon text-primary" aria-hidden="true"><use href="/assets/icons.svg#i-shield-check"></use></svg></p>
+            <p class="text-gray-500 mb-6 sm:mb-8 text-sm">Gia nhập đội CyberKnight ngay hôm nay! <svg class="icon text-primary" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-shield-check"></use></svg></p>
 
             <!-- Form -->
             <form id="registerForm" class="space-y-4" onsubmit="handleRegister(event)">
@@ -2380,7 +2380,7 @@
                 <div>
                     <label class="block text-gray-700 font-medium mb-2 text-sm">Tên đăng nhập</label>
                     <div class="relative">
-                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg flex"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-user-round"></use></svg></span>
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg flex"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-user-round"></use></svg></span>
                         <input type="text" id="regUsername" placeholder="an_hiepsi"
                             oninput="debouncedCheckUsername(this.value)"
                             class="w-full pl-12 pr-10 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:border-primary focus:ring-2 focus:ring-blue-100 focus:outline-none transition text-base sm:text-sm"
@@ -2394,7 +2394,7 @@
                 <div>
                     <label class="block text-gray-700 font-medium mb-2 text-sm">Email</label>
                     <div class="relative">
-                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg flex"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-mail"></use></svg></span>
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg flex"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-mail"></use></svg></span>
                         <input type="email" id="regEmail" placeholder="an@example.com"
                             class="w-full pl-12 pr-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:border-primary focus:ring-2 focus:ring-blue-100 focus:outline-none transition text-base sm:text-sm"
                             required>
@@ -2406,11 +2406,11 @@
                 <div>
                     <label class="block text-gray-700 font-medium mb-2 text-sm">Mật khẩu</label>
                     <div class="relative">
-                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg flex"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-lock"></use></svg></span>
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg flex"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-lock"></use></svg></span>
                         <input type="password" id="regPassword" placeholder="Tối thiểu 8 ký tự (gồm chữ & số)"
                             class="w-full pl-12 pr-12 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:border-primary focus:ring-2 focus:ring-blue-100 focus:outline-none transition text-base sm:text-sm"
                             required minlength="8" oninput="checkPasswordStrength(this.value)">
-                        <button type="button" onclick="togglePassword('regPassword', this)" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition text-lg flex" aria-label="Hiện/ẩn mật khẩu"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-eye"></use></svg></button>
+                        <button type="button" onclick="togglePassword('regPassword', this)" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition text-lg flex" aria-label="Hiện/ẩn mật khẩu"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-eye"></use></svg></button>
                     </div>
                     <p id="regPasswordError" class="hidden text-xs text-red-500 mt-1"></p>
                     <!-- Password strength -->
@@ -2429,7 +2429,7 @@
                 <div>
                     <label class="block text-gray-700 font-medium mb-2 text-sm">Xác nhận mật khẩu</label>
                     <div class="relative">
-                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg flex"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-lock-keyhole"></use></svg></span>
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg flex"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-lock-keyhole"></use></svg></span>
                         <input type="password" id="regConfirmPassword" placeholder="Nhập lại mật khẩu"
                             class="w-full pl-12 pr-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:border-primary focus:ring-2 focus:ring-blue-100 focus:outline-none transition text-base sm:text-sm"
                             required>
@@ -2446,7 +2446,7 @@
                         <option value="">-- Chọn năm sinh --</option>
                     </select>
                     <p id="under13Notice" class="hidden text-xs text-amber-700 bg-amber-50 border border-amber-200 p-2.5 rounded-lg mt-1.5 font-medium flex items-center gap-1.5">
-                        <svg class="icon text-base" aria-hidden="true"><use href="/assets/icons.svg#i-users-round"></use></svg> <span>Hãy nhờ bố mẹ hoặc thầy cô giúp em tạo tài khoản nhé!</span>
+                        <svg class="icon text-base" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-users-round"></use></svg> <span>Hãy nhờ bố mẹ hoặc thầy cô giúp em tạo tài khoản nhé!</span>
                     </p>
                     <p id="regBirthYearError" class="hidden text-xs text-red-500 mt-1"></p>
                 </div>
@@ -2459,12 +2459,12 @@
 
                 <!-- Error msg -->
                 <div id="registerError" class="hidden bg-red-50 border border-red-200 text-red-600 rounded-xl px-4 py-3 text-sm flex items-center gap-2">
-                    <svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-circle-x"></use></svg> <span id="registerErrorMsg">Có lỗi xảy ra!</span>
+                    <svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-circle-x"></use></svg> <span id="registerErrorMsg">Có lỗi xảy ra!</span>
                 </div>
 
                 <!-- Submit -->
                 <button type="submit" id="registerSubmitBtn" class="btn-primary w-full py-4 text-base flex items-center justify-center gap-2">
-                    <span id="registerBtnText" class="flex items-center justify-center gap-2"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-shield-check"></use></svg> Tạo tài khoản</span>
+                    <span id="registerBtnText" class="flex items-center justify-center gap-2"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-shield-check"></use></svg> Tạo tài khoản</span>
                     <span id="registerBtnSpinner" class="hidden w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
                 </button>
             </form>
@@ -2485,29 +2485,29 @@
             <div class="flex justify-between items-center mb-6 sm:mb-8">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-400 to-yellow-400 flex items-center justify-center">
-                        <svg class="icon text-white" aria-hidden="true"><use href="/assets/icons.svg#i-key-round"></use></svg>
+                        <svg class="icon text-white" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-key-round"></use></svg>
                     </div>
                     <h3 id="forgotTitle" class="text-2xl font-bold text-gray-800" style="font-family:'Space Grotesk'">Quên mật khẩu</h3>
                 </div>
-                <button type="button" onclick="closeForgotModal()" aria-label="Đóng" class="text-2xl text-gray-400 hover:text-gray-800 transition w-9 h-9 flex items-center justify-center rounded-full hover:bg-gray-100"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-x"></use></svg></button>
+                <button type="button" onclick="closeForgotModal()" aria-label="Đóng" class="text-2xl text-gray-400 hover:text-gray-800 transition w-9 h-9 flex items-center justify-center rounded-full hover:bg-gray-100"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-x"></use></svg></button>
             </div>
             <p class="text-gray-500 mb-6 sm:mb-8 text-sm">Nhập email của bạn, chúng tôi sẽ gửi link đặt lại mật khẩu.</p>
             <form id="forgotForm" onsubmit="handleForgotPassword(event)" class="space-y-5">
                 <div>
                     <label class="block text-gray-700 font-medium mb-2 text-sm">Email đăng ký</label>
                     <div class="relative">
-                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg flex"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-mail"></use></svg></span>
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg flex"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-mail"></use></svg></span>
                         <input type="email" id="forgotEmail" placeholder="email@example.com"
                             class="w-full pl-12 pr-4 py-3.5 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:border-primary focus:ring-2 focus:ring-blue-100 focus:outline-none transition text-base sm:text-sm"
                             required>
                     </div>
                 </div>
                 <button type="submit" id="forgotSubmitBtn" class="btn-primary w-full py-4 text-base flex items-center justify-center gap-2">
-                    <span id="forgotBtnText" class="flex items-center justify-center gap-2"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-send"></use></svg> Gửi link đặt lại</span>
+                    <span id="forgotBtnText" class="flex items-center justify-center gap-2"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-send"></use></svg> Gửi link đặt lại</span>
                     <span id="forgotBtnSpinner" class="hidden w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
                 </button>
                 <button type="button" onclick="closeForgotModal(); openLoginModal();" class="w-full text-center text-sm text-gray-500 hover:text-primary transition">
-                    <svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-arrow-left"></use></svg> Quay lại đăng nhập
+                    <svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-arrow-left"></use></svg> Quay lại đăng nhập
                 </button>
             </form>
         </div>
@@ -2517,7 +2517,7 @@
     <script>
         // Icon Lucide từ sprite tự host — dùng trong HTML dựng bằng JS (toast, badge, modal động)
         function icon(name, extraClass = '') {
-            return `<svg class="icon ${extraClass}" aria-hidden="true"><use href="/assets/icons.svg#i-${name}"></use></svg>`;
+            return `<svg class="icon ${extraClass}" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-${name}"></use></svg>`;
         }
 
         // ============================================
@@ -4427,7 +4427,7 @@
     </script>    <!-- Level Gate Modal (Phase 5) -->
     <div id="levelGateModal" class="modal-overlay">
         <div class="modal-content max-w-md mx-auto text-center">
-            <button onclick="closeLevelGate()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 hover:bg-red-50 hover:text-red-500 text-gray-500 flex items-center justify-center text-lg font-bold transition" title="Đóng"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-x"></use></svg></button>
+            <button onclick="closeLevelGate()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 hover:bg-red-50 hover:text-red-500 text-gray-500 flex items-center justify-center text-lg font-bold transition" title="Đóng"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-x"></use></svg></button>
             <div id="levelGateBody">
                 <!-- Filled dynamically by showLevelGate() -->
             </div>
@@ -4437,10 +4437,10 @@
     <!-- Pricing Modal (Phase 5) -->
     <div id="pricingModal" class="modal-overlay">
         <div class="modal-content max-w-4xl mx-auto p-6 md:p-8">
-            <button onclick="closePricingModal()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-gray-100 hover:bg-red-50 hover:text-red-500 text-gray-500 flex items-center justify-center text-xl font-bold transition"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-x"></use></svg></button>
+            <button onclick="closePricingModal()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-gray-100 hover:bg-red-50 hover:text-red-500 text-gray-500 flex items-center justify-center text-xl font-bold transition"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-x"></use></svg></button>
             <div class="text-center mb-8">
                 <div class="hidden sm:inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 text-primary text-xs font-black tracking-wider uppercase mb-2">
-                    <span><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-zap"></use></svg></span> NÂNG CẤP TÀI KHOẢN CYBERKNIGHT
+                    <span><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-zap"></use></svg></span> NÂNG CẤP TÀI KHOẢN CYBERKNIGHT
                 </div>
                 <h3 class="text-2xl md:text-3xl font-black text-gray-900 font-heading px-8 sm:px-0">
                     CHỌN GÓI HỌC TẬP & RÈN LUYỆN
@@ -4461,7 +4461,7 @@
                 <div class="package-card p-6 rounded-2xl border-2 border-blue-200 bg-white hover:border-blue-400 hover:shadow-xl transition-all flex flex-col justify-between">
                     <div>
                         <div class="flex items-center justify-between mb-3">
-                            <span class="text-[11px] font-black px-2.5 py-1 rounded-full bg-blue-100 text-blue-800"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-package"></use></svg> CƠ BẢN</span>
+                            <span class="text-[11px] font-black px-2.5 py-1 rounded-full bg-blue-100 text-blue-800"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-package"></use></svg> CƠ BẢN</span>
                             <span class="text-xs text-gray-500 font-semibold">4 Màn chơi</span>
                         </div>
                         <h4 class="text-xl font-black text-gray-900 mb-1">Gói Level 1–4</h4>
@@ -4470,9 +4470,9 @@
                             2.000đ <span class="text-xs text-emerald-700 font-bold">/ Vĩnh viễn (Giá Test)</span>
                         </div>
                         <ul class="space-y-2 text-xs text-gray-600 mb-6">
-                            <li class="flex items-center gap-2"><svg class="icon text-emerald-500 text-base" aria-hidden="true"><use href="/assets/icons.svg#i-check"></use></svg> Mở khóa Level 1, 2, 3, 4</li>
-                            <li class="flex items-center gap-2"><svg class="icon text-emerald-500 text-base" aria-hidden="true"><use href="/assets/icons.svg#i-check"></use></svg> Quyền chơi không giới hạn thời gian</li>
-                            <li class="flex items-center gap-2"><svg class="icon text-emerald-500 text-base" aria-hidden="true"><use href="/assets/icons.svg#i-check"></use></svg> Thẻ huy hiệu hiệp sĩ sau mỗi màn</li>
+                            <li class="flex items-center gap-2"><svg class="icon text-emerald-500 text-base" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-check"></use></svg> Mở khóa Level 1, 2, 3, 4</li>
+                            <li class="flex items-center gap-2"><svg class="icon text-emerald-500 text-base" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-check"></use></svg> Quyền chơi không giới hạn thời gian</li>
+                            <li class="flex items-center gap-2"><svg class="icon text-emerald-500 text-base" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-check"></use></svg> Thẻ huy hiệu hiệp sĩ sau mỗi màn</li>
                         </ul>
                     </div>
                     <button type="button" onclick="handleBuyPackage('pack_1_4')" id="btnBuy_pack_1_4" class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-black text-sm shadow-md transition">
@@ -4483,11 +4483,11 @@
                 <!-- Gói Premium (Khuyên dùng) -->
                 <div class="package-card p-6 rounded-2xl border-2 border-purple-400 bg-gradient-to-b from-purple-50/50 to-white hover:border-purple-600 hover:shadow-2xl transition-all flex flex-col justify-between relative shadow-lg ring-2 ring-purple-400/30">
                     <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-purple-600 to-pink-500 text-white text-[11px] font-black px-3 py-0.5 rounded-full shadow-sm tracking-wide whitespace-nowrap inline-flex items-center gap-1">
-                        <svg class="icon icon-fill" aria-hidden="true"><use href="/assets/icons.svg#i-star"></use></svg> PHỔ BIẾN & TIẾT KIỆM NHẤT
+                        <svg class="icon icon-fill" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-star"></use></svg> PHỔ BIẾN & TIẾT KIỆM NHẤT
                     </div>
                     <div>
                         <div class="flex items-center justify-between mb-3 mt-1">
-                            <span class="text-[11px] font-black px-2.5 py-1 rounded-full bg-purple-100 text-purple-800"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-crown"></use></svg> TOÀN DIỆN</span>
+                            <span class="text-[11px] font-black px-2.5 py-1 rounded-full bg-purple-100 text-purple-800"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-crown"></use></svg> TOÀN DIỆN</span>
                             <span class="text-xs text-purple-700 font-bold">Mở toàn bộ</span>
                         </div>
                         <h4 class="text-xl font-black text-gray-900 mb-1">Premium Cá Nhân</h4>
@@ -4496,14 +4496,14 @@
                             120.000đ <span class="text-xs text-emerald-600 font-bold">/ Vĩnh viễn</span>
                         </div>
                         <ul class="space-y-2 text-xs text-gray-700 mb-6">
-                            <li class="flex items-center gap-2"><svg class="icon text-purple-600 text-base" aria-hidden="true"><use href="/assets/icons.svg#i-check"></use></svg> <strong>Mở khóa TẤT CẢ Level 0 – 10</strong></li>
-                            <li class="flex items-center gap-2"><svg class="icon text-purple-600 text-base" aria-hidden="true"><use href="/assets/icons.svg#i-check"></use></svg> Quyền sở hữu Vĩnh viễn không hết hạn</li>
-                            <li class="flex items-center gap-2"><svg class="icon text-purple-600 text-base" aria-hidden="true"><use href="/assets/icons.svg#i-check"></use></svg> Tự động mở khóa khi ra mắt level mới</li>
-                            <li class="flex items-center gap-2"><svg class="icon text-purple-600 text-base" aria-hidden="true"><use href="/assets/icons.svg#i-check"></use></svg> Huy hiệu danh dự Hiệp sĩ Premium</li>
+                            <li class="flex items-center gap-2"><svg class="icon text-purple-600 text-base" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-check"></use></svg> <strong>Mở khóa TẤT CẢ Level 0 – 10</strong></li>
+                            <li class="flex items-center gap-2"><svg class="icon text-purple-600 text-base" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-check"></use></svg> Quyền sở hữu Vĩnh viễn không hết hạn</li>
+                            <li class="flex items-center gap-2"><svg class="icon text-purple-600 text-base" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-check"></use></svg> Tự động mở khóa khi ra mắt level mới</li>
+                            <li class="flex items-center gap-2"><svg class="icon text-purple-600 text-base" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-check"></use></svg> Huy hiệu danh dự Hiệp sĩ Premium</li>
                         </ul>
                     </div>
                     <button type="button" onclick="handleBuyPackage('premium')" id="btnBuy_premium" class="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white font-black text-sm shadow-lg hover:shadow-xl transition">
-                        <svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-zap"></use></svg> MUA PREMIUM NGAY
+                        <svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-zap"></use></svg> MUA PREMIUM NGAY
                     </button>
                 </div>
 
@@ -4511,7 +4511,7 @@
                 <div class="package-card p-6 rounded-2xl border-2 border-emerald-200 bg-white hover:border-emerald-400 hover:shadow-xl transition-all flex flex-col justify-between">
                     <div>
                         <div class="flex items-center justify-between mb-3">
-                            <span class="text-[11px] font-black px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-shield-check"></use></svg> NÂNG CAO</span>
+                            <span class="text-[11px] font-black px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-shield-check"></use></svg> NÂNG CAO</span>
                             <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-gray-100 text-gray-700">Sắp ra mắt</span>
                         </div>
                         <h4 class="text-xl font-black text-gray-900 mb-1">Gói Level 5–10</h4>
@@ -4520,9 +4520,9 @@
                             79.000đ <span class="text-xs text-emerald-600 font-bold">/ Vĩnh viễn</span>
                         </div>
                         <ul class="space-y-2 text-xs text-gray-600 mb-6">
-                            <li class="flex items-center gap-2"><svg class="icon text-emerald-500 text-base" aria-hidden="true"><use href="/assets/icons.svg#i-check"></use></svg> Mở khóa các Level từ 5 đến 10</li>
-                            <li class="flex items-center gap-2"><svg class="icon text-emerald-500 text-base" aria-hidden="true"><use href="/assets/icons.svg#i-check"></use></svg> Tự động kích hoạt khi các màn phát hành</li>
-                            <li class="flex items-center gap-2"><svg class="icon text-emerald-500 text-base" aria-hidden="true"><use href="/assets/icons.svg#i-check"></use></svg> Quyền chơi không giới hạn thời gian</li>
+                            <li class="flex items-center gap-2"><svg class="icon text-emerald-500 text-base" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-check"></use></svg> Mở khóa các Level từ 5 đến 10</li>
+                            <li class="flex items-center gap-2"><svg class="icon text-emerald-500 text-base" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-check"></use></svg> Tự động kích hoạt khi các màn phát hành</li>
+                            <li class="flex items-center gap-2"><svg class="icon text-emerald-500 text-base" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-check"></use></svg> Quyền chơi không giới hạn thời gian</li>
                         </ul>
                     </div>
                     <button type="button" onclick="handleBuyPackage('pack_5_10')" id="btnBuy_pack_5_10" class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-700 hover:to-teal-600 text-white font-black text-sm shadow-md transition">
@@ -4540,7 +4540,7 @@
     <!-- QR Payment Modal (Phase 5) -->
     <div id="paymentQrModal" class="modal-overlay">
         <div class="modal-content max-w-2xl mx-auto p-6 md:p-8">
-            <button onclick="closePaymentQrModal()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-gray-100 hover:bg-red-50 hover:text-red-500 text-gray-500 flex items-center justify-center text-xl font-bold transition"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-x"></use></svg></button>
+            <button onclick="closePaymentQrModal()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-gray-100 hover:bg-red-50 hover:text-red-500 text-gray-500 flex items-center justify-center text-xl font-bold transition"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-x"></use></svg></button>
 
             <!-- Trạng thái Đang Chờ Thanh Toán -->
             <div id="qrPendingView">
@@ -4564,7 +4564,7 @@
                             <img id="qrDisplayImg" src="" alt="VietQR Code" class="w-56 h-56 object-contain mx-auto">
                         </div>
                         <div id="qrCountdownTimer" class="mt-3 text-xs font-black text-red-600 flex items-center justify-center gap-1.5 bg-red-50 py-1.5 px-3 rounded-lg border border-red-100">
-                            <span><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-timer"></use></svg> Thời gian giữ đơn:</span>
+                            <span><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-timer"></use></svg> Thời gian giữ đơn:</span>
                             <span id="qrCountdownText" class="font-mono text-sm">15:00</span>
                         </div>
                     </div>
@@ -4578,7 +4578,7 @@
                                 <div id="qrDisplayAmount" class="text-xl font-black text-blue-700">0đ</div>
                             </div>
                             <button type="button" onclick="copyField('qrDisplayAmount', 'Số tiền')" class="px-2.5 py-1.5 bg-white hover:bg-blue-100 text-blue-700 font-bold rounded-lg border border-blue-200 transition text-[11px] flex items-center gap-1">
-                                <svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-copy"></use></svg> Copy
+                                <svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-copy"></use></svg> Copy
                             </button>
                         </div>
 
@@ -4586,10 +4586,10 @@
                         <div class="p-3 bg-amber-50 rounded-xl border-2 border-amber-300">
                             <div class="flex items-center justify-between mb-1">
                                 <span class="text-amber-900 font-black text-[11px] flex items-center gap-1">
-                                    <svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-triangle-alert"></use></svg> NỘI DUNG CHUYỂN KHOẢN (BẮT BUỘC):
+                                    <svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-triangle-alert"></use></svg> NỘI DUNG CHUYỂN KHOẢN (BẮT BUỘC):
                                 </span>
                                 <button type="button" onclick="copyField('qrDisplayContent', 'Nội dung chuyển khoản')" class="px-2.5 py-1 bg-amber-600 hover:bg-amber-700 text-white font-black rounded-lg transition text-[11px] shadow-sm flex items-center gap-1">
-                                    <svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-copy"></use></svg> Copy
+                                    <svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-copy"></use></svg> Copy
                                 </button>
                             </div>
                             <div id="qrDisplayContent" class="text-sm font-mono font-black text-amber-950 bg-white p-2 rounded-lg border border-amber-200 select-all tracking-wider text-center">
@@ -4626,7 +4626,7 @@
                 <!-- Box hỗ trợ sau 5 phút -->
                 <div id="qrSupportBox" class="hidden mt-4 p-3 bg-blue-50 border border-blue-200 rounded-xl text-xs text-blue-900 flex flex-col sm:flex-row items-center justify-between gap-2">
                     <div class="flex items-center gap-2">
-                        <span><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-message-circle"></use></svg></span>
+                        <span><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-message-circle"></use></svg></span>
                         <span>Đã chuyển tiền nhưng chưa được kích hoạt? Đội ngũ hỗ trợ sẵn sàng giúp bạn!</span>
                     </div>
                     <a href="tel:0966347482" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition whitespace-nowrap text-xs">
@@ -4637,7 +4637,7 @@
                 <!-- Footer buttons -->
                 <div class="mt-6 pt-4 border-t border-gray-100 flex flex-col-reverse sm:flex-row items-center justify-between gap-2">
                     <button type="button" onclick="cancelCurrentOrder()" id="btnCancelOrder" class="px-4 py-2 text-xs text-gray-500 hover:text-red-600 font-bold transition">
-                        <svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-x"></use></svg> Hủy đơn hàng này
+                        <svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-x"></use></svg> Hủy đơn hàng này
                     </button>
                     <div class="flex items-center gap-2 text-xs text-gray-400">
                         <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -4649,7 +4649,7 @@
             <!-- Trạng thái Thanh Toán Thành Công -->
             <div id="qrSuccessView" class="hidden text-center py-6">
                 <div class="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-4xl mx-auto mb-4 animate-bounce">
-                    <svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-party-popper"></use></svg>
+                    <svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-party-popper"></use></svg>
                 </div>
                 <h3 class="text-2xl font-black text-gray-900 font-heading mb-2">
                     THANH TOÁN THÀNH CÔNG!
@@ -4669,7 +4669,7 @@
                 </div>
                 <div class="flex flex-col sm:flex-row gap-3 justify-center max-w-xs mx-auto">
                     <button type="button" onclick="closePaymentQrModal(); openLevelSelectModal();" class="flex-1 py-3 px-6 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-black text-sm shadow-md hover:shadow-lg transition">
-                        <svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-rocket"></use></svg> VÀO CHƠI NGAY
+                        <svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-rocket"></use></svg> VÀO CHƠI NGAY
                     </button>
                     <button type="button" onclick="closePaymentQrModal()" class="py-3 px-5 rounded-xl bg-gray-100 text-gray-700 font-bold text-sm hover:bg-gray-200 transition">
                         Đóng
@@ -4682,10 +4682,10 @@
     <!-- My Orders Modal (Phase 5) -->
     <div id="myOrdersModal" class="modal-overlay">
         <div class="modal-content max-w-2xl mx-auto p-6 md:p-8">
-            <button onclick="closeMyOrdersModal()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-gray-100 hover:bg-red-50 hover:text-red-500 text-gray-500 flex items-center justify-center text-xl font-bold transition"><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-x"></use></svg></button>
+            <button onclick="closeMyOrdersModal()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-gray-100 hover:bg-red-50 hover:text-red-500 text-gray-500 flex items-center justify-center text-xl font-bold transition"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-x"></use></svg></button>
             <div class="mb-6">
                 <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 text-primary text-xs font-black tracking-wider uppercase mb-2">
-                    <span><svg class="icon" aria-hidden="true"><use href="/assets/icons.svg#i-scroll-text"></use></svg></span> LỊCH SỬ ĐƠN HÀNG
+                    <span><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-scroll-text"></use></svg></span> LỊCH SỬ ĐƠN HÀNG
                 </div>
                 <h3 class="text-2xl font-black text-gray-900 font-heading">
                     ĐƠN HÀNG CỦA BẠN

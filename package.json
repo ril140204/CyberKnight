@@ -8,7 +8,8 @@
     "start": "node backend/src/server.js",
     "test": "npm --prefix backend test",
     "test:all": "npm --prefix backend run test:all",
-    "build:css": "tailwindcss -i ./assets/tailwind-input.css -o ./assets/tailwind.css --minify",
+    "build:css": "tailwindcss -i ./assets/tailwind-input.css -o ./assets/tailwind.css --minify && python3 -I scripts/stamp-assets.py",
+    "build:icons": "bash scripts/build-icons.sh",
     "setup-db": "npm --prefix backend run setup-db",
     "encode:videos": "bash scripts/encode-videos.sh",
     "heroku-postbuild": "npm --prefix backend ci --omit=dev"
