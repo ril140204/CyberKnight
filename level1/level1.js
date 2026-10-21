@@ -853,8 +853,6 @@
 
         init() {
             this.canvas = document.getElementById('particle-canvas');
-            // Agent telemetry disabled - endpoint unavailable
-            // fetch('http://127.0.0.1:7270/ingest/...', ...).catch(()=>{});
             if (this.canvas) {
                 this.ctx = this.canvas.getContext('2d');
                 this.resize();
@@ -888,8 +886,6 @@
         },
 
         burstGlitch() {
-            // Agent telemetry disabled - endpoint unavailable
-            // fetch('http://127.0.0.1:7270/ingest/...', ...).catch(()=>{});
             if (!this.canvas) return;
             for (let i = 0; i < 40; i++) {
                 this.particles.push({
@@ -906,8 +902,6 @@
         },
 
         burstQuestion() {
-            // Agent telemetry disabled - endpoint unavailable
-            // fetch('http://127.0.0.1:7270/ingest/...', ...).catch(()=>{});
             if (!this.canvas) return;
             for (let i = 0; i < 35; i++) {
                 this.particles.push({
@@ -924,8 +918,6 @@
         },
 
         burstShield() {
-            // Agent telemetry disabled - endpoint unavailable
-            // fetch('http://127.0.0.1:7270/ingest/...', ...).catch(()=>{});
             if (!this.canvas) return;
             for (let i = 0; i < 45; i++) {
                 this.particles.push({

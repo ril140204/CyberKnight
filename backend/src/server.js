@@ -198,10 +198,67 @@ app.use(
   })
 );
 
+// ── 5a. File định danh site cho crawler & bộ lọc phishing ─────
+// robots.txt / sitemap.xml / security.txt: site minh bạch, có đầu mối liên hệ — tín hiệu tin cậy
+// cho Google Safe Browsing, SmartScreen... (đặt TRƯỚC khối chặn /.* bên dưới).
+const siteOrigin = () => (process.env.FRONTEND_URL || `http://localhost:${PORT}`).replace(/\/$/, '');
+const contactEmail = () => process.env.CONTACT_EMAIL || 'cyberknight.official.vn@gmail.com';
+
+app.get('/robots.txt', (req, res) => {
+  res.type('text/plain').set('Cache-Control', 'public, max-age=86400').send(
+    [
+      'User-agent: *',
+      'Allow: /',
+      'Disallow: /api/',
+      'Disallow: /admin',
+      'Disallow: /payment',
+      'Disallow: /reset-password',
+      'Disallow: /level',
+      `Sitemap: ${siteOrigin()}/sitemap.xml`,
+      '',
+    ].join('\n')
+  );
+});
+
+app.get('/sitemap.xml', (req, res) => {
+  const urls = ['/', '/privacy', '/terms', '/refund']
+    .map((p) => `  <url><loc>${siteOrigin()}${p}</loc></url>`)
+    .join('\n');
+  res
+    .type('application/xml')
+    .set('Cache-Control', 'public, max-age=86400')
+    .send(`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`);
+});
+
+app.get(['/.well-known/security.txt', '/security.txt'], (req, res) => {
+  const expires = new Date(Date.now() + 365 * 24 * 3600 * 1000).toISOString();
+  res.type('text/plain').set('Cache-Control', 'public, max-age=86400').send(
+    [
+      `Contact: mailto:${contactEmail()}`,
+      `Expires: ${expires}`,
+      'Preferred-Languages: vi, en',
+      `Canonical: ${siteOrigin()}/.well-known/security.txt`,
+      `Policy: ${siteOrigin()}/privacy`,
+      '',
+    ].join('\n')
+  );
+});
+
+app.get('/favicon.ico', (req, res) => {
+  res.set('Cache-Control', 'public, max-age=604800');
+  res.sendFile(path.join(rootDir, 'image', 'favicon.ico'));
+});
+
 // ── 5. Hard-deny sensitive files & SEO Noindex ───────────────
 app.use((req, res, next) => {
-  // Gắn header X-Robots-Tag cho /admin* và /payment*
-  if (req.path.startsWith('/admin') || req.path.startsWith('/payment')) {
+  // Gắn header X-Robots-Tag cho /admin*, /payment* và trang game (/levelN/ là tình huống MÔ PHỎNG
+  // lừa đảo để dạy trẻ — không để máy tìm kiếm lập chỉ mục tách khỏi ngữ cảnh giáo dục)
+  if (
+    req.path.startsWith('/admin') ||
+    req.path.startsWith('/payment') ||
+    req.path.startsWith('/reset-password') ||
+    /^\/level\d+/i.test(req.path)
+  ) {
     res.setHeader('X-Robots-Tag', 'noindex, nofollow');
   }
 
@@ -271,8 +328,21 @@ for (const mount of STATIC_MOUNTS) {
   }
 }
 
+// Trang chủ: thay __SITE_ORIGIN__ (canonical, og:url, og:image, JSON-LD) bằng FRONTEND_URL — link chia sẻ
+// lên Facebook/Zalo có ảnh xem trước và địa chỉ tuyệt đối đúng. Production đọc file 1 lần rồi giữ trong RAM.
+let indexHtmlCache = null;
+function sendIndexHtml(req, res) {
+  if (!indexHtmlCache || !isProd) {
+    indexHtmlCache = fs
+      .readFileSync(path.join(rootDir, 'index.html'), 'utf8')
+      .replaceAll('__SITE_ORIGIN__', siteOrigin());
+  }
+  res.set('Cache-Control', 'public, max-age=0');
+  return res.type('html').send(indexHtmlCache);
+}
+
 // Direct HTML routes
-app.get('/index.html', (req, res) => res.sendFile(path.join(rootDir, 'index.html')));
+app.get('/index.html', sendIndexHtml);
 app.get('/reset-password.html', (req, res) => res.sendFile(path.join(rootDir, 'reset-password.html')));
 app.get('/payment.html', (req, res) => res.sendFile(path.join(rootDir, 'payment.html')));
 app.get('/admin.html', (req, res) => res.sendFile(path.join(rootDir, 'admin.html')));
@@ -517,12 +587,28 @@ app.use('/api/*', (req, res) => {
   res.status(404).json({ success: false, message: 'Không tìm thấy API endpoint này.' });
 });
 
-// ── 11. SPA Fallback (không bao gồm /levelN/) ───────────────
+// ── 11. Trang chủ + 404 thật ─────────────────────────────────
+// Trước đây mọi đường dẫn lạ (/login, /verify, /wp-admin...) đều trả index.html kèm form đăng nhập với
+// mã 200 — đúng dấu hiệu "phishing kit" mà các bộ quét tự động tìm. Giờ chỉ "/" là trang chủ.
+app.get('/', sendIndexHtml);
+
 app.get('*', (req, res) => {
-  if (/^\/level\d+/i.test(req.path)) {
+  if (req.accepts(['html', 'json']) !== 'html') {
     return res.status(404).type('text/plain').send('Not found');
   }
-  res.sendFile(path.join(rootDir, 'index.html'));
+  return res
+    .status(404)
+    .type('text/html')
+    .send(
+      '<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">' +
+        '<meta name="robots" content="noindex"><title>Không tìm thấy trang — CyberKnight</title><link rel="icon" href="/favicon.ico">' +
+        '<style>body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:system-ui,-apple-system,sans-serif;background:#F0F7FF;color:#1a365d;padding:16px;box-sizing:border-box}' +
+        'main{max-width:420px;text-align:center}h1{font-size:1.5rem;margin:.5rem 0}p{color:#475569;line-height:1.6}' +
+        'a{display:inline-block;margin-top:1rem;padding:.75rem 1.5rem;border-radius:999px;background:#0066FF;color:#fff;text-decoration:none;font-weight:600}</style></head>' +
+        '<body><main><div style="font-size:3rem">🛡️</div><h1>Không tìm thấy trang</h1>' +
+        '<p>Đường dẫn này không tồn tại trên CyberKnight. Nếu ai đó gửi link này kèm lời mời nhận quà hay yêu cầu nhập mật khẩu, hãy cẩn thận — đó có thể là lừa đảo.</p>' +
+        '<a href="/">Về trang chủ CyberKnight</a></main></body></html>'
+    );
 });
 
 // ── 12. Error handler ─────────────────────────────────────────

@@ -17,6 +17,8 @@
 
 'use strict';
 
+const { isPaymentConfigured } = require('../utils/paymentConfig');
+
 const WEAK_SECRET_SUBSTRINGS = ['change_this', 'secret_key', 'super_secret', 'cyberknight_'];
 const WEAK_ADMIN_PASSWORDS = new Set([
   'admin',
@@ -132,6 +134,9 @@ function validateConfig(env = process.env) {
     validateProductionSecrets(env, errors);
     validateProductionBanking(env, errors);
     validateProductionDbAndUrl(env, errors);
+    if (!isPaymentConfigured(env)) {
+      warnings.push('Thanh toán đang TẮT: BANK_* còn giá trị giữ chỗ hoặc PAYMENTS_ENABLED=false — nút mua gói bị khoá.');
+    }
 
     const adminPwd = (env.SEED_ADMIN_PASSWORD || env.ADMIN_PASSWORD || '').trim();
     validateAdminSeedPassword(adminPwd, errors);
@@ -154,7 +159,7 @@ function validateStartupConfig(env = process.env) {
   const result = validateConfig(env);
 
   if (result.warnings.length > 0) {
-    console.warn('\x1b[33m%s\x1b[0m', '⚠️  CẢNH BÁO CẤU HÌNH PHÁT TRIỂN:');
+    console.warn('\x1b[33m%s\x1b[0m', '⚠️  CẢNH BÁO CẤU HÌNH:');
     result.warnings.forEach((w) => console.warn(`   • ${w}`));
   }
 

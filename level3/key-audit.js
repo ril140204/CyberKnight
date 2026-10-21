@@ -590,9 +590,6 @@
             const hasLeak = this._computeLeak();
             el.className = `ka-hud-leak ${hasLeak ? 'ka-hud-leak-on' : 'ka-hud-leak-ok'}`;
             el.querySelector('span').textContent = hasLeak ? '⚠️ Có rò rỉ!' : '🔒 An toàn';
-            // #region agent log
-            fetch('http://127.0.0.1:7768/ingest/8602fe44-4a08-43e9-a828-2d55bf3cf826',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'6ec25f'},body:JSON.stringify({sessionId:'6ec25f',runId:'post-fix-v1',hypothesisId:'A3',location:'key-audit.js:557',message:'leak indicator updated',data:{hasLeak},timestamp:Date.now()})}).catch(()=>{});
-            // #endregion
         }
 
         _startLeakAnimation() {

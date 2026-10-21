@@ -1609,3 +1609,16 @@ html, body {
         width: clamp(35px, 4vw, 55px);
     }
 }
+
+/* Ghi chú "tình huống mô phỏng" trên màn bắt đầu — nói rõ đây là bài học, không phải lời mời nhận quà thật */
+.sim-note {
+    max-width: 520px;
+    margin: 0;
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.75);
+    border: 1px solid rgba(0, 102, 255, 0.18);
+    color: #1e3a5f;
+    font-size: 0.85rem;
+    line-height: 1.5;
+}

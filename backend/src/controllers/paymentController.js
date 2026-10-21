@@ -19,6 +19,7 @@ const { generateOrderCode, extractOrderCode } = require('../utils/orderCode');
 const { buildQrUrl } = require('../utils/qr');
 const { sendPackageActivatedEmail } = require('../utils/mailer');
 const { invalidateEntitlementCache } = require('../utils/entitlementCache');
+const { isPaymentConfigured } = require('../utils/paymentConfig');
 
 // Các adapter thanh toán
 const providers = {
@@ -56,17 +57,16 @@ async function createOrder(req, res) {
     });
   }
 
-  // 1. Kiểm tra cấu hình ngân hàng (Fail-closed nếu thiếu)
+  // 1. Kiểm tra cấu hình ngân hàng (Fail-closed nếu thiếu hoặc còn giá trị giữ chỗ)
   const bankBin = process.env.BANK_BIN;
   const bankAccount = process.env.BANK_ACCOUNT;
   const bankName = process.env.BANK_NAME;
 
-  if (!bankBin || !bankAccount || !bankName) {
-    console.error('❌ Cấu hình ngân hàng chưa đầy đủ (BANK_BIN, BANK_ACCOUNT, BANK_NAME)!');
+  if (!isPaymentConfigured()) {
     return res.status(503).json({
       success: false,
-      error: 'PAYMENT_CONFIG_ERROR',
-      message: 'Hệ thống thanh toán tạm thời chưa sẵn sàng, vui lòng liên hệ quản trị viên.',
+      error: 'PAYMENTS_DISABLED',
+      message: 'Thanh toán trực tuyến đang tạm đóng. Level 0 vẫn chơi miễn phí — vui lòng quay lại sau.',
     });
   }
 
@@ -304,17 +304,21 @@ async function getOrder(req, res) {
     }
 
     const pkg = getPackageById(order.package_id);
-    const bankBin = process.env.BANK_BIN || '';
-    const bankAccount = process.env.BANK_ACCOUNT || '';
-    const bankName = process.env.BANK_NAME || '';
+    // Cổng thanh toán đang tắt → không trả thông tin tài khoản / mã QR (tránh chuyển nhầm vào tài khoản giữ chỗ)
+    const paymentsOn = isPaymentConfigured();
+    const bankBin = paymentsOn ? process.env.BANK_BIN || '' : '';
+    const bankAccount = paymentsOn ? process.env.BANK_ACCOUNT || '' : '';
+    const bankName = paymentsOn ? process.env.BANK_NAME || '' : '';
 
-    const qrUrl = buildQrUrl({
-      bin: bankBin,
-      account: bankAccount,
-      amount: order.amount,
-      orderCode: order.order_code,
-      accountName: bankName,
-    });
+    const qrUrl = paymentsOn
+      ? buildQrUrl({
+          bin: bankBin,
+          account: bankAccount,
+          amount: order.amount,
+          orderCode: order.order_code,
+          accountName: bankName,
+        })
+      : '';
 
     return res.json({
       success: true,

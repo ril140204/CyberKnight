@@ -2,13 +2,52 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sigmabloom - Think Twice, Click Right</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>CyberKnight – Hiệp Sĩ Mạng | Game học an toàn mạng cho trẻ em</title>
+    <meta name="description" content="CyberKnight (Hiệp Sĩ Mạng) là game giáo dục giúp trẻ em nhận biết lừa đảo trực tuyến, bảo vệ thông tin cá nhân và dùng Internet an toàn qua video tình huống và mini-game. Phát triển bởi nhóm Sigmabloom.">
+    <meta name="theme-color" content="#0066FF">
+    <link rel="canonical" href="__SITE_ORIGIN__/">
+    <link rel="icon" href="/favicon.ico" sizes="any">
+    <link rel="icon" href="/image/favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/image/apple-touch-icon.png">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="CyberKnight – Hiệp Sĩ Mạng">
+    <meta property="og:locale" content="vi_VN">
+    <meta property="og:title" content="CyberKnight – Game học an toàn mạng cho trẻ em">
+    <meta property="og:description" content="Giúp trẻ nhận biết lừa đảo trực tuyến và bảo vệ thông tin cá nhân qua video tình huống & mini-game. Level 0 chơi miễn phí.">
+    <meta property="og:url" content="__SITE_ORIGIN__/">
+    <meta property="og:image" content="__SITE_ORIGIN__/image/og-cover.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary_large_image">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@graph": [
+            {
+                "@type": "Organization",
+                "name": "Sigmabloom",
+                "url": "__SITE_ORIGIN__/",
+                "logo": "__SITE_ORIGIN__/image/z8014995365895_a3eb178f5f7a17a45925b55e43e202be-removebg-preview.png",
+                "email": "cyberknight.official.vn@gmail.com",
+                "telephone": "+84966347482",
+                "address": { "@type": "PostalAddress", "addressLocality": "Hà Nội", "addressCountry": "VN" },
+                "sameAs": ["https://www.tiktok.com/@cyberknight_hiepsimang"]
+            },
+            {
+                "@type": "WebSite",
+                "name": "CyberKnight – Hiệp Sĩ Mạng",
+                "url": "__SITE_ORIGIN__/",
+                "inLanguage": "vi-VN",
+                "publisher": { "@type": "Organization", "name": "Sigmabloom" }
+            }
+        ]
+    }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/assets/tailwind.css">
-    <script>
-        /* Tailwind custom colors — giờ đã build tĩnh qua tailwind.config.js */
-    </script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -94,6 +133,7 @@
             border-radius: 50%;
             opacity: 0.6;
             animation: particleFloat linear infinite;
+            will-change: transform, opacity;
         }
         .particle:nth-child(odd) {
             background: linear-gradient(135deg, #FF6B6B, #FFE66D);
@@ -155,6 +195,11 @@
         @keyframes glowPulse {
             0%, 100% { box-shadow: 0 0 30px rgba(0, 102, 255, 0.3); }
             50% { box-shadow: 0 0 60px rgba(0, 102, 255, 0.6), 0 0 100px rgba(0, 212, 255, 0.3); }
+        }
+        /* Quầng sáng nền: chỉ đổi opacity + scale (GPU), không vẽ lại box-shadow trên lớp blur mỗi khung hình */
+        @keyframes orbPulse {
+            0%, 100% { opacity: 0.55; transform: scale(1); }
+            50% { opacity: 0.9; transform: scale(1.12); }
         }
         @keyframes gradientShift {
             0% { background-position: 0% 50%; }
@@ -317,22 +362,22 @@
         /* ============================================
            GRADIENT TEXT WITH ANIMATION
         ============================================ */
+        /* Chữ gradient tĩnh: animate background-position trên chữ bắt trình duyệt vẽ lại mỗi khung hình
+           (trang có ~10 tiêu đề như vậy) → để tĩnh, chỉ dải slogan cầu vồng còn chuyển màu chậm. */
         .gradient-text {
-            background: linear-gradient(135deg, #0066FF 0%, #00D4FF 50%, #0066FF 100%);
-            background-size: 200% auto;
+            background: linear-gradient(135deg, #0066FF 0%, #00B4E6 60%, #0066FF 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            animation: gradientShift 3s ease infinite;
         }
-        
+
         .gradient-text-rainbow {
-            background: linear-gradient(90deg, #FF6B6B, #FFE66D, #4ECDC4, #0066FF, #FF6B6B);
+            background: linear-gradient(90deg, #FF6B6B, #F5B300, #20A99F, #0066FF, #FF6B6B);
             background-size: 200% auto;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            animation: gradientShift 4s linear infinite;
+            animation: gradientShift 8s linear infinite;
         }
         
         /* ============================================
@@ -372,9 +417,9 @@
             font-size: 1rem;
             cursor: pointer;
             overflow: hidden;
-            transition: all 0.4s ease;
+            transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s ease;
             box-shadow: 0 10px 30px rgba(0, 102, 255, 0.3);
-            transform-style: preserve-3d;
+            white-space: nowrap;
         }
         .btn-primary::before {
             content: '';
@@ -387,8 +432,13 @@
             transition: left 0.5s;
         }
         .btn-primary:hover {
-            transform: translateY(-3px) scale(1.05);
+            transform: translateY(-2px) scale(1.03);
             box-shadow: 0 15px 40px rgba(0, 102, 255, 0.4), 0 0 30px rgba(0, 212, 255, 0.3);
+        }
+        .btn-primary:disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+            transform: none;
         }
         .btn-primary:hover::before { left: 100%; }
         .btn-primary:active {
@@ -443,9 +493,10 @@
             color: #0066FF;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: background-color 0.25s ease, color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
             position: relative;
             overflow: hidden;
+            white-space: nowrap;
         }
         .btn-secondary::before {
             content: '';
@@ -478,22 +529,25 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            transition: all 0.3s ease;
+            gap: 16px;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease, padding 0.3s ease;
         }
         .navbar.scrolled {
             background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             padding: 12px 60px;
             box-shadow: 0 5px 30px rgba(0, 102, 255, 0.1);
         }
 
         .nav-link {
             position: relative;
-            color: #64748B;
+            color: #475569;
             text-decoration: none;
             font-weight: 500;
             padding: 8px 0;
-            transition: all 0.3s;
+            white-space: nowrap;
+            transition: color 0.2s ease, transform 0.2s ease;
         }
         .nav-link::after {
             content: '';
@@ -520,9 +574,13 @@
             background: white;
             border: 1px solid rgba(0, 102, 255, 0.1);
             border-radius: 24px;
-            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+            transition: transform 0.45s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.45s ease, border-color 0.3s ease;
             overflow: hidden;
             transform-style: preserve-3d;
+        }
+        /* Đang nghiêng theo chuột: bám tay nhanh, không "trễ" 0.45s mỗi lần di chuột */
+        .feature-card.is-tilting {
+            transition: transform 0.12s linear, box-shadow 0.3s ease, border-color 0.3s ease;
         }
         .feature-card::before {
             content: '';
@@ -532,12 +590,15 @@
             opacity: 0;
             transition: opacity 0.5s;
         }
-        .feature-card:hover {
-            transform: translateY(-15px) scale(1.03) rotateX(2deg);
-            border-color: rgba(0, 102, 255, 0.3);
-            box-shadow: 0 30px 60px rgba(0, 102, 255, 0.15), 0 0 50px rgba(0, 212, 255, 0.1);
+        /* Chỉ máy có chuột: trên điện thoại :hover "dính" sau khi chạm làm card nhảy lên rồi đứng im */
+        @media (hover: hover) {
+            .feature-card:hover {
+                transform: translateY(-10px) scale(1.02);
+                border-color: rgba(0, 102, 255, 0.3);
+                box-shadow: 0 30px 60px rgba(0, 102, 255, 0.15), 0 0 50px rgba(0, 212, 255, 0.1);
+            }
+            .feature-card:hover::before { opacity: 1; }
         }
-        .feature-card:hover::before { opacity: 1; }
         
         /* Feature Card Glow on Hover */
         .feature-card::after {
@@ -551,8 +612,8 @@
             transition: opacity 0.5s;
             filter: blur(15px);
         }
-        .feature-card:hover::after {
-            opacity: 0.3;
+        @media (hover: hover) {
+            .feature-card:hover::after { opacity: 0.3; }
         }
 
         .icon-container {
@@ -565,7 +626,7 @@
             justify-content: center;
             font-size: 2rem;
             margin-bottom: 24px;
-            transition: all 0.4s;
+            transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s ease;
             transform-style: preserve-3d;
         }
         .feature-card:hover .icon-container {
@@ -579,8 +640,10 @@
         ============================================ */
         .timeline-item {
             position: relative;
-            padding-left: 40px;
-            transition: all 0.3s;
+            padding-left: 28px;
+        }
+        @media (min-width: 640px) {
+            .timeline-item { padding-left: 40px; }
         }
         .timeline-item::before {
             content: '';
@@ -590,7 +653,7 @@
             bottom: 0;
             width: 3px;
             background: linear-gradient(180deg, #0066FF, #00D4FF, transparent);
-            transition: all 0.5s;
+            transition: width 0.3s ease, box-shadow 0.3s ease;
         }
         .timeline-item:hover::before {
             width: 5px;
@@ -606,7 +669,7 @@
             border: 3px solid #0066FF;
             border-radius: 50%;
             box-shadow: 0 0 15px rgba(0, 102, 255, 0.3);
-            transition: all 0.3s;
+            transition: transform 0.3s ease, background-color 0.3s ease;
         }
         .timeline-item:hover .timeline-dot {
             transform: scale(1.3);
@@ -615,35 +678,36 @@
         }
 
         /* ============================================
-           FORUM CARDS WITH HOVER EFFECTS
+           SAFETY TIP CARDS
         ============================================ */
-        .forum-card {
+        .tip-card {
             background: white;
             border: 1px solid rgba(0, 102, 255, 0.1);
             border-radius: 16px;
-            padding: 24px;
-            transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            padding: 20px;
+            transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease, border-color 0.3s ease;
             position: relative;
             overflow: hidden;
-            transform-style: preserve-3d;
         }
-        .forum-card::before {
+        .tip-card::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
+            inset: 0;
             background: linear-gradient(90deg, transparent, rgba(0, 102, 255, 0.08), transparent);
-            transition: left 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            transform: translateX(-100%);
+            transition: transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            pointer-events: none;
         }
-        .forum-card:hover {
-            border-color: rgba(0, 102, 255, 0.4);
-            transform: translateY(-5px) translateX(5px) scale(1.01);
-            box-shadow: 0 20px 40px rgba(0, 102, 255, 0.12);
+        @media (min-width: 640px) {
+            .tip-card { padding: 24px; }
         }
-        .forum-card:hover::before {
-            left: 100%;
+        @media (hover: hover) {
+            .tip-card:hover {
+                border-color: rgba(0, 102, 255, 0.4);
+                transform: translateY(-4px);
+                box-shadow: 0 20px 40px rgba(0, 102, 255, 0.12);
+            }
+            .tip-card:hover::before { transform: translateX(100%); }
         }
 
         .badge {
@@ -656,36 +720,56 @@
         /* ============================================
            ADVANCED MODAL WITH ANIMATIONS
         ============================================ */
+        /* Lớp phủ cuộn được: form đăng ký dài hơn màn điện thoại vẫn kéo xem hết (margin:auto giữ ở giữa khi đủ chỗ) */
         .modal-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(10px);
+            background: rgba(15, 23, 42, 0.55);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: center;
+            overflow-y: auto;
+            overscroll-behavior: contain;
+            padding: 16px;
             z-index: 1000;
             opacity: 0;
             visibility: hidden;
-            transition: all 0.4s ease;
+            transition: opacity 0.25s ease, visibility 0.25s ease;
         }
-        .modal-overlay.active { 
-            opacity: 1; 
-            visibility: visible; 
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
         }
         .modal-content {
+            position: relative;
+            margin: auto;
             background: white;
-            border-radius: 24px;
-            padding: 40px;
+            border-radius: 20px;
+            padding: 24px 20px;
             max-width: 900px;
-            width: 95%;
-            transform: scale(0.9) translateY(20px) rotateX(10deg);
-            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            width: 100%;
+            opacity: 0;
+            transform: translateY(16px) scale(0.98);
+            transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.25s ease;
             box-shadow: 0 30px 80px rgba(0, 102, 255, 0.2);
         }
         .modal-overlay.active .modal-content {
-            transform: scale(1) translateY(0) rotateX(0deg);
+            opacity: 1;
+            transform: none;
         }
+        @media (min-width: 640px) {
+            .modal-overlay { padding: 24px; }
+            .modal-content { padding: 40px; border-radius: 24px; }
+        }
+        /* Form đăng nhập / đăng ký / quên mật khẩu */
+        .auth-modal { max-width: 480px; }
+        @media (min-width: 640px) {
+            .modal-content.auth-modal { padding: 44px 40px; }
+        }
+        body:has(.modal-overlay.active),
+        body:has(.mobile-menu.open) { overflow: hidden; }
 
         /* ============================================
            FULLSCREEN GAME CONTAINER (100% Viewport #0a0e27)
@@ -695,6 +779,7 @@
             inset: 0;
             width: 100vw;
             height: 100vh;
+            height: 100dvh;
             background-color: #0a0e27;
             z-index: 99999;
             opacity: 0;
@@ -716,6 +801,7 @@
         .fullscreen-game-frame {
             width: 100vw;
             height: 100vh;
+            height: 100dvh;
             border: none;
             display: block;
             background-color: #0a0e27;
@@ -778,23 +864,30 @@
 
         .level-select-modal-content {
             max-width: 860px;
-            width: 95%;
-            padding: 32px;
-            border-radius: 28px;
+            padding: 20px 16px;
+            border-radius: 24px;
             border: 2px solid rgba(0, 102, 255, 0.15);
             background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%);
-            max-height: 90vh;
-            overflow-y: auto;
+        }
+        @media (min-width: 640px) {
+            .level-select-modal-content { padding: 32px; border-radius: 28px; }
         }
 
         .game-fullscreen-top-controls {
             position: absolute;
-            top: 16px;
-            right: 20px;
+            top: max(12px, env(safe-area-inset-top));
+            right: max(12px, env(safe-area-inset-right));
             z-index: 100000;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
+        }
+        @media (max-width: 639px) {
+            .game-fullscreen-top-controls .game-fullscreen-close-btn,
+            .game-fullscreen-top-controls .game-fullscreen-switch-btn {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
         }
 
         .game-fullscreen-top-controls .game-fullscreen-close-btn {
@@ -838,42 +931,38 @@
         /* ============================================
            LOGO & CHARACTER IMAGES
         ============================================ */
+        /* Ảnh logo/nhân vật: drop-shadow giữ TĨNH — đổi filter khi hover bắt vẽ lại cả ảnh lớn, gây giật */
         .logo-img {
-            height: 85px;
+            height: 56px;
             width: auto;
             filter: drop-shadow(0 4px 8px rgba(0, 102, 255, 0.2));
             background: transparent !important;
-            transition: all 0.3s;
+            transition: transform 0.3s ease;
         }
-        .logo-img:hover {
-            filter: drop-shadow(0 8px 20px rgba(0, 102, 255, 0.4));
-            transform: scale(1.05);
-        }
+        .logo-img:hover { transform: scale(1.05); }
 
         .character-img {
-            max-height: 500px;
+            max-height: 300px;
             width: auto;
-            filter: drop-shadow(0 20px 40px rgba(0, 102, 255, 0.25));
+            filter: drop-shadow(0 20px 40px rgba(0, 102, 255, 0.3));
             background: transparent !important;
-            transition: all 0.3s;
+            transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
         }
-        .character-img:hover {
-            filter: drop-shadow(0 30px 60px rgba(0, 102, 255, 0.4));
-            transform: scale(1.05);
-        }
-        
+        @media (min-width: 640px) { .character-img { max-height: 420px; } }
+        @media (min-width: 1024px) { .character-img { max-height: min(560px, 68vh); } }
+        .character-img.is-tilting { transition: transform 0.12s linear; }
+        #heroCharacterWrap { transform: scale(var(--hero-scale, 1)); transform-origin: center top; }
+
         /* CyberKnight icon for navbar */
         .nav-character {
-            width: 55px;
+            width: 44px;
             height: auto;
             background: transparent !important;
             filter: drop-shadow(0 4px 12px rgba(0, 102, 255, 0.4));
-            transition: all 0.3s;
+            transition: transform 0.3s ease;
         }
-        .nav-character:hover {
-            filter: drop-shadow(0 8px 20px rgba(0, 102, 255, 0.6));
-            transform: rotate(5deg) scale(1.1);
-        }
+        .nav-character:hover { transform: rotate(5deg) scale(1.1); }
+        @media (min-width: 1024px) { .nav-character { width: 52px; } }
 
         /* ============================================
            WAVE & SHAPE DECORATIONS
@@ -897,11 +986,7 @@
             position: absolute;
             border-radius: 50%;
             opacity: 0.5;
-            transition: all 0.3s;
-        }
-        .floating-shape:hover {
-            transform: scale(1.3);
-            opacity: 0.8;
+            pointer-events: none;
         }
         
         /* Magic Shape */
@@ -913,9 +998,9 @@
         .glowing-orb {
             position: absolute;
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(0, 102, 255, 0.3), transparent);
-            animation: glowPulse 4s ease-in-out infinite;
-            filter: blur(30px);
+            background: radial-gradient(circle, rgba(0, 102, 255, 0.28), transparent 70%);
+            animation: orbPulse 6s ease-in-out infinite;
+            will-change: transform, opacity;
         }
 
         /* ============================================
@@ -924,7 +1009,7 @@
         .reveal {
             opacity: 0;
             transform: translateY(30px);
-            transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+            transition: opacity 0.7s cubic-bezier(0.23, 1, 0.32, 1), transform 0.7s cubic-bezier(0.23, 1, 0.32, 1);
         }
         .reveal.visible {
             opacity: 1;
@@ -935,7 +1020,7 @@
         .reveal-left {
             opacity: 0;
             transform: translateX(-50px);
-            transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+            transition: opacity 0.7s cubic-bezier(0.23, 1, 0.32, 1), transform 0.7s cubic-bezier(0.23, 1, 0.32, 1);
         }
         .reveal-left.visible {
             opacity: 1;
@@ -946,7 +1031,7 @@
         .reveal-right {
             opacity: 0;
             transform: translateX(50px);
-            transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+            transition: opacity 0.7s cubic-bezier(0.23, 1, 0.32, 1), transform 0.7s cubic-bezier(0.23, 1, 0.32, 1);
         }
         .reveal-right.visible {
             opacity: 1;
@@ -957,7 +1042,7 @@
         .reveal-scale {
             opacity: 0;
             transform: scale(0.8);
-            transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+            transition: opacity 0.7s cubic-bezier(0.23, 1, 0.32, 1), transform 0.7s cubic-bezier(0.23, 1, 0.32, 1);
         }
         .reveal-scale.visible {
             opacity: 1;
@@ -968,7 +1053,7 @@
         .reveal-rotate {
             opacity: 0;
             transform: rotate(-10deg);
-            transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+            transition: opacity 0.7s cubic-bezier(0.23, 1, 0.32, 1), transform 0.7s cubic-bezier(0.23, 1, 0.32, 1);
         }
         .reveal-rotate.visible {
             opacity: 1;
@@ -978,9 +1063,103 @@
         /* ============================================
            RESPONSIVE DESIGN
         ============================================ */
-        @media (max-width: 768px) {
-            .navbar { padding: 15px 20px; }
-            .navbar.scrolled { padding: 12px 20px; }
+        @media (max-width: 1279px) {
+            .navbar { padding: 16px 32px; }
+            .navbar.scrolled { padding: 10px 32px; }
+        }
+        @media (max-width: 1023px) {
+            .navbar { padding: 12px 16px; }
+            .navbar.scrolled { padding: 8px 16px; }
+        }
+        @media (max-width: 639px) {
+            .feature-card { padding: 24px 20px; border-radius: 20px; }
+            .icon-container { width: 64px; height: 64px; font-size: 1.75rem; margin-bottom: 16px; }
+            .btn-primary { padding: 14px 28px; }
+            .btn-secondary { padding: 12px 26px; }
+        }
+        /* Neo cuộn tới section không bị navbar cố định che mất tiêu đề */
+        section[id] { scroll-margin-top: 84px; }
+
+        /* Hiện/ẩn theo trạng thái đăng nhập: JS chỉ bật/tắt class trên <body> */
+        body.is-authed [data-guest-only],
+        body:not(.is-authed) [data-user-only],
+        body:not(.is-admin) [data-admin-only] { display: none !important; }
+
+        /* ============================================
+           MOBILE MENU (drawer)
+        ============================================ */
+        .mobile-menu {
+            position: fixed;
+            inset: 0;
+            z-index: 950;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        .mobile-menu.open { visibility: visible; pointer-events: auto; }
+        .mobile-menu-backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.45);
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+        .mobile-menu.open .mobile-menu-backdrop { opacity: 1; }
+        .mobile-menu-panel {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: min(340px, 88vw);
+            background: #fff;
+            box-shadow: -20px 0 60px rgba(0, 40, 120, 0.18);
+            display: flex;
+            flex-direction: column;
+            padding: max(16px, env(safe-area-inset-top)) 20px max(20px, env(safe-area-inset-bottom));
+            overflow-y: auto;
+            transform: translateX(100%);
+            transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .mobile-menu.open .mobile-menu-panel { transform: none; }
+        .mobile-menu-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-height: 48px;
+            padding: 0 12px;
+            border-radius: 12px;
+            color: #1e293b;
+            font-weight: 600;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+        .mobile-menu-link:hover,
+        .mobile-menu-link:focus-visible { background: #EFF6FF; color: #0066FF; }
+
+        /* Vệt sáng theo chuột: một nhóm chấm dùng lại (không tạo/xoá DOM mỗi lần di chuột) */
+        .cursor-dot {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 14px;
+            height: 14px;
+            margin: -7px 0 0 -7px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0, 102, 255, 0.55), transparent 70%);
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0;
+            will-change: transform, opacity;
+        }
+
+        /* Người dùng bật "giảm chuyển động" trong hệ điều hành → tắt hiệu ứng trang trí */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+            .particles-container, #cursor-trail { display: none !important; }
+            .reveal, .reveal-left, .reveal-right, .reveal-scale, .reveal-rotate { opacity: 1 !important; transform: none !important; }
         }
         
         /* ============================================
@@ -1064,37 +1243,40 @@
     <div class="floating-shape w-24 h-24 bg-blue-200 bottom-20 right-1/4 animate-float" style="animation-delay: 0.5s;"></div>
 
     <!-- Navbar -->
-    <nav class="navbar" id="navbar">
-        <!-- Left: CyberKnight -->
-        <div class="flex items-center gap-3">
-            <img src="image/z8014995365895_a3eb178f5f7a17a45925b55e43e202be-removebg-preview.webp" alt="CyberKnight" class="nav-character animate-float-slow">
-            <span class="font-bold text-lg text-primary hidden sm:block" style="font-family: 'Space Grotesk'">SIGMABLOOM</span>
-        </div>
-        
+    <nav class="navbar" id="navbar" aria-label="Điều hướng chính">
+        <!-- Left: Sigmabloom brand -->
+        <a href="#home" class="flex items-center gap-2.5 shrink-0" aria-label="CyberKnight — về đầu trang">
+            <img src="image/z8014995365895_a3eb178f5f7a17a45925b55e43e202be-removebg-preview.webp" alt="Sigmabloom" class="nav-character animate-float-slow" width="52" height="52">
+            <span class="hidden sm:flex flex-col leading-tight">
+                <span class="font-bold text-lg text-primary" style="font-family: 'Space Grotesk'">CyberKnight</span>
+                <span class="text-[11px] font-medium text-gray-500">by Sigmabloom</span>
+            </span>
+        </a>
+
         <!-- Center: Navigation Links -->
-        <div class="hidden md:flex items-center gap-10">
+        <div class="hidden xl:flex items-center gap-8">
             <a href="#home" class="nav-link">Trang chủ</a>
             <a href="#features" class="nav-link">Tính năng</a>
             <a href="#updates" class="nav-link">Cập nhật</a>
-            <a href="#forum" class="nav-link">Diễn đàn</a>
+            <a href="#tips" class="nav-link">Mẹo an toàn</a>
             <a href="#contact" class="nav-link">Liên hệ</a>
         </div>
-        
+
         <!-- Right: Logo + Button -->
-        <div class="flex items-center gap-4">
-            <img src="image/z8014995224177_069f99816bf77dda5fed3feb153a6c0e-removebg-preview.webp" alt="Sigmabloom Logo" class="logo-img animate-float-slow hidden md:block">
+        <div class="flex items-center gap-2 sm:gap-3">
+            <img src="image/z8014995224177_069f99816bf77dda5fed3feb153a6c0e-removebg-preview.webp" alt="CyberKnight – Hiệp Sĩ Mạng" class="logo-img hidden 2xl:block" width="56" height="56">
             <!-- Auth Buttons (khi chưa đăng nhập) -->
-            <div id="authButtons" class="hidden md:flex items-center gap-3">
-                <button class="btn-secondary" style="padding: 10px 22px; font-size:0.9rem;" onclick="openLoginModal()">
+            <div id="authButtons" data-guest-only class="hidden lg:flex items-center gap-2">
+                <button type="button" class="btn-secondary" style="padding: 9px 18px; font-size:0.9rem;" onclick="openLoginModal()">
                     Đăng nhập
                 </button>
-                <button class="btn-primary" style="padding: 10px 22px; font-size:0.9rem;" onclick="openRegisterModal()">
+                <button type="button" class="btn-primary" style="padding: 10px 20px; font-size:0.9rem;" onclick="openRegisterModal()">
                     Đăng ký
                 </button>
             </div>
             <!-- User Info (khi đã đăng nhập) -->
-            <div id="userInfo" class="hidden md:flex items-center gap-3" style="display:none!important;">
-                <button type="button" class="flex items-center gap-2 px-4 py-2 rounded-full glass cursor-pointer text-left" onclick="toggleUserMenu()" id="userAvatar">
+            <div id="userInfo" data-user-only class="hidden lg:flex items-center gap-3">
+                <button type="button" class="flex items-center gap-2 px-4 py-2 rounded-full glass cursor-pointer text-left" onclick="toggleUserMenu()" id="userAvatar" aria-haspopup="true">
                     <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-cyan-400 flex items-center justify-center text-white font-bold text-sm" id="userAvatarText">?</div>
                     <span class="font-semibold text-gray-700 text-sm" id="userNameDisplay">Người dùng</span>
                     <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24" class="text-gray-500"><path d="M7 10l5 5 5-5z"/></svg>
@@ -1121,7 +1303,7 @@
                             ⚡ Nâng cấp / Mua gói
                         </button>
                     </div>
-                    <a href="/admin.html" id="adminDropdownLink" class="hidden w-full text-left px-4 py-2.5 text-sm text-purple-600 font-bold hover:bg-purple-50 rounded-xl transition flex items-center gap-2">
+                    <a href="/admin.html" id="adminDropdownLink" data-admin-only class="w-full text-left px-4 py-2.5 text-sm text-purple-600 font-bold hover:bg-purple-50 rounded-xl transition flex items-center gap-2">
                         🛡️ Trang Quản Trị
                     </a>
                     <button type="button" onclick="openLevelSelectModal()" class="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 rounded-xl transition flex items-center gap-2">
@@ -1137,8 +1319,8 @@
             </div>
 
             <!-- Bộ chọn Level khi hover hoặc click vào "Chơi ngay" -->
-            <div class="relative group hidden md:block" id="playNowDropdownWrapper">
-                <button type="button" class="btn-primary flex items-center gap-2" style="padding: 12px 24px;" onclick="openLevelSelectModal()" aria-label="Chơi ngay - Chọn màn chơi" aria-haspopup="true">
+            <div class="relative group hidden lg:block" id="playNowDropdownWrapper">
+                <button type="button" class="btn-primary flex items-center gap-2" style="padding: 11px 22px;" onclick="openLevelSelectModal()" aria-label="Chơi ngay - Chọn màn chơi" aria-haspopup="true">
                     <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                     <span>Chơi ngay</span>
                     <svg class="w-4 h-4 transition-transform duration-300 group-hover:rotate-180 opacity-80" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
@@ -1246,12 +1428,68 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Màn hẹp: nút chơi gọn + mở menu -->
+            <button type="button" class="btn-primary lg:hidden flex items-center gap-1.5" style="padding: 9px 16px; font-size: 0.9rem;" onclick="openLevelSelectModal()">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+                Chơi ngay
+            </button>
+            <button type="button" id="mobileMenuBtn" class="xl:hidden w-11 h-11 -mr-1 flex items-center justify-center rounded-xl text-primary hover:bg-blue-50 transition-colors" onclick="toggleMenu()" aria-label="Mở menu" aria-controls="mobileMenu" aria-expanded="false">
+                <svg width="26" height="26" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+            </button>
         </div>
-        
-        <button class="md:hidden text-2xl text-primary" onclick="toggleMenu()">
-            <svg width="28" height="28" fill="currentColor" viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
-        </button>
     </nav>
+
+    <!-- Mobile Menu (dưới 1280px; dưới 1024px còn chứa cả nút đăng nhập/đăng ký) -->
+    <div id="mobileMenu" class="mobile-menu" aria-hidden="true">
+        <div class="mobile-menu-backdrop" onclick="closeMobileMenu()"></div>
+        <aside class="mobile-menu-panel" role="dialog" aria-modal="true" aria-label="Menu">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-2.5">
+                    <img src="image/z8014995365895_a3eb178f5f7a17a45925b55e43e202be-removebg-preview.webp" alt="" class="w-10 h-10" width="40" height="40">
+                    <div class="leading-tight">
+                        <div class="font-bold text-primary" style="font-family: 'Space Grotesk'">CyberKnight</div>
+                        <div class="text-[11px] text-gray-500">by Sigmabloom</div>
+                    </div>
+                </div>
+                <button type="button" onclick="closeMobileMenu()" class="w-11 h-11 -mr-2 flex items-center justify-center rounded-xl text-gray-500 hover:bg-gray-100 text-2xl" aria-label="Đóng menu">&times;</button>
+            </div>
+
+            <!-- Thông tin tài khoản (đã đăng nhập) -->
+            <div data-user-only class="flex items-center gap-3 p-3 mb-3 rounded-2xl bg-blue-50/70 border border-blue-100">
+                <div class="w-10 h-10 shrink-0 rounded-full bg-gradient-to-br from-blue-400 to-cyan-400 flex items-center justify-center text-white font-bold text-sm" id="mobileUserAvatar">?</div>
+                <div class="min-w-0">
+                    <div class="text-sm font-bold text-gray-800 truncate" id="mobileUserName">Người dùng</div>
+                    <div class="text-xs text-gray-500 truncate" id="mobileUserEmail"></div>
+                </div>
+            </div>
+
+            <nav class="flex flex-col gap-1" aria-label="Điều hướng">
+                <a href="#home" class="mobile-menu-link">🏠 Trang chủ</a>
+                <a href="#features" class="mobile-menu-link">✨ Tính năng</a>
+                <a href="#updates" class="mobile-menu-link">📰 Cập nhật</a>
+                <a href="#tips" class="mobile-menu-link">🛡️ Mẹo an toàn</a>
+                <a href="#contact" class="mobile-menu-link">✉️ Liên hệ</a>
+            </nav>
+
+            <div class="mt-auto pt-5 flex flex-col gap-3">
+                <button type="button" class="btn-primary w-full flex items-center justify-center gap-2" onclick="closeMobileMenu(); openLevelSelectModal();">
+                    <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+                    Chọn màn chơi
+                </button>
+                <div data-guest-only class="grid grid-cols-2 gap-3">
+                    <button type="button" class="btn-secondary w-full" style="padding: 11px 12px;" onclick="closeMobileMenu(); openLoginModal();">Đăng nhập</button>
+                    <button type="button" class="btn-primary w-full" style="padding: 12px 12px;" onclick="closeMobileMenu(); openRegisterModal();">Đăng ký</button>
+                </div>
+                <div data-user-only class="flex flex-col gap-1 border-t border-gray-100 pt-3">
+                    <button type="button" class="mobile-menu-link w-full text-left" onclick="closeMobileMenu(); openPricingModal();">⚡ Nâng cấp / Mua gói</button>
+                    <button type="button" class="mobile-menu-link w-full text-left" onclick="closeMobileMenu(); openMyOrdersModal();">📜 Lịch sử đơn hàng</button>
+                    <a href="/admin.html" data-admin-only class="mobile-menu-link text-purple-600">🛡️ Trang quản trị</a>
+                    <button type="button" class="mobile-menu-link w-full text-left text-red-500" onclick="closeMobileMenu(); logout();">🚪 Đăng xuất</button>
+                </div>
+            </div>
+        </aside>
+    </div>
 
     <!-- Hero Section -->
     <section id="home" class="min-h-screen relative flex items-center pt-20 overflow-hidden perspective-container">
@@ -1262,31 +1500,31 @@
             <div class="absolute bottom-1/4 right-10 w-80 h-80 bg-cyan-100 rounded-full blur-3xl opacity-50"></div>
             
             <!-- 3D Floating Orbs -->
-            <div class="glowing-orb w-64 h-64 top-20 -left-20 animate-float-3d"></div>
-            <div class="glowing-orb w-48 h-48 bottom-32 -right-16 animate-float-3d" style="animation-delay: 1s;"></div>
-            <div class="glowing-orb w-32 h-32 top-1/3 right-1/4 animate-float-3d" style="animation-delay: 2s;"></div>
-            
-            <!-- 3D Rotating Rings -->
-            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px]" style="transform: translateX(-50%) translateY(-50%) perspective(1000px) rotateX(70deg);">
-                <div class="absolute inset-0 rounded-full border-2 border-blue-200 opacity-30 animate-pulse"></div>
+            <div class="glowing-orb w-64 h-64 top-20 -left-20"></div>
+            <div class="glowing-orb w-48 h-48 bottom-32 -right-16" style="animation-delay: 1.5s;"></div>
+            <div class="glowing-orb w-32 h-32 top-1/3 right-1/4 hidden md:block" style="animation-delay: 3s;"></div>
+
+            <!-- 3D Rotating Rings (chỉ màn rộng) -->
+            <div class="absolute top-1/2 left-1/2 w-[600px] h-[600px] hidden lg:block" style="transform: translateX(-50%) translateY(-50%) perspective(1000px) rotateX(70deg);" aria-hidden="true">
+                <div class="absolute inset-0 rounded-full border-2 border-blue-200 opacity-30"></div>
                 <div class="absolute inset-0 rounded-full border border-cyan-200 opacity-20" style="animation: rotate 20s linear infinite;"></div>
                 <div class="absolute inset-0 rounded-full border border-blue-100 opacity-15" style="animation: rotateReverse 30s linear infinite;"></div>
             </div>
-            
+
             <!-- Magic Shapes -->
-            <div class="magic-shape absolute w-20 h-20 bg-gradient-to-br from-blue-200 to-cyan-200 top-32 right-20 opacity-60"></div>
-            <div class="magic-shape absolute w-16 h-16 bg-gradient-to-br from-purple-200 to-pink-200 bottom-40 left-32 opacity-50" style="animation-delay: 2s;"></div>
-            <div class="magic-shape absolute w-12 h-12 bg-gradient-to-br from-yellow-200 to-orange-200 top-1/2 right-10 opacity-40" style="animation-delay: 4s;"></div>
+            <div class="magic-shape absolute w-20 h-20 bg-gradient-to-br from-blue-200 to-cyan-200 top-32 right-20 opacity-60 hidden sm:block"></div>
+            <div class="magic-shape absolute w-16 h-16 bg-gradient-to-br from-purple-200 to-pink-200 bottom-40 left-32 opacity-50 hidden sm:block" style="animation-delay: 2s;"></div>
+            <div class="magic-shape absolute w-12 h-12 bg-gradient-to-br from-yellow-200 to-orange-200 top-1/2 right-10 opacity-40 hidden 2xl:block" style="animation-delay: 4s;"></div>
         </div>
-        
-        <div class="max-w-7xl mx-auto px-6 py-20 grid lg:grid-cols-2 gap-16 items-center relative z-10">
+
+        <div class="max-w-7xl w-full mx-auto px-4 sm:px-6 pt-8 pb-20 lg:py-20 grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center relative z-10">
             <!-- Left - Character Image (3D Effect) -->
-            <div class="relative flex justify-center items-center preserve-3d" style="animation: scaleIn 1.2s ease">
-                <div class="relative">
+            <div class="relative flex justify-center items-center preserve-3d order-2 lg:order-1 pt-6 lg:pt-0" style="animation: scaleIn 1s cubic-bezier(0.22, 1, 0.36, 1)">
+                <div class="relative" id="heroCharacterWrap">
                     <!-- Glow rings -->
-                    <div class="absolute inset-0 -m-8 rounded-full border-2 border-blue-200 animate-pulse"></div>
-                    <div class="absolute inset-0 -m-16 rounded-full border border-cyan-200" style="animation: rotate 30s linear infinite"></div>
-                    <div class="absolute inset-0 -m-24 rounded-full border border-blue-100 opacity-50" style="animation: rotateReverse 40s linear infinite"></div>
+                    <div class="absolute inset-0 -m-4 sm:-m-8 rounded-full border-2 border-blue-200 opacity-70"></div>
+                    <div class="absolute inset-0 -m-8 sm:-m-16 rounded-full border border-cyan-200" style="animation: rotate 30s linear infinite"></div>
+                    <div class="absolute inset-0 -m-24 rounded-full border border-blue-100 opacity-50 hidden sm:block" style="animation: rotateReverse 40s linear infinite"></div>
                     
                     <!-- Orbit rings -->
                     <div class="absolute inset-0 animate-orbit">
@@ -1296,14 +1534,14 @@
                         <div class="absolute w-3 h-3 bg-gradient-to-r from-pink-500 to-purple-400 rounded-full shadow-lg" style="top: 0; left: 50%; transform: translateX(-50%);"></div>
                     </div>
                     
-                    <!-- Character Image - Sigmabloom with 3D Float -->
+                    <!-- Character Image - CyberKnight with 3D Float -->
                     <div class="float-3d">
-                        <img src="image/z8014995224177_069f99816bf77dda5fed3feb153a6c0e-removebg-preview.webp" alt="Sigmabloom Character" class="character-img" style="max-height: 580px; filter: drop-shadow(0 30px 60px rgba(0, 102, 255, 0.35));">
+                        <img src="image/z8014995224177_069f99816bf77dda5fed3feb153a6c0e-removebg-preview.webp" alt="Hai hiệp sĩ CyberKnight – Hiệp Sĩ Mạng" class="character-img" width="500" height="500" fetchpriority="high">
                     </div>
-                    
+
                     <!-- Floating Shield -->
-                    <div class="absolute -top-10 -right-10 w-24 h-24 animate-bounce-slow">
-                        <svg width="80" height="80" viewBox="0 0 100 120" fill="none">
+                    <div class="absolute -top-6 -right-2 sm:-top-10 sm:-right-10 w-14 h-14 sm:w-24 sm:h-24 animate-bounce-slow" aria-hidden="true">
+                        <svg class="w-full h-full" viewBox="0 0 100 120" fill="none">
                             <path d="M50 5 L95 20 L95 55 Q95 95 50 115 Q5 95 5 55 L5 20 Z" fill="#0066FF"/>
                             <path d="M50 15 L85 27 L85 52 Q85 85 50 102 Q15 85 15 52 L15 27 Z" fill="#00D4FF"/>
                             <text x="50" y="70" text-anchor="middle" fill="white" font-size="28" font-weight="bold" font-family="Space Grotesk">CK</text>
@@ -1312,59 +1550,58 @@
                 </div>
             </div>
             
-            <!-- Right Content (Sigmabloom) -->
-            <div class="space-y-8">
-                <div class="inline-flex items-center gap-3 px-5 py-2 rounded-full glass shadow-lg" style="animation: slideInDown 0.8s ease">
-                    <span class="w-2 h-2 rounded-full bg-green-500" style="animation: pulse 1.5s ease-in-out infinite"></span>
-                    <span class="text-sm text-blue-600 font-medium">Dự án giáo dục cybersecurity cho trẻ em</span>
+            <!-- Right Content -->
+            <div class="space-y-6 lg:space-y-7 order-1 lg:order-2 text-center lg:text-left min-w-0">
+                <div class="inline-flex items-center gap-2.5 px-4 sm:px-5 py-2 rounded-full glass shadow-lg" style="animation: slideInDown 0.7s cubic-bezier(0.22, 1, 0.36, 1)">
+                    <span class="w-2 h-2 shrink-0 rounded-full bg-green-500" style="animation: pulse 1.8s ease-in-out infinite"></span>
+                    <span class="text-sm text-blue-700 font-medium">Game giáo dục an toàn mạng cho trẻ em</span>
                 </div>
-                
-                <!-- CyberKnight Logo - Small -->
-                <div style="animation: slideInRight 0.8s ease">
-                    <img src="image/z8014995365895_a3eb178f5f7a17a45925b55e43e202be-removebg-preview.webp" alt="CyberKnight" class="h-20 mb-4 opacity-70">
-                </div>
-                
-                <!-- Slogan -->
-                <p class="text-2xl text-primary font-bold italic" style="animation: slideInRight 1s ease; font-family: 'Space Grotesk'">
-                    "Think Twice, Click Right"
+
+                <h1 style="animation: slideInUp 0.8s cubic-bezier(0.22, 1, 0.36, 1)">
+                    <span class="block text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-800 leading-tight" style="font-family: 'Space Grotesk'">CyberKnight – Hiệp Sĩ Mạng</span>
+                    <span class="block mt-2 text-xl sm:text-2xl lg:text-3xl font-bold italic gradient-text" style="font-family: 'Space Grotesk'">"Think Twice, Click Right"</span>
+                </h1>
+
+                <p class="text-base sm:text-lg text-gray-600 max-w-lg mx-auto lg:mx-0" style="animation: slideInUp 0.9s cubic-bezier(0.22, 1, 0.36, 1)">
+                    Giúp trẻ nhận biết lừa đảo trực tuyến, giữ an toàn thông tin cá nhân và biết hỏi người lớn khi gặp điều lạ — qua video tình huống và mini-game ngắn.
                 </p>
-                
-                <p class="text-lg text-gray-600 max-w-lg" style="animation: slideInRight 1.2s ease">
-                    Trang bị kiến thức bảo mật mạng cho thế hệ trẻ thông qua gaming và tương tác thực tế.
-                </p>
-                
-                <div class="flex flex-wrap gap-4" style="animation: slideInUp 1.4s ease">
-                    <button type="button" class="btn-primary text-lg" onclick="openLevelSelectModal()">
-                        <span class="flex items-center gap-2">
-                            <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+
+                <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start" style="animation: slideInUp 1s cubic-bezier(0.22, 1, 0.36, 1)">
+                    <button type="button" class="btn-primary text-lg w-full sm:w-auto" onclick="openLevelSelectModal()">
+                        <span class="flex items-center justify-center gap-2">
+                            <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
                             Bắt đầu chơi
                         </span>
                     </button>
-                    <button type="button" class="btn-secondary" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">
+                    <button type="button" class="btn-secondary w-full sm:w-auto" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">
                         Khám phá thêm
                     </button>
                 </div>
-                
-                <!-- Stats -->
-                <div class="flex gap-12 pt-6" style="animation: slideInUp 1.6s ease">
+
+                <!-- Số liệu thật của sản phẩm (không dùng số người chơi / đánh giá chưa kiểm chứng) -->
+                <div class="grid grid-cols-3 gap-3 sm:gap-8 pt-2 max-w-md mx-auto lg:mx-0" style="animation: slideInUp 1.1s cubic-bezier(0.22, 1, 0.36, 1)">
                     <div>
-                        <div class="text-4xl font-bold gradient-text">10K+</div>
-                        <div class="text-gray-500 text-sm">Người chơi</div>
+                        <div class="text-3xl sm:text-4xl font-bold gradient-text">5</div>
+                        <div class="text-gray-500 text-xs sm:text-sm">Màn chơi</div>
                     </div>
                     <div>
-                        <div class="text-4xl font-bold gradient-text">50+</div>
-                        <div class="text-gray-500 text-sm">Cấp độ</div>
+                        <div class="text-3xl sm:text-4xl font-bold gradient-text">~20′</div>
+                        <div class="text-gray-500 text-xs sm:text-sm">Video & game</div>
                     </div>
                     <div>
-                        <div class="text-4xl font-bold gradient-text">5★</div>
-                        <div class="text-gray-500 text-sm">Đánh giá</div>
+                        <div class="text-3xl sm:text-4xl font-bold gradient-text">0đ</div>
+                        <div class="text-gray-500 text-xs sm:text-sm">Chơi thử Level 0</div>
                     </div>
                 </div>
+
+                <p class="text-xs sm:text-sm text-gray-500 max-w-lg mx-auto lg:mx-0" style="animation: slideInUp 1.2s cubic-bezier(0.22, 1, 0.36, 1)">
+                    🔒 Không quảng cáo · Không nhắn tin với người lạ · CyberKnight không bao giờ hỏi mật khẩu hay mã OTP
+                </p>
             </div>
         </div>
 
         <!-- Scroll Indicator -->
-        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 animate-bounce-slow">
+        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 hidden xl:flex flex-col items-center gap-3 animate-bounce-slow" aria-hidden="true">
             <div class="text-blue-400 text-sm font-medium">Cuộn xuống</div>
             <svg width="24" height="24" fill="none" stroke="#0066FF" stroke-width="2" viewBox="0 0 24 24">
                 <path d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
@@ -1380,118 +1617,118 @@
     </section>
 
     <!-- Slogan Banner -->
-    <section class="py-16 px-6 relative overflow-hidden">
-        <!-- Background animation -->
+    <section class="py-12 sm:py-16 px-4 sm:px-6 relative overflow-hidden">
+        <!-- Background -->
         <div class="absolute inset-0 bg-gradient-to-r from-blue-50 via-cyan-50 to-purple-50"></div>
-        <div class="absolute inset-0 opacity-30">
-            <div class="absolute top-0 left-1/4 w-32 h-32 bg-blue-200 rounded-full blur-2xl animate-pulse"></div>
-            <div class="absolute bottom-0 right-1/4 w-40 h-40 bg-purple-200 rounded-full blur-2xl animate-pulse" style="animation-delay: 1s;"></div>
+        <div class="absolute inset-0 opacity-30" aria-hidden="true">
+            <div class="absolute top-0 left-1/4 w-32 h-32 bg-blue-200 rounded-full blur-2xl"></div>
+            <div class="absolute bottom-0 right-1/4 w-40 h-40 bg-purple-200 rounded-full blur-2xl"></div>
         </div>
-        
+
         <div class="max-w-4xl mx-auto text-center relative z-10">
-            <h2 class="text-3xl lg:text-4xl font-bold italic gradient-text-rainbow" style="font-family: 'Space Grotesk'">
+            <p class="text-2xl sm:text-3xl lg:text-4xl font-bold italic gradient-text-rainbow" style="font-family: 'Space Grotesk'">
                 "Think Twice, Click Right"
-            </h2>
-            <p class="text-gray-600 mt-4 text-lg">Suy nghĩ kỹ trước khi click - An toàn hơn mỗi ngày</p>
+            </p>
+            <p class="text-gray-600 mt-3 sm:mt-4 text-base sm:text-lg">Suy nghĩ kỹ trước khi click — An toàn hơn mỗi ngày</p>
         </div>
     </section>
 
     <!-- Features Section -->
-    <section id="features" class="py-32 px-6 bg-gradient-to-b from-white to-blue-50">
+    <section id="features" class="py-20 lg:py-32 px-4 sm:px-6 bg-gradient-to-b from-white to-blue-50">
         <div class="max-w-7xl mx-auto">
-            <div class="text-center mb-20 reveal">
-                <span class="inline-block px-4 py-1 rounded-full bg-blue-100 text-primary text-sm font-semibold mb-4">TÍNH NĂNG</span>
-                <h2 class="text-4xl lg:text-5xl font-bold mb-6">
-                    <span class="gradient-text">Khám phá</span>
-                    <span class="text-gray-800"> thế giới bảo mật</span>
+            <div class="text-center mb-12 lg:mb-20 reveal">
+                <span class="inline-block px-4 py-1 rounded-full bg-blue-100 text-blue-700 text-sm font-semibold mb-4">TÍNH NĂNG</span>
+                <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 lg:mb-6">
+                    <span class="gradient-text">Học an toàn mạng</span>
+                    <span class="text-gray-800"> bằng cách chơi</span>
                 </h2>
-                <p class="text-gray-600 text-lg max-w-2xl mx-auto">
-                    Học cách bảo vệ bản thân trên mạng thông qua những trải nghiệm gaming hấp dẫn
+                <p class="text-gray-600 text-base sm:text-lg max-w-2xl mx-auto">
+                    Mỗi màn chơi là một tình huống trẻ hay gặp trên mạng — xem, thử, chọn và rút ra bài học
                 </p>
             </div>
 
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div class="feature-card reveal" style="transition-delay: 0.1s">
-                    <div class="icon-container animate-pulse-scale">🎮</div>
-                    <h3 class="text-2xl font-bold text-gray-800 mb-4">Học qua chơi</h3>
-                    <p class="text-gray-600">Mini-game vui nhộn giúp nhận biết email lừa đảo, mật khẩu an toàn và bảo vệ thông tin cá nhân.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-8">
+                <div class="feature-card reveal" style="transition-delay: 0.05s">
+                    <div class="icon-container">🎬</div>
+                    <h3 class="text-xl lg:text-2xl font-bold text-gray-800 mb-3">Học qua tình huống thật</h3>
+                    <p class="text-gray-600">Video ngắn về chuyện trẻ hay gặp: quà lạ trên mạng, link "nhận thưởng", người bạn mới quen, quyền camera – micro, ảnh đăng lên mạng.</p>
+                </div>
+
+                <div class="feature-card reveal" style="transition-delay: 0.1s;">
+                    <div class="icon-container">🎮</div>
+                    <h3 class="text-xl lg:text-2xl font-bold text-gray-800 mb-3">Mini-game tương tác</h3>
+                    <p class="text-gray-600">Soi hộp quà tìm mã độc, phân loại tin nhắn an toàn, ghép cửa bảo vệ, kéo-thả chìa khóa quyền truy cập, tìm thông tin bị lộ trong ảnh.</p>
+                </div>
+
+                <div class="feature-card reveal" style="transition-delay: 0.15s;">
+                    <div class="icon-container">🔀</div>
+                    <h3 class="text-xl lg:text-2xl font-bold text-gray-800 mb-3">Lựa chọn có hậu quả</h3>
+                    <p class="text-gray-600">Con tự quyết định và xem điều gì xảy ra sau mỗi lựa chọn, rồi rút ra bài học để lần sau phản xạ đúng.</p>
                 </div>
 
                 <div class="feature-card reveal" style="transition-delay: 0.2s;">
-                    <div class="icon-container animate-pulse-scale" style="animation-delay: 0.3s;">🛡️</div>
-                    <h3 class="text-2xl font-bold text-gray-800 mb-4">Phòng thủ thông minh</h3>
-                    <p class="text-gray-600">Hệ thống AI phát hiện và cảnh báo nội dung không phù hợp, bảo vệ trẻ em khỏi mối nguy.</p>
+                    <div class="icon-container">🏅</div>
+                    <h3 class="text-xl lg:text-2xl font-bold text-gray-800 mb-3">Huy hiệu sau mỗi màn</h3>
+                    <p class="text-gray-600">Hoàn thành màn chơi nhận huy hiệu hiệp sĩ và bảng tóm tắt kiến thức để ôn lại cùng bố mẹ, thầy cô.</p>
+                </div>
+
+                <div class="feature-card reveal" style="transition-delay: 0.25s;">
+                    <div class="icon-container">📱</div>
+                    <h3 class="text-xl lg:text-2xl font-bold text-gray-800 mb-3">Chơi trên mọi thiết bị</h3>
+                    <p class="text-gray-600">Chạy ngay trên trình duyệt máy tính, máy tính bảng và điện thoại. Video tự chỉnh chất lượng theo tốc độ mạng.</p>
                 </div>
 
                 <div class="feature-card reveal" style="transition-delay: 0.3s;">
-                    <div class="icon-container animate-pulse-scale" style="animation-delay: 0.6s;">🏆</div>
-                    <h3 class="text-2xl font-bold text-gray-800 mb-4">Phần thưởng hấp dẫn</h3>
-                    <p class="text-gray-600">Thu thập badge, shield pieces và coins khi hoàn thành thử thách. Leo hạng bảng xếp hạng!</p>
-                </div>
-
-                <div class="feature-card reveal" style="transition-delay: 0.4s;">
-                    <div class="icon-container animate-pulse-scale" style="animation-delay: 0.9s;">👨‍👩‍👧</div>
-                    <h3 class="text-2xl font-bold text-gray-800 mb-4">Dành cho gia đình</h3>
-                    <p class="text-gray-600">Phụ huynh theo dõi tiến độ học tập của con qua dashboard riêng biệt và an toàn.</p>
-                </div>
-
-                <div class="feature-card reveal" style="transition-delay: 0.5s;">
-                    <div class="icon-container animate-pulse-scale" style="animation-delay: 1.2s;">📱</div>
-                    <h3 class="text-2xl font-bold text-gray-800 mb-4">Đa nền tảng</h3>
-                    <p class="text-gray-600">Chơi mọi lúc mọi nơi trên máy tính, tablet hay điện thoại. Đồng bộ qua cloud.</p>
-                </div>
-
-                <div class="feature-card reveal" style="transition-delay: 0.6s;">
-                    <div class="icon-container animate-pulse-scale" style="animation-delay: 1.5s;">🌐</div>
-                    <h3 class="text-2xl font-bold text-gray-800 mb-4">Cộng đồng an toàn</h3>
-                    <p class="text-gray-600">Diễn đàn moderated chỉ dành cho trẻ em, nơi chia sẻ kinh nghiệm và học hỏi lẫn nhau.</p>
+                    <div class="icon-container">👨‍👩‍👧</div>
+                    <h3 class="text-xl lg:text-2xl font-bold text-gray-800 mb-3">An toàn cho trẻ</h3>
+                    <p class="text-gray-600">Không quảng cáo, không có tính năng nhắn tin với người lạ. Trẻ dưới 13 tuổi nên nhờ bố mẹ, thầy cô tạo tài khoản.</p>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Updates Timeline -->
-    <section id="updates" class="py-32 px-6 bg-gradient-to-b from-blue-50 to-white">
+    <section id="updates" class="py-20 lg:py-32 px-4 sm:px-6 bg-gradient-to-b from-blue-50 to-white">
         <div class="max-w-4xl mx-auto">
-            <div class="text-center mb-20 reveal">
-                <span class="inline-block px-4 py-1 rounded-full bg-blue-100 text-primary text-sm font-semibold mb-4">CẬP NHẬT</span>
-                <h2 class="text-4xl lg:text-5xl font-bold mb-6">
-                    <span class="gradient-text">Tin tức</span>
-                    <span class="text-gray-800"> mới nhất</span>
+            <div class="text-center mb-12 lg:mb-20 reveal">
+                <span class="inline-block px-4 py-1 rounded-full bg-blue-100 text-blue-700 text-sm font-semibold mb-4">CẬP NHẬT</span>
+                <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 lg:mb-6">
+                    <span class="gradient-text">Nhật ký</span>
+                    <span class="text-gray-800"> phát triển</span>
                 </h2>
             </div>
 
-            <div class="space-y-12">
+            <div class="space-y-8 sm:space-y-12">
                 <div class="timeline-item reveal">
                     <div class="timeline-dot"></div>
-                    <div class="glass-strong p-6 rounded-2xl ml-4">
+                    <div class="glass-strong p-5 sm:p-6 rounded-2xl ml-2 sm:ml-4">
                         <div class="flex items-center gap-3 mb-3">
-                            <span class="badge bg-blue-100 text-primary">15/12/2024</span>
+                            <span class="badge bg-blue-100 text-blue-700">10/2026</span>
                         </div>
-                        <h3 class="text-xl font-bold text-gray-800 mb-2">CyberKnight 2.0 Ra mắt</h3>
-                        <p class="text-gray-600">Giao diện hoàn toàn mới, 20 cấp độ mới với các scenario cybersecurity thực tế!</p>
+                        <h3 class="text-lg sm:text-xl font-bold text-gray-800 mb-2">Video mượt hơn trên mạng yếu</h3>
+                        <p class="text-gray-600">Video trong các màn chơi được tối ưu lại, tự đổi chất lượng theo tốc độ mạng để bắt đầu nhanh hơn trên 3G/4G và Wi-Fi yếu.</p>
                     </div>
                 </div>
 
                 <div class="timeline-item reveal" style="transition-delay: 0.1s">
-                    <div class="timeline-dot" style="border-color: #00D4FF;"></div>
-                    <div class="glass-strong p-6 rounded-2xl ml-4">
+                    <div class="timeline-dot" style="border-color: #00B4E6;"></div>
+                    <div class="glass-strong p-5 sm:p-6 rounded-2xl ml-2 sm:ml-4">
                         <div class="flex items-center gap-3 mb-3">
-                            <span class="badge bg-cyan-100 text-cyan-600">01/12/2024</span>
+                            <span class="badge bg-cyan-100 text-cyan-800">10/2026</span>
                         </div>
-                        <h3 class="text-xl font-bold text-gray-800 mb-2">Sự kiện Giáng Sinh An Toàn</h3>
-                        <p class="text-gray-600">Tham gia event đặc biệt, nhận voucher và học cách tránh lừa đảo online dịp cuối năm!</p>
+                        <h3 class="text-lg sm:text-xl font-bold text-gray-800 mb-2">Ra mắt Level 0 – 4</h3>
+                        <p class="text-gray-600">5 màn chơi đầu tiên: Hộp Quà Bí Ẩn, Lớp Trưởng Gửi Link Nhận Quà, Kết Bạn Online, Bốn Chìa Khóa Bí Mật và Bức Ảnh Có Quá Nhiều Bí Mật.</p>
                     </div>
                 </div>
 
                 <div class="timeline-item reveal" style="transition-delay: 0.2s">
-                    <div class="timeline-dot" style="border-color: #FFD700;"></div>
-                    <div class="glass-strong p-6 rounded-2xl ml-4">
+                    <div class="timeline-dot" style="border-color: #F59E0B;"></div>
+                    <div class="glass-strong p-5 sm:p-6 rounded-2xl ml-2 sm:ml-4">
                         <div class="flex items-center gap-3 mb-3">
-                            <span class="badge bg-yellow-100 text-yellow-600">15/11/2024</span>
+                            <span class="badge bg-amber-100 text-amber-800">Sắp tới</span>
                         </div>
-                        <h3 class="text-xl font-bold text-gray-800 mb-2">Đạt 10,000 người chơi!</h3>
-                        <p class="text-gray-600">Cảm ơn cộng đồng đã đồng hành! Đã có thêm nhiều phần thưởng cho người chơi mới.</p>
+                        <h3 class="text-lg sm:text-xl font-bold text-gray-800 mb-2">Level 5 – 10 đang được phát triển</h3>
+                        <p class="text-gray-600">Các chủ đề nâng cao như phòng chống bắt nạt trên mạng và bảo vệ tài khoản. Chúng mình sẽ thông báo tại đây khi phát hành.</p>
                     </div>
                 </div>
             </div>
@@ -1499,104 +1736,61 @@
     </section>
 
     <!-- Forum Section -->
-    <section id="forum" class="py-32 px-6 bg-gradient-to-b from-white to-blue-50">
+    <section id="tips" class="py-20 lg:py-32 px-4 sm:px-6 bg-gradient-to-b from-white to-blue-50">
         <div class="max-w-7xl mx-auto">
-            <div class="flex flex-col md:flex-row md:items-center justify-between mb-16 reveal">
-                <div>
-                    <span class="inline-block px-4 py-1 rounded-full bg-blue-100 text-primary text-sm font-semibold mb-4">DIỄN ĐÀN</span>
-                    <h2 class="text-4xl lg:text-5xl font-bold">
-                        <span class="gradient-text">Cộng đồng</span>
-                        <span class="text-gray-800"> CyberKnight</span>
-                    </h2>
-                    <p class="text-gray-600 mt-3">Nơi các em chia sẻ và học hỏi kinh nghiệm an toàn mạng</p>
-                </div>
-                <button class="btn-primary mt-6 md:mt-0" onclick="openPostModal()">
-                    <span class="flex items-center gap-2">
-                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
-                        Đăng bài mới
-                    </span>
-                </button>
+            <div class="text-center lg:text-left mb-10 lg:mb-16 reveal">
+                <span class="inline-block px-4 py-1 rounded-full bg-blue-100 text-blue-700 text-sm font-semibold mb-4">MẸO AN TOÀN</span>
+                <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold">
+                    <span class="gradient-text">Bỏ túi</span>
+                    <span class="text-gray-800"> trước khi lên mạng</span>
+                </h2>
+                <p class="text-gray-600 mt-3 text-base sm:text-lg">Những điều CyberKnight dạy trong game — bố mẹ có thể cùng con ôn lại</p>
             </div>
 
-            <div class="grid lg:grid-cols-4 gap-8">
-                <!-- Sidebar -->
-                <div class="glass-strong rounded-2xl p-6 reveal">
-                    <h4 class="font-bold text-gray-800 mb-6">Chủ đề</h4>
-                    <div class="space-y-2">
-                        <div class="flex items-center justify-between p-3 rounded-xl hover:bg-blue-50 cursor-pointer transition">
-                            <span class="text-gray-600">🔐 Mật khẩu</span>
-                            <span class="badge bg-blue-100 text-primary">24</span>
-                        </div>
-                        <div class="flex items-center justify-between p-3 rounded-xl hover:bg-blue-50 cursor-pointer transition">
-                            <span class="text-gray-600">📧 Email</span>
-                            <span class="badge bg-cyan-100 text-cyan-600">18</span>
-                        </div>
-                        <div class="flex items-center justify-between p-3 rounded-xl hover:bg-blue-50 cursor-pointer transition">
-                            <span class="text-gray-600">🔒 Privacy</span>
-                            <span class="badge bg-green-100 text-green-600">12</span>
-                        </div>
-                        <div class="flex items-center justify-between p-3 rounded-xl hover:bg-blue-50 cursor-pointer transition">
-                            <span class="text-gray-600">🎮 Game</span>
-                            <span class="badge bg-yellow-100 text-yellow-600">32</span>
-                        </div>
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-5 lg:gap-8">
+                <!-- Khi gặp điều lạ -->
+                <div class="glass-strong rounded-2xl p-5 sm:p-6 reveal">
+                    <h3 class="font-bold text-gray-800 mb-4">Khi gặp điều lạ trên mạng</h3>
+                    <ol class="space-y-3 text-gray-700">
+                        <li class="flex items-start gap-3"><span class="badge bg-blue-100 text-blue-700 shrink-0">1</span><span><b>Dừng lại</b>, chưa bấm vội</span></li>
+                        <li class="flex items-start gap-3"><span class="badge bg-blue-100 text-blue-700 shrink-0">2</span><span><b>Soi kỹ</b> người gửi và đường link</span></li>
+                        <li class="flex items-start gap-3"><span class="badge bg-blue-100 text-blue-700 shrink-0">3</span><span><b>Hỏi</b> bố mẹ, thầy cô</span></li>
+                        <li class="flex items-start gap-3"><span class="badge bg-blue-100 text-blue-700 shrink-0">4</span><span><b>Chặn và báo cáo</b> nếu thấy sai</span></li>
+                    </ol>
+                    <div class="mt-5 pt-4 border-t border-blue-100 text-sm text-gray-600">
+                        Trang chính thức của CyberKnight:<br>
+                        <span class="font-mono font-semibold text-gray-800 break-all" data-site-host></span>
                     </div>
                 </div>
 
-                <!-- Posts -->
-                <div class="lg:col-span-3 space-y-4">
-                    <div class="forum-card reveal">
+                <!-- Tips -->
+                <div class="lg:col-span-3 grid grid-cols-1 gap-4">
+                    <div class="tip-card reveal">
                         <div class="flex items-start gap-4">
-                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-400 to-cyan-400 flex items-center justify-center text-xl">🧒</div>
-                            <div class="flex-1">
-                                <div class="flex items-center gap-2 mb-2">
-                                    <span class="font-semibold text-gray-800">MinhAnh_2009</span>
-                                    <span class="badge bg-blue-100 text-primary">Rookie</span>
-                                </div>
-                                <h4 class="text-lg font-semibold text-gray-800 mb-2">Làm sao tạo mật khẩu mạnh mà dễ nhớ?</h4>
-                                <p class="text-gray-600 text-sm mb-3">Mình thường quên mật khẩu, nhưng mật khẩu yếu thì không an toàn...</p>
-                                <div class="flex items-center gap-4 text-sm text-gray-500">
-                                    <span>💬 15 bình luận</span>
-                                    <span>👁️ 234 lượt xem</span>
-                                    <span>2 giờ trước</span>
-                                </div>
+                            <div class="w-12 h-12 shrink-0 rounded-xl bg-gradient-to-br from-blue-400 to-cyan-400 flex items-center justify-center text-xl" aria-hidden="true">🔐</div>
+                            <div class="min-w-0">
+                                <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-1.5">Mật khẩu và mã OTP là bí mật</h3>
+                                <p class="text-gray-600 text-sm sm:text-base">Không đưa mật khẩu hay mã OTP cho bất kỳ ai, kể cả người tự xưng là bạn bè, thầy cô hay "nhân viên game". CyberKnight không bao giờ hỏi những thông tin này qua tin nhắn, email hay điện thoại.</p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="forum-card reveal" style="transition-delay: 0.1s">
+                    <div class="tip-card reveal" style="transition-delay: 0.1s">
                         <div class="flex items-start gap-4">
-                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-green-400 to-cyan-400 flex items-center justify-center text-xl">👧</div>
-                            <div class="flex-1">
-                                <div class="flex items-center gap-2 mb-2">
-                                    <span class="font-semibold text-gray-800">ThuHien_2010</span>
-                                    <span class="badge bg-green-100 text-green-600">CyberKnight</span>
-                                </div>
-                                <h4 class="text-lg font-semibold text-gray-800 mb-2">Cách nhận biết email lừa đảo</h4>
-                                <p class="text-gray-600 text-sm mb-3">Hôm qua mình nhận được email thưởng iPhone, may mà đã hỏi mẹ trước...</p>
-                                <div class="flex items-center gap-4 text-sm text-gray-500">
-                                    <span>💬 28 bình luận</span>
-                                    <span>👁️ 512 lượt xem</span>
-                                    <span>5 giờ trước</span>
-                                </div>
+                            <div class="w-12 h-12 shrink-0 rounded-xl bg-gradient-to-br from-amber-400 to-orange-400 flex items-center justify-center text-xl" aria-hidden="true">🎁</div>
+                            <div class="min-w-0">
+                                <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-1.5">Quà miễn phí bất ngờ? Soi kỹ trước</h3>
+                                <p class="text-gray-600 text-sm sm:text-base">Lời mời "nhận quà", "kim cương miễn phí", "trúng thưởng" kèm đồng hồ đếm ngược thường là bẫy. Đừng điền địa chỉ nhà hay số điện thoại — hãy hỏi bố mẹ trước khi bấm.</p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="forum-card reveal" style="transition-delay: 0.2s">
+                    <div class="tip-card reveal" style="transition-delay: 0.2s">
                         <div class="flex items-start gap-4">
-                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center text-xl">👦</div>
-                            <div class="flex-1">
-                                <div class="flex items-center gap-2 mb-2">
-                                    <span class="font-semibold text-gray-800">KhoaPro_2008</span>
-                                    <span class="badge bg-purple-100 text-purple-600">Expert</span>
-                                </div>
-                                <h4 class="text-lg font-semibold text-gray-800 mb-2">Chia sẻ Shield Piece #1</h4>
-                                <p class="text-gray-600 text-sm mb-3">Đã hoàn thành level 5! Mẹo: cẩn thận với những link có chữ "FREE"...</p>
-                                <div class="flex items-center gap-4 text-sm text-gray-500">
-                                    <span>💬 42 bình luận</span>
-                                    <span>👁️ 1.2K lượt xem</span>
-                                    <span>1 ngày trước</span>
-                                </div>
+                            <div class="w-12 h-12 shrink-0 rounded-xl bg-gradient-to-br from-pink-400 to-rose-400 flex items-center justify-center text-xl" aria-hidden="true">📸</div>
+                            <div class="min-w-0">
+                                <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-1.5">Nhìn – Che – Hỏi trước khi đăng ảnh</h3>
+                                <p class="text-gray-600 text-sm sm:text-base">Một bức ảnh có thể lộ tên trường, lớp, địa chỉ, số điện thoại. Nhìn kỹ, che thông tin riêng tư và hỏi người lớn nếu chưa chắc.</p>
                             </div>
                         </div>
                     </div>
@@ -1606,25 +1800,25 @@
     </section>
 
     <!-- CTA Section -->
-    <section class="py-32 px-6 bg-gradient-to-r from-blue-50 via-white to-cyan-50 relative overflow-hidden">
+    <section class="py-20 lg:py-32 px-4 sm:px-6 bg-gradient-to-r from-blue-50 via-white to-cyan-50 relative overflow-hidden">
         <!-- Background decorations -->
-        <div class="absolute top-0 left-1/4 w-96 h-96 bg-blue-100 rounded-full blur-3xl opacity-30"></div>
-        <div class="absolute bottom-0 right-1/4 w-80 h-80 bg-cyan-100 rounded-full blur-3xl opacity-30"></div>
-        
+        <div class="absolute top-0 left-1/4 w-96 h-96 bg-blue-100 rounded-full blur-3xl opacity-30" aria-hidden="true"></div>
+        <div class="absolute bottom-0 right-1/4 w-80 h-80 bg-cyan-100 rounded-full blur-3xl opacity-30" aria-hidden="true"></div>
+
         <div class="max-w-4xl mx-auto text-center relative z-10 reveal">
-            <div class="bg-white rounded-3xl p-16 relative overflow-hidden shadow-2xl border border-blue-100">
-                <div class="absolute -top-20 -right-20 w-60 h-60 bg-blue-100 rounded-full blur-3xl"></div>
-                <div class="absolute -bottom-20 -left-20 w-60 h-60 bg-cyan-100 rounded-full blur-3xl"></div>
-                
+            <div class="bg-white rounded-3xl px-5 py-10 sm:p-12 lg:p-16 relative overflow-hidden shadow-2xl border border-blue-100">
+                <div class="absolute -top-20 -right-20 w-60 h-60 bg-blue-100 rounded-full blur-3xl" aria-hidden="true"></div>
+                <div class="absolute -bottom-20 -left-20 w-60 h-60 bg-cyan-100 rounded-full blur-3xl" aria-hidden="true"></div>
+
                 <!-- Logo in CTA -->
-                <img src="image/z8014995224177_069f99816bf77dda5fed3feb153a6c0e-removebg-preview.webp" alt="Sigmabloom" class="h-20 mx-auto mb-8">
-                
-                <h2 class="text-4xl lg:text-5xl font-bold mb-6 relative">
+                <img src="image/z8014995224177_069f99816bf77dda5fed3feb153a6c0e-removebg-preview.webp" alt="CyberKnight – Hiệp Sĩ Mạng" class="h-20 w-20 mx-auto mb-6 sm:mb-8 relative" width="80" height="80" loading="lazy">
+
+                <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold mb-5 sm:mb-6 relative">
                     <span class="text-gray-800">Sẵn sàng trở thành</span><br>
                     <span class="gradient-text">CyberKnight</span><span class="text-gray-800">?</span>
                 </h2>
-                <p class="text-gray-600 text-xl mb-10 max-w-2xl mx-auto relative">
-                    "Think Twice, Click Right" - Tham gia ngay hôm nay để bảo vệ bản thân và gia đình trong thế giới số!
+                <p class="text-gray-600 text-base sm:text-xl mb-8 sm:mb-10 max-w-2xl mx-auto relative">
+                    Level 0 chơi miễn phí, không cần tài khoản. Cùng con thử ngay hôm nay!
                 </p>
                 <div class="flex flex-wrap justify-center gap-4 relative">
                     <button type="button" class="btn-primary text-lg animate-glow-pulse" onclick="openLevelSelectModal()">
@@ -1639,29 +1833,29 @@
     </section>
 
     <!-- Contact Section -->
-    <section id="contact" class="py-24 px-6 bg-gradient-to-br from-blue-50 via-white to-cyan-50 relative overflow-hidden">
+    <section id="contact" class="py-20 lg:py-24 px-4 sm:px-6 bg-gradient-to-br from-blue-50 via-white to-cyan-50 relative overflow-hidden">
         <!-- Background decorations -->
-        <div class="absolute top-10 right-10 w-72 h-72 bg-blue-100 rounded-full blur-3xl opacity-40"></div>
-        <div class="absolute bottom-10 left-10 w-96 h-96 bg-cyan-100 rounded-full blur-3xl opacity-30"></div>
-        
+        <div class="absolute top-10 right-10 w-72 h-72 bg-blue-100 rounded-full blur-3xl opacity-40" aria-hidden="true"></div>
+        <div class="absolute bottom-10 left-10 w-96 h-96 bg-cyan-100 rounded-full blur-3xl opacity-30" aria-hidden="true"></div>
+
         <div class="max-w-6xl mx-auto relative z-10">
-            <div class="text-center mb-16 reveal">
-                <span class="inline-block px-4 py-1 rounded-full bg-blue-100 text-primary text-sm font-semibold mb-4">LIÊN HỆ</span>
-                <h2 class="text-4xl lg:text-5xl font-bold mb-6">
+            <div class="text-center mb-10 lg:mb-16 reveal">
+                <span class="inline-block px-4 py-1 rounded-full bg-blue-100 text-blue-700 text-sm font-semibold mb-4">LIÊN HỆ</span>
+                <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 lg:mb-6">
                     <span class="gradient-text">Kết nối</span>
                     <span class="text-gray-800"> với chúng tôi</span>
                 </h2>
-                <p class="text-gray-600 text-lg max-w-2xl mx-auto">
-                    Bạn có câu hỏi hoặc muốn đóng góp ý kiến? Hãy liên hệ ngay!
+                <p class="text-gray-600 text-base sm:text-lg max-w-2xl mx-auto">
+                    Bạn có câu hỏi, muốn báo lỗi hay hợp tác với nhóm Sigmabloom? Hãy nhắn cho chúng mình.
                 </p>
             </div>
-            
-            <div class="grid lg:grid-cols-2 gap-12">
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-12">
                 <!-- Contact Form -->
-                <div class="glass-strong rounded-3xl p-8 reveal-left">
-                    <h3 class="text-2xl font-bold text-gray-800 mb-6">📬 Gửi tin nhắn cho chúng tôi</h3>
+                <div class="glass-strong rounded-3xl p-5 sm:p-8 reveal-left min-w-0">
+                    <h3 class="text-xl sm:text-2xl font-bold text-gray-800 mb-5 sm:mb-6">📬 Gửi tin nhắn cho chúng tôi</h3>
                     <form class="space-y-5" id="contactForm">
-                        <div class="grid md:grid-cols-2 gap-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label for="contactName" class="block text-gray-600 mb-2 font-medium">Họ và tên</label>
                                 <input type="text" id="contactName" placeholder="Nhập tên của bạn..."
@@ -1700,117 +1894,117 @@
                 </div>
                 
                 <!-- Contact Info -->
-                <div class="space-y-6 reveal-right">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4 sm:gap-5 reveal-right min-w-0">
                     <!-- Contact Cards -->
-                    <div class="feature-card" style="padding: 24px;">
+                    <div class="feature-card" style="padding: 20px;">
                         <div class="flex items-center gap-4">
-                            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-400 to-cyan-400 flex items-center justify-center text-2xl">
+                            <div class="w-12 h-12 sm:w-14 sm:h-14 shrink-0 rounded-2xl bg-gradient-to-br from-blue-400 to-cyan-400 flex items-center justify-center text-2xl" aria-hidden="true">
                                 📧
                             </div>
-                            <div>
-                                <h4 class="font-bold text-gray-800">Email</h4>
-                                <a href="mailto:cyberknight.official.vn@gmail.com" class="text-primary hover:underline">cyberknight.official.vn@gmail.com</a>
+                            <div class="min-w-0">
+                                <h3 class="font-bold text-gray-800">Email</h3>
+                                <a href="mailto:cyberknight.official.vn@gmail.com" class="text-primary hover:underline break-all">cyberknight.official.vn@gmail.com</a>
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="feature-card" style="padding: 24px;">
+
+                    <div class="feature-card" style="padding: 20px;">
                         <div class="flex items-center gap-4">
-                            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-green-400 to-emerald-400 flex items-center justify-center text-2xl">
+                            <div class="w-12 h-12 sm:w-14 sm:h-14 shrink-0 rounded-2xl bg-gradient-to-br from-green-400 to-emerald-400 flex items-center justify-center text-2xl" aria-hidden="true">
                                 📱
                             </div>
-                            <div>
-                                <h4 class="font-bold text-gray-800">Điện thoại</h4>
+                            <div class="min-w-0">
+                                <h3 class="font-bold text-gray-800">Điện thoại</h3>
                                 <a href="tel:0966347482" class="text-primary hover:underline">0966 347 482</a>
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="feature-card" style="padding: 24px;">
+
+                    <div class="feature-card" style="padding: 20px;">
                         <div class="flex items-center gap-4">
-                            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center text-2xl">
+                            <div class="w-12 h-12 sm:w-14 sm:h-14 shrink-0 rounded-2xl bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center text-2xl" aria-hidden="true">
                                 📍
                             </div>
-                            <div>
-                                <h4 class="font-bold text-gray-800">Địa chỉ</h4>
+                            <div class="min-w-0">
+                                <h3 class="font-bold text-gray-800">Địa chỉ</h3>
                                 <p class="text-gray-600">Hà Nội, Việt Nam</p>
                             </div>
                         </div>
                     </div>
-                    
-                    <!-- Social Links -->
-                    <div class="glass-strong rounded-3xl p-6">
-                        <h4 class="font-bold text-gray-800 mb-4">🌐 Kết nối mạng xã hội</h4>
-                        <div class="flex gap-4">
-                            <a href="https://www.tiktok.com/@cyberknight_hiepsimang" target="_blank" rel="noopener noreferrer" class="w-14 h-14 rounded-2xl bg-gradient-to-br from-pink-500 via-purple-500 to-orange-400 flex items-center justify-center text-white text-2xl hover:scale-110 transition-transform shadow-lg">
-                                🎵
-                            </a>
-                        </div>
-                        <p class="text-gray-500 text-sm mt-3">🎵 TikTok: @cyberknight_hiepsimang</p>
-                    </div>
-                    
+
                     <!-- Working Hours -->
-                    <div class="feature-card" style="padding: 24px;">
+                    <div class="feature-card" style="padding: 20px;">
                         <div class="flex items-center gap-4">
-                            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-400 flex items-center justify-center text-2xl">
+                            <div class="w-12 h-12 sm:w-14 sm:h-14 shrink-0 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-400 flex items-center justify-center text-2xl" aria-hidden="true">
                                 🕐
                             </div>
-                            <div>
-                                <h4 class="font-bold text-gray-800">Giờ làm việc</h4>
-                                <p class="text-gray-600">Thứ 2 - Thứ 6: 8:00 - 17:00</p>
+                            <div class="min-w-0">
+                                <h3 class="font-bold text-gray-800">Giờ làm việc</h3>
+                                <p class="text-gray-600">Thứ 2 – Thứ 6: 8:00 – 17:00</p>
                             </div>
                         </div>
                     </div>
+
+                    <!-- Social Links -->
+                    <a href="https://www.tiktok.com/@cyberknight_hiepsimang" target="_blank" rel="noopener noreferrer" class="glass-strong rounded-3xl p-5 flex items-center gap-4 sm:col-span-2 lg:col-span-1 hover:border-blue-300 transition-colors">
+                        <span class="w-12 h-12 sm:w-14 sm:h-14 shrink-0 rounded-2xl bg-gradient-to-br from-pink-500 via-purple-500 to-orange-400 flex items-center justify-center text-white text-2xl shadow-lg" aria-hidden="true">🎵</span>
+                        <span class="min-w-0">
+                            <span class="block font-bold text-gray-800">TikTok chính thức</span>
+                            <span class="block text-gray-600 text-sm break-all">@cyberknight_hiepsimang</span>
+                        </span>
+                    </a>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Footer -->
-    <footer class="py-16 px-6 bg-gradient-to-b from-blue-50 to-blue-100 border-t border-blue-200">
+    <footer class="pt-14 pb-8 px-4 sm:px-6 bg-gradient-to-b from-blue-50 to-blue-100 border-t border-blue-200">
         <div class="max-w-7xl mx-auto">
-            <div class="grid md:grid-cols-4 gap-12 mb-12">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.9fr)_minmax(0,0.9fr)_minmax(0,1.3fr)] gap-8 lg:gap-10 mb-10">
                 <div>
-                    <div class="flex items-center gap-3 mb-6">
-                        <img src="image/z8014995224177_069f99816bf77dda5fed3feb153a6c0e-removebg-preview.webp" alt="Sigmabloom" class="h-12">
+                    <div class="flex items-center gap-3 mb-4">
+                        <img src="image/z8014995365895_a3eb178f5f7a17a45925b55e43e202be-removebg-preview.webp" alt="Sigmabloom" class="h-12 w-12" width="48" height="48" loading="lazy">
                         <div>
-                            <div class="font-bold text-lg text-primary" style="font-family: 'Space Grotesk'">SIGMABLOOM</div>
-                            <div class="text-xs text-gray-500">Think Twice, Click Right</div>
+                            <div class="font-bold text-lg text-primary" style="font-family: 'Space Grotesk'">CyberKnight</div>
+                            <div class="text-xs text-gray-500">Hiệp Sĩ Mạng · by Sigmabloom</div>
                         </div>
                     </div>
-                    <p class="text-gray-600 text-sm">Dự án giáo dục cybersecurity cho trẻ em Việt Nam. Bảo vệ thế hệ trẻ trong thế giới số.</p>
+                    <p class="text-gray-600 text-sm">Game giáo dục an toàn mạng cho trẻ em Việt Nam, do nhóm Sigmabloom (Hà Nội) phát triển.</p>
                 </div>
-                
+
                 <div>
-                    <h4 class="font-bold text-gray-800 mb-4">Liên kết</h4>
-                    <div class="space-y-3">
-                        <a href="#" class="block text-gray-600 hover:text-primary transition">Về chúng tôi</a>
-                        <a href="#" class="block text-gray-600 hover:text-primary transition">Hướng dẫn sử dụng</a>
-                        <a href="#" class="block text-gray-600 hover:text-primary transition">Chính sách bảo mật</a>
+                    <h2 class="font-bold text-gray-800 mb-3">Khám phá</h2>
+                    <div class="flex flex-col">
+                        <a href="#features" class="py-1.5 text-gray-600 hover:text-primary transition-colors">Tính năng</a>
+                        <a href="#updates" class="py-1.5 text-gray-600 hover:text-primary transition-colors">Nhật ký phát triển</a>
+                        <a href="#tips" class="py-1.5 text-gray-600 hover:text-primary transition-colors">Mẹo an toàn</a>
+                        <a href="#contact" class="py-1.5 text-gray-600 hover:text-primary transition-colors">Liên hệ & báo lỗi</a>
                     </div>
                 </div>
-                
+
                 <div>
-                    <h4 class="font-bold text-gray-800 mb-4">Hỗ trợ</h4>
-                    <div class="space-y-3">
-                        <a href="#" class="block text-gray-600 hover:text-primary transition">FAQ</a>
-                        <a href="#" class="block text-gray-600 hover:text-primary transition">Liên hệ</a>
-                        <a href="#" class="block text-gray-600 hover:text-primary transition">Báo lỗi</a>
+                    <h2 class="font-bold text-gray-800 mb-3">Chính sách</h2>
+                    <div class="flex flex-col">
+                        <a href="/privacy" class="py-1.5 text-gray-600 hover:text-primary transition-colors">Chính sách bảo mật</a>
+                        <a href="/terms" class="py-1.5 text-gray-600 hover:text-primary transition-colors">Điều khoản sử dụng</a>
+                        <a href="/refund" class="py-1.5 text-gray-600 hover:text-primary transition-colors">Chính sách hoàn tiền</a>
                     </div>
                 </div>
-                
+
                 <div>
-                    <h4 class="font-bold text-gray-800 mb-4">Kết nối</h4>
-                    <div class="flex gap-4">
-                        <a href="#" class="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center text-lg hover:bg-primary hover:text-white transition">📘</a>
-                        <a href="#" class="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center text-lg hover:bg-primary hover:text-white transition">📸</a>
-                        <a href="#" class="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center text-lg hover:bg-primary hover:text-white transition">🐦</a>
+                    <h2 class="font-bold text-gray-800 mb-3">Liên hệ</h2>
+                    <div class="flex flex-col text-gray-600">
+                        <a href="mailto:cyberknight.official.vn@gmail.com" class="py-1.5 hover:text-primary transition-colors break-all">cyberknight.official.vn@gmail.com</a>
+                        <a href="tel:0966347482" class="py-1.5 hover:text-primary transition-colors">0966 347 482</a>
+                        <a href="https://www.tiktok.com/@cyberknight_hiepsimang" target="_blank" rel="noopener noreferrer" class="py-1.5 hover:text-primary transition-colors">TikTok @cyberknight_hiepsimang</a>
                     </div>
                 </div>
             </div>
-            
-            <div class="pt-8 border-t border-blue-200 text-center">
-                <p class="text-gray-600 text-sm">© 2024 Sigmabloom - CyberKnight. Made with ❤️ for kids.</p>
+
+            <div class="pt-6 border-t border-blue-200 flex flex-col md:flex-row md:items-center md:justify-between gap-3 text-sm text-gray-600 text-center md:text-left">
+                <p>© 2026 Sigmabloom · CyberKnight – Hiệp Sĩ Mạng</p>
+                <p class="max-w-xl">🔒 CyberKnight không bao giờ yêu cầu mật khẩu, mã OTP hay chuyển khoản qua tin nhắn, email hoặc điện thoại.</p>
             </div>
         </div>
     </footer>
@@ -1826,11 +2020,14 @@
                     <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 text-primary text-xs font-black tracking-wide uppercase mb-2">
                         <span>🎮</span> CHỌN MÀN CHƠI CYBERKNIGHT
                     </div>
-                    <h3 class="text-2xl md:text-3xl font-black text-gray-900 font-heading">
+                    <h3 class="text-xl sm:text-2xl md:text-3xl font-black text-gray-900 font-heading">
                         CON MUỐN BẮT ĐẦU VỚI MÀN NÀO?
                     </h3>
                     <p class="text-gray-600 text-sm mt-1">
                         Mỗi màn chơi là một chuyến phiêu lưu bảo vệ bản thân và rèn luyện kỹ năng an toàn số!
+                    </p>
+                    <p class="text-xs text-blue-800 bg-blue-50 border border-blue-100 rounded-lg px-3 py-2 mt-3">
+                        🛡️ Các màn chơi là tình huống <b>mô phỏng</b> để học — không có quà hay phần thưởng thật, game không bao giờ hỏi mật khẩu, OTP hay thông tin ngân hàng.
                     </p>
                 </div>
                 <button type="button" onclick="closeLevelSelectModal()" class="w-10 h-10 rounded-full bg-gray-100 hover:bg-red-50 hover:text-red-500 text-gray-500 flex items-center justify-center text-xl font-bold transition flex-shrink-0" title="Đóng" aria-label="Đóng">&times;</button>
@@ -2049,41 +2246,8 @@
         <iframe id="gameFrame" src="/level0/level0.html" class="fullscreen-game-frame" title="CyberKnight Game Level 0" allow="autoplay"></iframe>
     </div>
 
-    <!-- Post Modal -->
-    <div id="postModal" class="modal-overlay">
-        <div class="modal-content">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-2xl font-bold text-gray-800">Đăng bài mới</h3>
-                <button onclick="closePostModal()" class="text-2xl text-gray-400 hover:text-gray-800 transition">&times;</button>
-            </div>
-            
-            <form class="space-y-4">
-                <div>
-                    <label class="block text-gray-600 mb-2">Tiêu đề</label>
-                    <input type="text" placeholder="Nhập tiêu đề bài viết..." class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:border-primary focus:outline-none transition">
-                </div>
-                <div>
-                    <label class="block text-gray-600 mb-2">Nội dung</label>
-                    <textarea rows="5" placeholder="Chia sẻ kinh nghiệm của bạn..." class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:border-primary focus:outline-none transition resize-none"></textarea>
-                </div>
-                <div>
-                    <label class="block text-gray-600 mb-2">Chủ đề</label>
-                    <select class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:border-primary focus:outline-none transition">
-                        <option>🔐 Mật khẩu an toàn</option>
-                        <option>📧 Email & Tin nhắn</option>
-                        <option>🔒 Quyền riêng tư</option>
-                        <option>🎮 Thủ thuật Game</option>
-                    </select>
-                </div>
-                <button type="button" class="btn-primary w-full" onclick="closePostModal(); showToast('Bài viết đã được gửi!')">
-                    Đăng bài
-                </button>
-            </form>
-        </div>
-    </div>
-
     <!-- Toast -->
-    <div id="toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 px-6 py-3 rounded-full bg-primary text-white font-semibold opacity-0 transition-all duration-300 pointer-events-none z-50 shadow-lg">
+    <div id="toast" role="status" aria-live="polite" class="fixed bottom-6 left-1/2 -translate-x-1/2 w-max max-w-[calc(100%-2rem)] text-center px-5 py-3 rounded-2xl bg-primary text-white font-semibold opacity-0 transition-opacity duration-300 pointer-events-none z-[1100] shadow-lg">
         <span id="toastMessage">Thành công!</span>
     </div>
 
@@ -2091,20 +2255,20 @@
          MODAL ĐĂNG NHẬP
     ============================================ -->
     <div id="loginModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
-        <div class="modal-content" style="max-width: 480px; padding: 48px 40px;">
+        <div class="modal-content auth-modal">
             <!-- Header -->
-            <div class="flex justify-between items-center mb-8">
+            <div class="flex justify-between items-center mb-6 sm:mb-8">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center">
                         🔐
                     </div>
                     <h3 id="loginTitle" class="text-2xl font-bold text-gray-800" style="font-family:'Space Grotesk'">Đăng nhập</h3>
                 </div>
-                <button onclick="closeLoginModal()" class="text-2xl text-gray-400 hover:text-gray-800 transition w-9 h-9 flex items-center justify-center rounded-full hover:bg-gray-100">&times;</button>
+                <button type="button" onclick="closeLoginModal()" aria-label="Đóng" class="text-2xl text-gray-400 hover:text-gray-800 transition w-9 h-9 flex items-center justify-center rounded-full hover:bg-gray-100">&times;</button>
             </div>
 
             <!-- Welcome text -->
-            <p class="text-gray-500 mb-8 text-sm">Chào mừng trở lại, CyberKnight! 👋</p>
+            <p class="text-gray-500 mb-6 sm:mb-8 text-sm">Chào mừng trở lại, CyberKnight! 👋</p>
 
             <!-- Form -->
             <form id="loginForm" class="space-y-5" onsubmit="handleLogin(event)">
@@ -2114,7 +2278,7 @@
                     <div class="relative">
                         <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg">📧</span>
                         <input type="text" id="loginEmail" placeholder="email@example.com hoặc username..."
-                            class="w-full pl-12 pr-4 py-3.5 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:border-primary focus:ring-2 focus:ring-blue-100 focus:outline-none transition text-sm"
+                            class="w-full pl-12 pr-4 py-3.5 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:border-primary focus:ring-2 focus:ring-blue-100 focus:outline-none transition text-base sm:text-sm"
                             required>
                     </div>
                 </div>
@@ -2125,7 +2289,7 @@
                     <div class="relative">
                         <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg">🔒</span>
                         <input type="password" id="loginPassword" placeholder="Nhập mật khẩu..."
-                            class="w-full pl-12 pr-12 py-3.5 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:border-primary focus:ring-2 focus:ring-blue-100 focus:outline-none transition text-sm"
+                            class="w-full pl-12 pr-12 py-3.5 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:border-primary focus:ring-2 focus:ring-blue-100 focus:outline-none transition text-base sm:text-sm"
                             required>
                         <button type="button" onclick="togglePassword('loginPassword', this)" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition text-lg">👁️</button>
                     </div>
@@ -2162,7 +2326,7 @@
             <!-- Switch to Register -->
             <p class="text-center text-gray-600 text-sm">
                 Chưa có tài khoản?
-                <button onclick="switchToRegister()" class="text-primary font-bold hover:underline">Đăng ký ngay</button>
+                <button type="button" onclick="switchToRegister()" class="text-primary font-bold hover:underline">Đăng ký ngay</button>
             </p>
         </div>
     </div>
@@ -2171,19 +2335,19 @@
          MODAL ĐĂNG KÝ
     ============================================ -->
     <div id="registerModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="registerTitle">
-        <div class="modal-content" style="max-width: 520px; padding: 48px 40px;">
+        <div class="modal-content auth-modal" style="max-width: 520px;">
             <!-- Header -->
-            <div class="flex justify-between items-center mb-8">
+            <div class="flex justify-between items-center mb-6 sm:mb-8">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-green-400 to-cyan-400 flex items-center justify-center">
                         ✨
                     </div>
                     <h3 id="registerTitle" class="text-2xl font-bold text-gray-800" style="font-family:'Space Grotesk'">Tạo tài khoản</h3>
                 </div>
-                <button onclick="closeRegisterModal()" class="text-2xl text-gray-400 hover:text-gray-800 transition w-9 h-9 flex items-center justify-center rounded-full hover:bg-gray-100">&times;</button>
+                <button type="button" onclick="closeRegisterModal()" aria-label="Đóng" class="text-2xl text-gray-400 hover:text-gray-800 transition w-9 h-9 flex items-center justify-center rounded-full hover:bg-gray-100">&times;</button>
             </div>
 
-            <p class="text-gray-500 mb-8 text-sm">Gia nhập đội CyberKnight ngay hôm nay! 🛡️</p>
+            <p class="text-gray-500 mb-6 sm:mb-8 text-sm">Gia nhập đội CyberKnight ngay hôm nay! 🛡️</p>
 
             <!-- Form -->
             <form id="registerForm" class="space-y-4" onsubmit="handleRegister(event)">
@@ -2192,14 +2356,14 @@
                     <div>
                         <label class="block text-gray-700 font-medium mb-2 text-sm">Họ</label>
                         <input type="text" id="regFirstName" placeholder="Nguyễn Văn"
-                            class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:border-primary focus:ring-2 focus:ring-blue-100 focus:outline-none transition text-sm"
+                            class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:border-primary focus:ring-2 focus:ring-blue-100 focus:outline-none transition text-base sm:text-sm"
                             required>
                         <p id="regFirstNameError" class="hidden text-xs text-red-500 mt-1"></p>
                     </div>
                     <div>
                         <label class="block text-gray-700 font-medium mb-2 text-sm">Tên</label>
                         <input type="text" id="regLastName" placeholder="An"
-                            class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:border-primary focus:ring-2 focus:ring-blue-100 focus:outline-none transition text-sm"
+                            class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:border-primary focus:ring-2 focus:ring-blue-100 focus:outline-none transition text-base sm:text-sm"
                             required>
                         <p id="regLastNameError" class="hidden text-xs text-red-500 mt-1"></p>
                     </div>
@@ -2212,7 +2376,7 @@
                         <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg">🧑</span>
                         <input type="text" id="regUsername" placeholder="an_hiepsi"
                             oninput="debouncedCheckUsername(this.value)"
-                            class="w-full pl-12 pr-10 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:border-primary focus:ring-2 focus:ring-blue-100 focus:outline-none transition text-sm"
+                            class="w-full pl-12 pr-10 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:border-primary focus:ring-2 focus:ring-blue-100 focus:outline-none transition text-base sm:text-sm"
                             required minlength="3">
                         <span id="usernameCheckStatus" class="absolute right-3 top-1/2 -translate-y-1/2 text-sm"></span>
                     </div>
@@ -2225,7 +2389,7 @@
                     <div class="relative">
                         <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg">📧</span>
                         <input type="email" id="regEmail" placeholder="an@example.com"
-                            class="w-full pl-12 pr-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:border-primary focus:ring-2 focus:ring-blue-100 focus:outline-none transition text-sm"
+                            class="w-full pl-12 pr-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:border-primary focus:ring-2 focus:ring-blue-100 focus:outline-none transition text-base sm:text-sm"
                             required>
                     </div>
                     <p id="regEmailError" class="hidden text-xs text-red-500 mt-1"></p>
@@ -2237,7 +2401,7 @@
                     <div class="relative">
                         <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg">🔒</span>
                         <input type="password" id="regPassword" placeholder="Tối thiểu 8 ký tự (gồm chữ & số)"
-                            class="w-full pl-12 pr-12 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:border-primary focus:ring-2 focus:ring-blue-100 focus:outline-none transition text-sm"
+                            class="w-full pl-12 pr-12 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:border-primary focus:ring-2 focus:ring-blue-100 focus:outline-none transition text-base sm:text-sm"
                             required minlength="8" oninput="checkPasswordStrength(this.value)">
                         <button type="button" onclick="togglePassword('regPassword', this)" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition text-lg">👁️</button>
                     </div>
@@ -2260,7 +2424,7 @@
                     <div class="relative">
                         <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg">🔐</span>
                         <input type="password" id="regConfirmPassword" placeholder="Nhập lại mật khẩu"
-                            class="w-full pl-12 pr-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:border-primary focus:ring-2 focus:ring-blue-100 focus:outline-none transition text-sm"
+                            class="w-full pl-12 pr-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:border-primary focus:ring-2 focus:ring-blue-100 focus:outline-none transition text-base sm:text-sm"
                             required>
                     </div>
                     <p id="regConfirmPasswordError" class="hidden text-xs text-red-500 mt-1"></p>
@@ -2270,7 +2434,7 @@
                 <div>
                     <label class="block text-gray-700 font-medium mb-2 text-sm">Năm sinh</label>
                     <select id="regBirthYear" onchange="checkBirthYearNotice(this.value)"
-                        class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:border-primary focus:ring-2 focus:ring-blue-100 focus:outline-none transition text-sm"
+                        class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:border-primary focus:ring-2 focus:ring-blue-100 focus:outline-none transition text-base sm:text-sm"
                         required>
                         <option value="">-- Chọn năm sinh --</option>
                     </select>
@@ -2283,7 +2447,7 @@
                 <!-- Terms -->
                 <label class="flex items-start gap-3 cursor-pointer text-sm text-gray-600">
                     <input type="checkbox" id="agreeTerms" class="w-4 h-4 rounded accent-blue-500 mt-0.5 flex-shrink-0" required>
-                    <span>Tôi đồng ý với <a href="#" class="text-primary hover:underline">Điều khoản sử dụng</a> và <a href="#" class="text-primary hover:underline">Chính sách bảo mật</a> của Sigmabloom</span>
+                    <span>Tôi đồng ý với <a href="/terms" target="_blank" rel="noopener" class="text-primary hover:underline">Điều khoản sử dụng</a> và <a href="/privacy" target="_blank" rel="noopener" class="text-primary hover:underline">Chính sách bảo mật</a> của CyberKnight / Sigmabloom</span>
                 </label>
 
                 <!-- Error msg -->
@@ -2301,7 +2465,7 @@
             <!-- Switch to Login -->
             <p class="text-center text-gray-600 text-sm mt-6">
                 Đã có tài khoản?
-                <button onclick="switchToLogin()" class="text-primary font-bold hover:underline">Đăng nhập</button>
+                <button type="button" onclick="switchToLogin()" class="text-primary font-bold hover:underline">Đăng nhập</button>
             </p>
         </div>
     </div>
@@ -2310,24 +2474,24 @@
          MODAL QUÊN MẬT KHẨU
     ============================================ -->
     <div id="forgotModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="forgotTitle">
-        <div class="modal-content" style="max-width: 440px; padding: 48px 40px;">
-            <div class="flex justify-between items-center mb-8">
+        <div class="modal-content auth-modal" style="max-width: 440px;">
+            <div class="flex justify-between items-center mb-6 sm:mb-8">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-400 to-yellow-400 flex items-center justify-center">
                         🔑
                     </div>
                     <h3 id="forgotTitle" class="text-2xl font-bold text-gray-800" style="font-family:'Space Grotesk'">Quên mật khẩu</h3>
                 </div>
-                <button onclick="closeForgotModal()" class="text-2xl text-gray-400 hover:text-gray-800 transition w-9 h-9 flex items-center justify-center rounded-full hover:bg-gray-100">&times;</button>
+                <button type="button" onclick="closeForgotModal()" aria-label="Đóng" class="text-2xl text-gray-400 hover:text-gray-800 transition w-9 h-9 flex items-center justify-center rounded-full hover:bg-gray-100">&times;</button>
             </div>
-            <p class="text-gray-500 mb-8 text-sm">Nhập email của bạn, chúng tôi sẽ gửi link đặt lại mật khẩu.</p>
+            <p class="text-gray-500 mb-6 sm:mb-8 text-sm">Nhập email của bạn, chúng tôi sẽ gửi link đặt lại mật khẩu.</p>
             <form id="forgotForm" onsubmit="handleForgotPassword(event)" class="space-y-5">
                 <div>
                     <label class="block text-gray-700 font-medium mb-2 text-sm">Email đăng ký</label>
                     <div class="relative">
                         <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg">📧</span>
                         <input type="email" id="forgotEmail" placeholder="email@example.com"
-                            class="w-full pl-12 pr-4 py-3.5 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:border-primary focus:ring-2 focus:ring-blue-100 focus:outline-none transition text-sm"
+                            class="w-full pl-12 pr-4 py-3.5 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:border-primary focus:ring-2 focus:ring-blue-100 focus:outline-none transition text-base sm:text-sm"
                             required>
                     </div>
                 </div>
@@ -2344,149 +2508,201 @@
 
     <script src="/assets/safe.js"></script>
     <script>
-        // Navbar scroll effect
-        window.addEventListener('scroll', () => {
-            const navbar = document.getElementById('navbar');
-            if (window.scrollY > 50) {
-                navbar.classList.add('scrolled');
-            } else {
-                navbar.classList.remove('scrolled');
+        // ============================================
+        // HIỆU ỨNG TRANG TRÍ — chỉ đổi transform/opacity, gom cập nhật vào requestAnimationFrame,
+        // tắt hẳn khi người dùng bật "giảm chuyển động" trong hệ điều hành
+        // ============================================
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+        const isSmallScreen = window.matchMedia('(max-width: 639px)').matches;
+
+        // Navbar + nhân vật hero theo cuộn: MỘT listener passive, tính trong rAF (trước đây 3 listener ghi DOM mỗi sự kiện cuộn)
+        const navbarEl = document.getElementById('navbar');
+        const heroWrap = document.getElementById('heroCharacterWrap');
+        let scrollTicking = false;
+        function onScrollFrame() {
+            scrollTicking = false;
+            const y = window.scrollY;
+            navbarEl.classList.toggle('scrolled', y > 50);
+            if (heroWrap && !prefersReducedMotion && y < window.innerHeight) {
+                heroWrap.style.setProperty('--hero-scale', Math.max(0.8, 1 - y / (window.innerHeight * 2.5)).toFixed(3));
             }
-        });
+        }
+        window.addEventListener('scroll', () => {
+            if (!scrollTicking) {
+                scrollTicking = true;
+                requestAnimationFrame(onScrollFrame);
+            }
+        }, { passive: true });
+        onScrollFrame();
 
         // ============================================
         // ADVANCED PARTICLE SYSTEM
         // ============================================
         function createParticles() {
+            if (prefersReducedMotion) return;
             const container = document.getElementById('particles');
-            const particleCount = 30;
-            
+            const particleCount = isSmallScreen ? 12 : 24;
+            const frag = document.createDocumentFragment();
+
             for (let i = 0; i < particleCount; i++) {
                 const particle = document.createElement('div');
                 particle.className = 'particle';
                 particle.style.left = Math.random() * 100 + '%';
-                particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+                particle.style.animationDuration = (Math.random() * 10 + 12) + 's';
                 particle.style.animationDelay = Math.random() * 10 + 's';
                 particle.style.width = (Math.random() * 8 + 4) + 'px';
                 particle.style.height = particle.style.width;
-                container.appendChild(particle);
+                frag.appendChild(particle);
             }
+            container.appendChild(frag);
         }
         createParticles();
-        
+
         // ============================================
-        // MOUSE TRAIL EFFECT
+        // MOUSE TRAIL EFFECT — 10 chấm dùng lại, vẽ theo rAF (không tạo/xoá DOM mỗi lần di chuột)
         // ============================================
-        const cursorTrail = document.getElementById('cursor-trail');
-        let lastTrailTime = 0;
-        const trailInterval = 50;
-        
-        document.addEventListener('mousemove', (e) => {
-            const now = Date.now();
-            if (now - lastTrailTime > trailInterval) {
-                lastTrailTime = now;
-                
-                const trail = document.createElement('div');
-                trail.style.cssText = `
-                    position: fixed;
-                    left: ${e.clientX}px;
-                    top: ${e.clientY}px;
-                    width: 15px;
-                    height: 15px;
-                    background: radial-gradient(circle, rgba(0, 102, 255, 0.6), transparent);
-                    border-radius: 50%;
-                    pointer-events: none;
-                    transform: translate(-50%, -50%);
-                    z-index: 9999;
-                `;
-                document.body.appendChild(trail);
-                
-                // Animate and remove
-                trail.animate([
-                    { opacity: 1, transform: 'translate(-50%, -50%) scale(1)' },
-                    { opacity: 0, transform: 'translate(-50%, -50%) scale(0)' }
-                ], {
-                    duration: 800,
-                    easing: 'ease-out'
-                }).onfinish = () => trail.remove();
+        (function initCursorTrail() {
+            if (prefersReducedMotion || !finePointer) return;
+            const host = document.getElementById('cursor-trail');
+            const DOT_COUNT = 10;
+            const LIFE_MS = 700;
+            const dots = [];
+            for (let i = 0; i < DOT_COUNT; i++) {
+                const el = document.createElement('div');
+                el.className = 'cursor-dot';
+                host.appendChild(el);
+                dots.push({ el, x: 0, y: 0, born: -Infinity });
             }
-        });
-        
+            let next = 0;
+            let lastSpawn = 0;
+            let rafId = 0;
+
+            function frame(now) {
+                let alive = false;
+                for (const d of dots) {
+                    const age = (now - d.born) / LIFE_MS;
+                    if (age >= 1) {
+                        if (d.el.style.opacity !== '0') d.el.style.opacity = '0';
+                        continue;
+                    }
+                    alive = true;
+                    d.el.style.opacity = String(1 - age);
+                    d.el.style.transform = `translate3d(${d.x}px, ${d.y}px, 0) scale(${1 - age * 0.8})`;
+                }
+                rafId = alive ? requestAnimationFrame(frame) : 0;
+            }
+
+            document.addEventListener('mousemove', (e) => {
+                const now = performance.now();
+                if (now - lastSpawn < 40) return;
+                lastSpawn = now;
+                const d = dots[next];
+                next = (next + 1) % DOT_COUNT;
+                d.x = e.clientX;
+                d.y = e.clientY;
+                d.born = now;
+                if (!rafId) rafId = requestAnimationFrame(frame);
+            }, { passive: true });
+        })();
+
         // ============================================
-        // 3D TILT EFFECT ON CARDS
+        // 3D TILT EFFECT ON CARDS — chỉ máy có chuột, mỗi khung hình tính 1 lần
         // ============================================
-        document.querySelectorAll('.feature-card, .forum-card, .card-3d').forEach(card => {
-            card.addEventListener('mousemove', (e) => {
-                const rect = card.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                const centerX = rect.width / 2;
-                const centerY = rect.height / 2;
-                const rotateX = (y - centerY) / 20;
-                const rotateY = (centerX - x) / 20;
-                
-                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-10px) scale(1.02)`;
+        function attachTilt(el, strength, extraTransform) {
+            let raf = 0;
+            let px = 0;
+            let py = 0;
+            el.addEventListener('mouseenter', () => el.classList.add('is-tilting'));
+            el.addEventListener('mousemove', (e) => {
+                px = e.clientX;
+                py = e.clientY;
+                if (raf) return;
+                raf = requestAnimationFrame(() => {
+                    raf = 0;
+                    const rect = el.getBoundingClientRect();
+                    const rotateX = (py - rect.top - rect.height / 2) / strength;
+                    const rotateY = (rect.width / 2 - (px - rect.left)) / strength;
+                    el.style.transform = `perspective(1000px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) ${extraTransform}`;
+                });
             });
-            
-            card.addEventListener('mouseleave', () => {
-                card.style.transform = '';
+            el.addEventListener('mouseleave', () => {
+                if (raf) cancelAnimationFrame(raf);
+                raf = 0;
+                el.classList.remove('is-tilting');
+                el.style.transform = '';
             });
-        });
-        
+        }
+        if (finePointer && !prefersReducedMotion) {
+            document.querySelectorAll('.feature-card, .card-3d').forEach(card => {
+                attachTilt(card, 20, 'translateY(-8px) scale(1.02)');
+            });
+        }
+
         // ============================================
         // CONFETTI ON BUTTON CLICK
         // ============================================
         function createConfetti(x, y) {
+            if (prefersReducedMotion) return;
             const colors = ['#FF6B6B', '#FFE66D', '#4ECDC4', '#0066FF', '#FF9F43'];
-            const confettiCount = 30;
-            
+            const confettiCount = isSmallScreen ? 16 : 26;
+            const frag = document.createDocumentFragment();
+
             for (let i = 0; i < confettiCount; i++) {
                 const confetti = document.createElement('div');
+                const size = Math.random() * 10 + 5;
                 confetti.style.cssText = `
                     position: fixed;
                     left: ${x}px;
                     top: ${y}px;
-                    width: ${Math.random() * 10 + 5}px;
-                    height: ${Math.random() * 10 + 5}px;
+                    width: ${size}px;
+                    height: ${size}px;
                     background: ${colors[Math.floor(Math.random() * colors.length)]};
                     pointer-events: none;
                     z-index: 9999;
                     border-radius: ${Math.random() > 0.5 ? '50%' : '2px'};
+                    will-change: transform, opacity;
                 `;
-                document.body.appendChild(confetti);
-                
+                frag.appendChild(confetti);
+
                 const angle = (Math.PI * 2 * i) / confettiCount;
                 const velocity = Math.random() * 200 + 100;
-                
+
                 confetti.animate([
-                    { 
-                        transform: 'translate(0, 0) rotate(0deg)', 
-                        opacity: 1 
+                    {
+                        transform: 'translate(0, 0) rotate(0deg)',
+                        opacity: 1
                     },
-                    { 
-                        transform: `translate(${Math.cos(angle) * velocity}px, ${Math.sin(angle) * velocity + 200}px) rotate(${Math.random() * 720}deg)`, 
-                        opacity: 0 
+                    {
+                        transform: `translate(${Math.cos(angle) * velocity}px, ${Math.sin(angle) * velocity + 200}px) rotate(${Math.random() * 720}deg)`,
+                        opacity: 0
                     }
                 ], {
-                    duration: 1500,
+                    duration: 1300,
                     easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
                 }).onfinish = () => confetti.remove();
             }
+            document.body.appendChild(frag);
         }
-        
-        // Add confetti to all primary buttons
+
+        // Add confetti to all primary buttons (bấm bằng bàn phím thì bắn từ giữa nút)
         document.querySelectorAll('.btn-primary').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                createConfetti(e.clientX, e.clientY);
+                if (e.clientX || e.clientY) {
+                    createConfetti(e.clientX, e.clientY);
+                } else {
+                    const r = btn.getBoundingClientRect();
+                    createConfetti(r.left + r.width / 2, r.top + r.height / 2);
+                }
             });
         });
-        
+
         // ============================================
         // SPARKLE EFFECT ON HOVER
         // ============================================
         function createSparkle(container) {
             const sparkle = document.createElement('div');
-            sparkle.innerHTML = '✨';
+            sparkle.textContent = '✨';
             sparkle.style.cssText = `
                 position: absolute;
                 left: ${Math.random() * 100}%;
@@ -2498,35 +2714,19 @@
             container.appendChild(sparkle);
             setTimeout(() => sparkle.remove(), 1000);
         }
-        
-        document.querySelectorAll('.feature-card, .logo-img, .character-img').forEach(el => {
-            el.addEventListener('mouseenter', () => {
-                for (let i = 0; i < 5; i++) {
-                    setTimeout(() => createSparkle(el), i * 100);
-                }
+
+        if (finePointer && !prefersReducedMotion) {
+            document.querySelectorAll('.feature-card, .logo-img, .character-img').forEach(el => {
+                // <img> không chứa được phần tử con → gắn lấp lánh vào khung bao quanh ảnh
+                const host = el.tagName === 'IMG' ? el.parentElement : el;
+                el.addEventListener('mouseenter', () => {
+                    for (let i = 0; i < 5; i++) {
+                        setTimeout(() => createSparkle(host), i * 100);
+                    }
+                });
             });
-        });
-        
-        // ============================================
-        // SCROLL-BASED ANIMATIONS
-        // ============================================
-        window.addEventListener('scroll', () => {
-            const scrolled = window.scrollY;
-            
-            // Parallax effect on floating shapes
-            document.querySelectorAll('.floating-shape').forEach((shape, i) => {
-                const speed = 0.1 + (i * 0.05);
-                shape.style.transform = `translateY(${scrolled * speed}px)`;
-            });
-            
-            // Character scale based on scroll
-            const hero = document.querySelector('.character-img');
-            if (hero && scrolled < window.innerHeight) {
-                const scale = 1 - (scrolled / (window.innerHeight * 2));
-                hero.style.transform = `scale(${Math.max(0.7, scale)})`;
-            }
-        });
-        
+        }
+
         // ============================================
         // INTERACTIVE RIPPLE EFFECT
         // ============================================
@@ -2550,7 +2750,7 @@
                 setTimeout(() => ripple.remove(), 600);
             });
         });
-        
+
         // Add ripple animation
         const rippleStyle = document.createElement('style');
         rippleStyle.textContent = `
@@ -2562,49 +2762,26 @@
             }
         `;
         document.head.appendChild(rippleStyle);
-        
+
         // ============================================
-        // ADVANCED SCROLL REVEAL
+        // ADVANCED SCROLL REVEAL — hiện xong thì thôi theo dõi
         // ============================================
-        const revealObserverOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-        
-        const revealObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
+        const revealEls = document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale, .reveal-rotate');
+        if (prefersReducedMotion || !('IntersectionObserver' in window)) {
+            revealEls.forEach(el => el.classList.add('visible'));
+        } else {
+            const revealObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (!entry.isIntersecting) return;
                     entry.target.classList.add('visible');
-                    
-                    // Stagger animation for child elements
-                    const children = entry.target.querySelectorAll('.reveal');
-                    children.forEach((child, i) => {
-                        setTimeout(() => child.classList.add('visible'), i * 100);
-                    });
-                }
-            });
-        }, revealObserverOptions);
-        
-        document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale, .reveal-rotate').forEach(el => {
-            revealObserver.observe(el);
-        });
-        
-        // Also observe contact section elements
-        document.querySelectorAll('#contact .reveal, #contact .reveal-left, #contact .reveal-right').forEach(el => {
-            revealObserver.observe(el);
-        });
-        
-        // ============================================
-        // NAVBAR SCROLL EFFECT
-        // ============================================
-        window.addEventListener('scroll', () => {
-            const navbar = document.getElementById('navbar');
-            if (window.scrollY > 50) {
-                navbar.classList.add('scrolled');
-            } else {
-                navbar.classList.remove('scrolled');
-            }
-        });
+                    observer.unobserve(entry.target);
+                });
+            }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+            revealEls.forEach(el => revealObserver.observe(el));
+        }
+
+        // Tên miền đang mở — để trẻ/phụ huynh đối chiếu với trang chính thức
+        document.querySelectorAll('[data-site-host]').forEach(el => { el.textContent = location.host; });
 
         // ============================================
         // LEVEL SELECTION & GAME MODAL FUNCTIONS
@@ -2697,14 +2874,6 @@
             }
         });
 
-        function openPostModal() {
-            document.getElementById('postModal').classList.add('active');
-        }
-
-        function closePostModal() {
-            document.getElementById('postModal').classList.remove('active');
-        }
-
         // Close modal on outside click
         document.querySelectorAll('.modal-overlay').forEach(modal => {
             modal.addEventListener('click', (e) => {
@@ -2714,29 +2883,53 @@
             });
         });
 
-        // Mobile menu
-        function toggleMenu() {
-            alert('Mobile menu - Đang phát triển!');
+        // Mobile menu (drawer bên phải, dưới 1280px)
+        function openMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            if (!menu) return;
+            menu.classList.add('open');
+            menu.setAttribute('aria-hidden', 'false');
+            document.getElementById('mobileMenuBtn')?.setAttribute('aria-expanded', 'true');
+            setTimeout(() => menu.querySelector('.mobile-menu-link')?.focus({ preventScroll: true }), 50);
         }
+        function closeMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            if (!menu || !menu.classList.contains('open')) return;
+            menu.classList.remove('open');
+            menu.setAttribute('aria-hidden', 'true');
+            const btn = document.getElementById('mobileMenuBtn');
+            btn?.setAttribute('aria-expanded', 'false');
+        }
+        function toggleMenu() {
+            const menu = document.getElementById('mobileMenu');
+            if (menu?.classList.contains('open')) closeMobileMenu();
+            else openMobileMenu();
+        }
+        // Xoay ngang / mở rộng cửa sổ qua 1024px thì đóng drawer
+        window.matchMedia('(min-width: 1280px)').addEventListener('change', (e) => { if (e.matches) closeMobileMenu(); });
 
         // Toast notification
+        let toastTimer = null;
         function showToast(message) {
             const toast = document.getElementById('toast');
             document.getElementById('toastMessage').textContent = message;
             toast.style.opacity = '1';
-            setTimeout(() => {
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => {
                 toast.style.opacity = '0';
             }, 3000);
         }
 
-        // Smooth scroll
+        // Smooth scroll (neo "#..." trong trang; đóng menu mobile nếu đang mở)
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function(e) {
+                const hash = this.getAttribute('href');
+                if (!hash || hash.length < 2) return;
+                const target = document.querySelector(hash);
+                if (!target) return;
                 e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth' });
-                }
+                closeMobileMenu();
+                target.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth' });
             });
         });
         
@@ -2951,24 +3144,19 @@
         }
 
         function showUserState(user) {
-            const authButtons = document.getElementById('authButtons');
-            if (authButtons) {
-                authButtons.classList.add('hidden');
-                authButtons.style.setProperty('display', 'none', 'important');
-            }
-            const userInfo = document.getElementById('userInfo');
-            if (userInfo) {
-                userInfo.classList.remove('hidden');
-                userInfo.style.removeProperty('display');
-                userInfo.classList.add('flex');
-                userInfo.style.setProperty('display', 'flex', 'important');
-            }
+            // Hiện/ẩn khối khách – thành viên – admin bằng class trên <body> (xem CSS [data-guest-only]...)
+            document.body.classList.add('is-authed');
+            document.body.classList.toggle('is-admin', user.role === 'admin');
 
-            const initials = ((user.firstName || user.username || '?')[0] + (user.lastName || '')[0]).toUpperCase();
+            const initials = ((user.firstName || user.username || '?')[0] + ((user.lastName || '')[0] || '')).toUpperCase();
+            const fullName = ((user.firstName || '') + ' ' + (user.lastName || '')).trim() || user.username;
             document.getElementById('userAvatarText').textContent = initials || '?';
             document.getElementById('userNameDisplay').textContent = user.username || user.firstName;
-            document.getElementById('dropdownName').textContent = (user.firstName + ' ' + (user.lastName || '')).trim() || user.username;
+            document.getElementById('dropdownName').textContent = fullName;
             document.getElementById('dropdownEmail').textContent = user.email || '';
+            document.getElementById('mobileUserAvatar').textContent = initials || '?';
+            document.getElementById('mobileUserName').textContent = fullName;
+            document.getElementById('mobileUserEmail').textContent = user.email || '';
 
             // Tự động điền và khóa email trong Contact Form khi đã đăng nhập
             const contactEmailInput = document.getElementById('contactEmail');
@@ -2983,30 +3171,11 @@
             if (contactNameInput && !contactNameInput.value.trim()) {
                 contactNameInput.value = (user.firstName ? (user.firstName + ' ' + (user.lastName || '')).trim() : user.username) || '';
             }
-
-            // Hiển thị link quản trị nếu là Admin
-            const adminLink = document.getElementById('adminDropdownLink');
-            if (adminLink) {
-                if (user.role === 'admin') {
-                    adminLink.classList.remove('hidden');
-                } else {
-                    adminLink.classList.add('hidden');
-                }
-            }
             updateMyPackagesUI();
         }
 
         function showGuestState() {
-            const authButtons = document.getElementById('authButtons');
-            if (authButtons) {
-                authButtons.classList.remove('hidden');
-                authButtons.style.removeProperty('display');
-            }
-            const userInfo = document.getElementById('userInfo');
-            if (userInfo) {
-                userInfo.classList.add('hidden');
-                userInfo.style.setProperty('display', 'none', 'important');
-            }
+            document.body.classList.remove('is-authed', 'is-admin');
 
             // Mở khóa contact form cho khách
             const contactEmailInput = document.getElementById('contactEmail');
@@ -3017,9 +3186,6 @@
                 contactEmailInput.classList.remove('bg-gray-100', 'cursor-not-allowed', 'text-gray-600');
             }
             if (contactEmailHint) contactEmailHint.classList.add('hidden');
-
-            const adminLink = document.getElementById('adminDropdownLink');
-            if (adminLink) adminLink.classList.add('hidden');
             updateMyPackagesUI();
         }
 
@@ -3102,15 +3268,17 @@
          * Sets window.__catalog and also calls applyLevelCardBadges().
          */
         async function loadCatalog() {
-            const cacheKey = 'ck_catalog_v1';
+            const cacheKey = 'ck_catalog_v2';
             try {
                 const cached = localStorage.getItem(cacheKey);
                 if (cached) {
-                    const { data, ts } = JSON.parse(cached);
+                    const { data, ts, paymentsEnabled } = JSON.parse(cached);
                     // TTL giảm xuống 5 phút (300.000ms) để cập nhật catalog nhanh
                     if (Date.now() - ts < 300 * 1000) {
                         window.__catalog = data;
+                        window.__paymentsEnabled = paymentsEnabled !== false;
                         applyLevelCardBadges();
+                        applyPaymentAvailability();
                         return;
                     }
                 }
@@ -3123,12 +3291,34 @@
                 const json = await res.json();
                 if (json.success && Array.isArray(json.data)) {
                     window.__catalog = json.data;
-                    localStorage.setItem(cacheKey, JSON.stringify({ data: json.data, ts: Date.now() }));
+                    window.__paymentsEnabled = json.paymentsEnabled !== false;
+                    try {
+                        localStorage.setItem(cacheKey, JSON.stringify({ data: json.data, ts: Date.now(), paymentsEnabled: window.__paymentsEnabled }));
+                    } catch (_) { /* bộ nhớ trình duyệt bị chặn */ }
                 }
             } catch (_) {
                 // Bỏ qua lỗi mạng khi nạp danh mục
             }
             applyLevelCardBadges();
+            applyPaymentAvailability();
+        }
+
+        /**
+         * Cổng thanh toán chưa cấu hình tài khoản thật → khoá nút mua, hiện thông báo trong bảng giá.
+         * (Không bao giờ hiện mã QR tới tài khoản giữ chỗ.)
+         */
+        function applyPaymentAvailability() {
+            const disabled = window.__paymentsEnabled === false;
+            document.getElementById('paymentsDisabledNotice')?.classList.toggle('hidden', !disabled);
+            ['pack_1_4', 'premium', 'pack_5_10'].forEach(id => {
+                const btn = document.getElementById(`btnBuy_${id}`);
+                if (!btn) return;
+                if (!btn.dataset.label) btn.dataset.label = btn.innerHTML;
+                btn.disabled = disabled;
+                btn.classList.toggle('opacity-60', disabled);
+                btn.classList.toggle('cursor-not-allowed', disabled);
+                btn.innerHTML = disabled ? 'TẠM ĐÓNG THANH TOÁN' : btn.dataset.label;
+            });
         }
 
         /**
@@ -3407,6 +3597,7 @@
         // Đóng modal khi bấm phím Escape
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
+                closeMobileMenu();
                 closeLoginModal();
                 closeRegisterModal();
                 closeForgotModal();
@@ -3768,6 +3959,8 @@
 
         // Init auth khi trang load — also loads catalog & entitlements (Phase 5)
         document.addEventListener('DOMContentLoaded', async () => {
+            // Trang "cần mua gói" của level guard dẫn về /index.html#packages → mở bảng giá
+            if (location.hash === '#packages') openPricingModal();
             await initAuth();
             // Load public catalog + apply badges (Phase 5)
             loadCatalog();
@@ -3779,18 +3972,31 @@
         // INTERACTIVE 3D CHARACTER
         // ============================================
         const heroCharacter = document.querySelector('.character-img');
-        if (heroCharacter) {
+        if (heroCharacter && finePointer && !prefersReducedMotion) {
+            let heroRaf = 0;
+            let heroX = 0;
+            let heroY = 0;
+            heroCharacter.addEventListener('mouseenter', () => heroCharacter.classList.add('is-tilting'));
             heroCharacter.addEventListener('mousemove', (e) => {
-                const rect = heroCharacter.getBoundingClientRect();
-                const x = (e.clientX - rect.left - rect.width / 2) / 50;
-                const y = (e.clientY - rect.top - rect.height / 2) / 50;
-                heroCharacter.style.transform = `perspective(1000px) rotateY(${x}deg) rotateX(${-y}deg) scale(1.05)`;
+                heroX = e.clientX;
+                heroY = e.clientY;
+                if (heroRaf) return;
+                heroRaf = requestAnimationFrame(() => {
+                    heroRaf = 0;
+                    const rect = heroCharacter.getBoundingClientRect();
+                    const x = (heroX - rect.left - rect.width / 2) / 50;
+                    const y = (heroY - rect.top - rect.height / 2) / 50;
+                    heroCharacter.style.transform = `perspective(1000px) rotateY(${x.toFixed(2)}deg) rotateX(${(-y).toFixed(2)}deg) scale(1.04)`;
+                });
             });
-            
+
             heroCharacter.addEventListener('mouseleave', () => {
+                if (heroRaf) cancelAnimationFrame(heroRaf);
+                heroRaf = 0;
+                heroCharacter.classList.remove('is-tilting');
                 heroCharacter.style.transform = '';
             });
-            
+
             heroCharacter.addEventListener('click', () => {
                 // Create celebration effect
                 for (let i = 0; i < 20; i++) {
@@ -3876,6 +4082,10 @@
         }
 
         async function handleBuyPackage(packageId) {
+            if (window.__paymentsEnabled === false) {
+                showToast('Thanh toán trực tuyến đang tạm đóng. Level 0 vẫn chơi miễn phí!');
+                return;
+            }
             if (!accessToken || !currentUser) {
                 showToast('🔐 Vui lòng đăng nhập để tiến hành mua gói!');
                 closePricingModal();
@@ -4213,15 +4423,20 @@
         <div class="modal-content max-w-4xl mx-auto p-6 md:p-8">
             <button onclick="closePricingModal()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-gray-100 hover:bg-red-50 hover:text-red-500 text-gray-500 flex items-center justify-center text-xl font-bold transition">&times;</button>
             <div class="text-center mb-8">
-                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 text-primary text-xs font-black tracking-wider uppercase mb-2">
+                <div class="hidden sm:inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 text-primary text-xs font-black tracking-wider uppercase mb-2">
                     <span>⚡</span> NÂNG CẤP TÀI KHOẢN CYBERKNIGHT
                 </div>
-                <h3 class="text-2xl md:text-3xl font-black text-gray-900 font-heading">
+                <h3 class="text-2xl md:text-3xl font-black text-gray-900 font-heading px-8 sm:px-0">
                     CHỌN GÓI HỌC TẬP & RÈN LUYỆN
                 </h3>
                 <p class="text-gray-600 text-sm mt-1 max-w-lg mx-auto">
                     Mở khóa các màn chơi chất lượng cao và đồng hành cùng con xây dựng kỹ năng số an toàn vĩnh viễn!
                 </p>
+            </div>
+
+            <!-- Hiện khi máy chủ báo cổng thanh toán chưa sẵn sàng (paymentsEnabled=false) -->
+            <div id="paymentsDisabledNotice" class="hidden mb-6 p-4 rounded-2xl bg-amber-50 border border-amber-200 text-sm text-amber-900 text-left">
+                <b>Thanh toán trực tuyến đang tạm đóng.</b> Chúng mình đang hoàn tất xác minh tài khoản nhận thanh toán. Level 0 vẫn chơi miễn phí — cần mua gói ngay, hãy liên hệ <a href="mailto:cyberknight.official.vn@gmail.com" class="underline font-semibold break-all">cyberknight.official.vn@gmail.com</a>.
             </div>
 
             <!-- 3 Packages Cards -->
@@ -4281,10 +4496,10 @@
                     <div>
                         <div class="flex items-center justify-between mb-3">
                             <span class="text-[11px] font-black px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800">🛡️ NÂNG CAO</span>
-                            <span class="text-xs text-gray-500 font-semibold">6 Màn chơi</span>
+                            <span class="text-[11px] font-bold px-2 py-0.5 rounded-full bg-gray-100 text-gray-700">Sắp ra mắt</span>
                         </div>
                         <h4 class="text-xl font-black text-gray-900 mb-1">Gói Level 5–10</h4>
-                        <p class="text-xs text-gray-500 mb-4">Kỹ năng nâng cao: chống bắt nạt mạng, lừa đảo tài khoản</p>
+                        <p class="text-xs text-gray-500 mb-4">6 màn nâng cao (đang phát triển): chống bắt nạt mạng, bảo vệ tài khoản</p>
                         <div class="text-2xl font-black text-gray-900 mb-4">
                             79.000đ <span class="text-xs text-emerald-600 font-bold">/ Vĩnh viễn</span>
                         </div>
@@ -4301,7 +4516,7 @@
             </div>
 
             <div class="mt-8 pt-4 border-t border-gray-100 text-center text-xs text-gray-500">
-                🔒 Thanh toán an toàn 100% qua chuyển khoản VietQR tự động • Kích hoạt tức thì sau 5-10 giây • Cam kết không phát sinh phụ phí
+                Thanh toán bằng chuyển khoản qua mã VietQR · Gói được kích hoạt tự động khi ngân hàng xác nhận giao dịch · Xem <a href="/refund" class="underline hover:text-primary">chính sách hoàn tiền</a>
             </div>
         </div>
     </div>
@@ -4373,7 +4588,7 @@
                         <div class="p-3 bg-gray-50 rounded-xl border border-gray-200 space-y-2">
                             <div class="flex items-center justify-between">
                                 <span class="text-gray-500">Ngân hàng:</span>
-                                <span id="qrDisplayBank" class="font-bold text-gray-800">Vietcombank</span>
+                                <span id="qrDisplayBank" class="font-bold text-gray-800">—</span>
                             </div>
                             <div class="flex items-center justify-between">
                                 <span class="text-gray-500">Số tài khoản:</span>
@@ -4386,7 +4601,7 @@
                             </div>
                             <div class="flex items-center justify-between">
                                 <span class="text-gray-500">Chủ tài khoản:</span>
-                                <span id="qrDisplayAccountName" class="font-bold text-gray-800 uppercase">CYBERKNIGHT</span>
+                                <span id="qrDisplayAccountName" class="font-bold text-gray-800 uppercase">—</span>
                             </div>
                         </div>
                     </div>
@@ -4398,13 +4613,13 @@
                         <span>💬</span>
                         <span>Đã chuyển tiền nhưng chưa được kích hoạt? Đội ngũ hỗ trợ sẵn sàng giúp bạn!</span>
                     </div>
-                    <a href="https://zalo.me" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition whitespace-nowrap text-xs">
-                        Hỗ trợ Zalo / Hotline
+                    <a href="tel:0966347482" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition whitespace-nowrap text-xs">
+                        Gọi hỗ trợ 0966 347 482
                     </a>
                 </div>
 
                 <!-- Footer buttons -->
-                <div class="mt-6 pt-4 border-t border-gray-100 flex items-center justify-between">
+                <div class="mt-6 pt-4 border-t border-gray-100 flex flex-col-reverse sm:flex-row items-center justify-between gap-2">
                     <button type="button" onclick="cancelCurrentOrder()" id="btnCancelOrder" class="px-4 py-2 text-xs text-gray-500 hover:text-red-600 font-bold transition">
                         ✖ Hủy đơn hàng này
                     </button>
@@ -4466,17 +4681,5 @@
         </div>
     </div>
 
-    <!-- Footer -->
-    <footer class="bg-indigo-900 text-indigo-200 py-4 px-6 mt-12">
-        <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs">
-            <a href="/privacy" class="hover:text-white transition">Chính sách bảo mật</a>
-            <span>·</span>
-            <a href="/terms" class="hover:text-white transition">Điều khoản sử dụng</a>
-            <span>·</span>
-            <a href="/refund" class="hover:text-white transition">Chính sách hoàn tiền</a>
-            <span>·</span>
-            <span>© 2026 CyberKnight / Sigmabloom</span>
-        </div>
-    </footer>
 </body>
 </html>
