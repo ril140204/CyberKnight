@@ -16,7 +16,7 @@
 const db = require('../config/db');
 const { getPackageById } = require('../config/catalog');
 const { generateOrderCode, extractOrderCode } = require('../utils/orderCode');
-const { buildQrUrl } = require('../utils/qr');
+const { buildQrUrl, buildTransferContent, getBankShortName } = require('../utils/qr');
 const { sendPackageActivatedEmail } = require('../utils/mailer');
 const { invalidateEntitlementCache } = require('../utils/entitlementCache');
 const { isPaymentConfigured } = require('../utils/paymentConfig');
@@ -141,7 +141,8 @@ async function createOrder(req, res) {
             accountNumber: bankAccount,
             accountName: bankName,
             bankBin: bankBin,
-            content: pendingOrder.order_code,
+            bankName: getBankShortName(bankBin),
+            content: buildTransferContent(pendingOrder.order_code),
             amount: pendingOrder.amount,
             expiredAt: pendingOrder.expires_at,
             qrUrl,
@@ -186,7 +187,8 @@ async function createOrder(req, res) {
       accountNumber: bankAccount,
       accountName: bankName,
       bankBin: bankBin,
-      content: orderCode,
+      bankName: getBankShortName(bankBin),
+      content: buildTransferContent(orderCode),
       amount: pkg.price,
       expiredAt: expiresAt.toISOString(),
       qrUrl,
@@ -337,7 +339,8 @@ async function getOrder(req, res) {
           accountNumber: bankAccount,
           accountName: bankName,
           bankBin,
-          content: order.order_code,
+          bankName: getBankShortName(bankBin),
+          content: buildTransferContent(order.order_code),
           amount: order.amount,
           qrUrl,
         },

@@ -656,20 +656,24 @@
         if (videoEl.currentTime !== 0) {
             try { videoEl.currentTime = 0; } catch (e) { /* chưa có metadata */ }
         }
-        // Video level 4 phát muted → trình duyệt luôn cho autoplay; nếu vẫn bị chặn
-        // (token gesture hết hạn) thì cú click kế tiếp ở bất kỳ đâu sẽ phát tiếp.
-        videoEl.muted = true;
+        // Level 4 video CÓ TIẾNG (giọng kể) → KHÔNG mute. play() được gọi ngay trong call stack
+        // của click nên thường được phép; nếu trình duyệt vẫn chặn autoplay có tiếng thì hiện
+        // nút "Bấm để xem tiếp" và cú click kế tiếp ở bất kỳ đâu cũng sẽ phát.
         const playPromise = videoEl.play();
         if (playPromise !== undefined) {
             playPromise.catch((err) => {
                 if (errorHandled || endedTriggered) return;
                 if (_isDebugMode()) console.log(`[Level4] play FAIL scene=${sceneName} err=${err && err.name}`);
                 if (err && err.name === 'NotAllowedError') {
+                    hideLoading();
+                    _showPlayButtonOverlay(videoEl, sceneName);
                     const armClick = () => {
                         document.removeEventListener('click', armClick, true);
                         document.removeEventListener('pointerdown', armClick, true);
-                        videoEl.muted = true;
-                        videoEl.play().catch(() => _showPlayButtonOverlay(videoEl, level4State.currentScene));
+                        videoEl.play().then(() => {
+                            const ov = videoEl.closest('.video-container')?.querySelector('.video-play-overlay');
+                            if (ov) ov.remove();
+                        }).catch(() => {});
                     };
                     document.addEventListener('click', armClick, true);
                     document.addEventListener('pointerdown', armClick, true);
@@ -678,7 +682,6 @@
                     // được gắn ngay sau đó → thử lại khi có thể phát
                     const retryPlay = () => {
                         if (errorHandled || endedTriggered || !videoEl.paused) return;
-                        videoEl.muted = true;
                         videoEl.play().catch(() => _showPlayButtonOverlay(videoEl, sceneName));
                     };
                     if (videoEl.readyState >= 3) retryPlay();
@@ -777,6 +780,12 @@
 
     function _advanceToScene(sceneName) {
         sound.init();
+        // 'summary' không phải video scene — gọi _showSummary() trực tiếp
+        // để chuyển sang màn hình tổng kết khi scene5 kết thúc.
+        if (sceneName === 'summary') {
+            _showSummary();
+            return;
+        }
         _playScene(sceneName);
     }
 

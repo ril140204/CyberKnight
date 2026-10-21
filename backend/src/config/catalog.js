@@ -42,7 +42,7 @@ const LEVELS = [
 
 const PACKAGES = {
   premium:  { name: 'Premium cá nhân', price: 120000, levels: 'ALL' },
-  pack_1_4: { name: 'Gói Level 1–4',    price: 2000,   levels: [1, 2, 3, 4] },
+  pack_1_4: { name: 'Gói Level 1–4',    price: 49000,  levels: [1, 2, 3, 4] },
   pack_5_10:{ name: 'Gói Level 5–10',   price: 79000,  levels: [5, 6, 7, 8, 9, 10] },
 };
 

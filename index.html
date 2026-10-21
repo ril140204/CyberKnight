@@ -4172,10 +4172,10 @@
             if (amtEl) amtEl.textContent = Number(order.amount).toLocaleString('vi-VN') + 'đ';
 
             const contentEl = document.getElementById('qrDisplayContent');
-            if (contentEl) contentEl.textContent = order.orderCode;
+            if (contentEl) contentEl.textContent = (qr && qr.content) ? qr.content : order.orderCode;
 
             const bankEl = document.getElementById('qrDisplayBank');
-            if (bankEl && qr && qr.bankName) bankEl.textContent = qr.bankName;
+            if (bankEl) bankEl.textContent = (qr && qr.bankName) ? qr.bankName : '';
 
             const accEl = document.getElementById('qrDisplayAccount');
             if (accEl && qr && qr.accountNumber) accEl.textContent = qr.accountNumber;
@@ -4467,7 +4467,7 @@
                         <h4 class="text-xl font-black text-gray-900 mb-1">Gói Level 1–4</h4>
                         <p class="text-xs text-gray-500 mb-4">Trang bị phản xạ tự vệ & nhận diện lừa đảo cơ bản</p>
                         <div class="text-2xl font-black text-emerald-600 mb-4">
-                            2.000đ <span class="text-xs text-emerald-700 font-bold">/ Vĩnh viễn (Giá Test)</span>
+                            49.000đ <span class="text-xs text-emerald-700 font-bold">/ Vĩnh viễn</span>
                         </div>
                         <ul class="space-y-2 text-xs text-gray-600 mb-6">
                             <li class="flex items-center gap-2"><svg class="icon text-emerald-500 text-base" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-check"></use></svg> Mở khóa Level 1, 2, 3, 4</li>
