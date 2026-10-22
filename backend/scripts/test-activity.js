@@ -164,7 +164,7 @@ function makeAdminToken(userId, username = 'admin') {
 
 async function getAdminToken() {
   const [rows] = await db.query(
-    "SELECT id, username FROM users WHERE role = 'admin' AND is_active = 1 LIMIT 1"
+    "SELECT id, username FROM users WHERE role = 'admin' AND is_active = TRUE LIMIT 1"
   );
   if (rows.length === 0) throw new Error('Không tìm thấy tài khoản admin trong DB');
   return makeAdminToken(rows[0].id, rows[0].username);
@@ -226,8 +226,11 @@ async function runTests() {
   }
 
   // Bảng phải tồn tại (migration 008)
+  // PostgreSQL: connection pool KHÔNG giữ search_path giữa các query nên
+  // current_schema() không đáng tin — kiểm tra theo DB_SCHEMA thật.
   const [tables] = await db.query(
-    "SELECT COUNT(*) AS cnt FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'user_activity'"
+    "SELECT COUNT(*) AS cnt FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = ? AND TABLE_NAME = 'user_activity'",
+    [process.env.DB_SCHEMA || 'local']
   );
   if (Number(tables[0].cnt) === 0) {
     console.error("❌ Bảng user_activity chưa tồn tại. Hãy chạy `npm run setup-db` trước.");
@@ -271,7 +274,7 @@ async function runTests() {
   {
     // Đẩy mốc heartbeat về 5 giây trước để mô phỏng "quá sớm"
     await db.query(
-      'UPDATE user_activity SET last_heartbeat_at = DATE_SUB(NOW(), INTERVAL 5 SECOND) WHERE user_id = ?',
+      'UPDATE user_activity SET last_heartbeat_at = NOW() - make_interval(secs => 5) WHERE user_id = ?',
       [userId]
     );
     const before = Number((await getRow(userId)).total_seconds);
@@ -292,7 +295,7 @@ async function runTests() {
   {
     // Đẩy mốc heartbeat về 10 PHÚT trước
     await db.query(
-      'UPDATE user_activity SET last_heartbeat_at = DATE_SUB(NOW(), INTERVAL 600 SECOND) WHERE user_id = ?',
+      'UPDATE user_activity SET last_heartbeat_at = NOW() - make_interval(secs => 600) WHERE user_id = ?',
       [userId]
     );
     const before = Number((await getRow(userId)).total_seconds);
@@ -317,7 +320,7 @@ async function runTests() {
   console.log('\n── (5) Heartbeat trong phiên liên tục (delta 30s và 300s) ──');
   {
     await db.query(
-      'UPDATE user_activity SET last_heartbeat_at = DATE_SUB(NOW(), INTERVAL 30 SECOND) WHERE user_id = ?',
+      'UPDATE user_activity SET last_heartbeat_at = NOW() - make_interval(secs => 30) WHERE user_id = ?',
       [userId]
     );
     const before = Number((await getRow(userId)).total_seconds);
@@ -331,7 +334,7 @@ async function runTests() {
   {
     // Delta 80s nằm trong [20s, 90s] → được cộng nhưng cap cứng 60s mỗi nhịp
     await db.query(
-      'UPDATE user_activity SET last_heartbeat_at = DATE_SUB(NOW(), INTERVAL 80 SECOND) WHERE user_id = ?',
+      'UPDATE user_activity SET last_heartbeat_at = NOW() - make_interval(secs => 80) WHERE user_id = ?',
       [userId]
     );
     const before = Number((await getRow(userId)).total_seconds);
@@ -350,7 +353,7 @@ async function runTests() {
     // Nhịp đầu tiên để tạo dòng cho user race
     await heartbeat(race.token);
     await db.query(
-      'UPDATE user_activity SET last_heartbeat_at = DATE_SUB(NOW(), INTERVAL 45 SECOND) WHERE user_id = ?',
+      'UPDATE user_activity SET last_heartbeat_at = NOW() - make_interval(secs => 45) WHERE user_id = ?',
       [race.userId]
     );
     const before = Number((await getRow(race.userId)).total_seconds);

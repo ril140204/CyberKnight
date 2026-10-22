@@ -62,6 +62,9 @@ const APP_TABLES = [
   'payment_transactions',
   'user_entitlements',
   'admin_audit_log',
+  // Theo dõi thời gian online (migration 008)
+  'user_activity',
+  'user_activity_daily',
 ];
 
 const TABLE_REF_RE = new RegExp(
@@ -102,6 +105,9 @@ function convertPlaceholders(sql) {
   return out;
 }
 
+// Bảng không có cột `id` (khóa chính tên khác) → không thêm RETURNING id
+const TABLES_WITHOUT_ID = ['user_activity', 'user_activity_daily'];
+
 const INSERT_RE = new RegExp(`^\\s*INSERT\\s+INTO\\s+${QSCHEMA.replace(/"/g, '"')}\\.(${APP_TABLES.join('|')})\\b`, 'i');
 
 /**
@@ -111,7 +117,10 @@ const INSERT_RE = new RegExp(`^\\s*INSERT\\s+INTO\\s+${QSCHEMA.replace(/"/g, '"'
 function compile(sql) {
   let text = convertPlaceholders(qualifyTables(sql));
   if (INSERT_RE.test(text) && !/\bRETURNING\b/i.test(text)) {
-    text = `${text.replace(/;\s*$/, '')} RETURNING id`;
+    const table = (text.match(INSERT_RE) || [])[1];
+    if (!TABLES_WITHOUT_ID.includes(table)) {
+      text = `${text.replace(/;\s*$/, '')} RETURNING id`;
+    }
   }
   return text;
 }
