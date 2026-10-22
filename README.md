@@ -6,12 +6,13 @@
 
 ## 🌟 Tính Năng Nổi Bật
 
-- **Hành Trình Màn Chơi (Level 0 – 4):**
+- **Hành Trình Màn Chơi (Level 0 – 5):**
   - **Level 0 (Miễn phí):** *Hộp Quà Bí Ẩn* — Nhận diện mã độc và đường link quà tặng khả nghi.
   - **Level 1 (Gói Trả Phí):** *Lớp Trưởng Gửi Link Nhận Quà* — Mini-game Lưới Lọc An Toàn và 3 nhánh kết cục độc lập.
   - **Level 2 (Gói Trả Phí):** *Kết Bạn Online* — Ghép cửa căn cứ, phân loại đối tượng lạ trên không gian mạng.
   - **Level 3 (Gói Trả Phí):** *Bốn Chìa Khóa Bí Mật* — Quản lý 4 quyền truy cập nhạy cảm (Camera, Micro, Vị trí, Thư viện ảnh).
   - **Level 4 (Gói Trả Phí):** *Bức Ảnh Có Quá Nhiều Bí Mật* — Công thức Nhìn – Che – Hỏi trước khi chia sẻ ảnh mạng xã hội.
+  - **Level 5 (Gói Trả Phí):** *Thật Hay Giả? Đống Ảnh AI* — Nhận biết hình ảnh do AI tạo ra với Bút Thử AI.
 
 - **Thanh Toán Tự Động VietQR & SePay:**
   - Sinh mã đơn hàng ngẫu nhiên 10 ký tự chuẩn **Crockford Base32** (`CK` + 8 ký tự an toàn, loại bỏ triệt để ký tự dễ nhầm lẫn `0, O, 1, I, L`).
@@ -26,6 +27,14 @@
   - **Nhật ký kiểm toán (Audit Logging):** Mọi hành động can thiệp đặc quyền (`grant_package`, `revoke_package`, `reconcile_transaction`) đều được ghi nhận trong bảng `admin_audit_log`. **Lưu ý:** `sigmabloom_app` user có quyền DML trên bảng này, nên tính bất biến chỉ được đảm bảo ở tầng ứng dụng (không phải tầng DB).
   - **Giao diện quản trị hiện đại (`admin.html`):** Theo dõi 6 chỉ số thời gian thực (doanh thu, đơn hàng, người dùng, giao dịch lỗi), quản lý phân quyền và modal đối soát giao dịch 1 chạm.
 
+- **Theo Dõi Thời Gian Online (Activity Tracking):**
+  - **Client chỉ "báo sống", máy chủ tự tính:** `assets/activity.js` gửi `POST /api/me/activity/heartbeat` mỗi **30 giây**, **không gửi thời lượng** — server tự tính `delta = NOW() - last_heartbeat_at`. Chống gian lận ở tầng server, không tin tuyệt đối vào client.
+  - **Điều kiện gửi:** đã đăng nhập + `document.visibilityState === 'visible'` + có tương tác thật (mouse/key/touch/scroll) trong **5 phút gần nhất** → không tính máy bị bỏ quên. Đóng tab/ẩn tab → dừng timer + gửi 1 nhịp cuối bằng `fetch(keepalive:true)`.
+  - **Chống đếm trùng khi mở nhiều tab:** `delta < 20s` → bỏ qua; `delta > 90s` → coi là phiên mới, chỉ cộng tối đa 30s; nhịp thường cộng `min(delta, 60s)`. Toàn bộ thao tác trong 1 transaction `SELECT ... FOR UPDATE` (pessimistic locking) nên không race condition.
+  - **Rate limit riêng:** 6 lần/phút mỗi user (`express-rate-limit`), trả `429 {success:false, message}`.
+  - **Bảng dữ liệu:** `user_activity` (tổng giây + `first_seen_at` / `last_heartbeat_at`) và `user_activity_daily` (theo ngày, cộng trong cùng transaction). **Chỉ lưu số giây + mốc thời gian — không lưu IP/User-Agent/nội dung tương tác.**
+  - **Trang quản trị:** cột "Thời gian online" (định dạng `< 1 phút` / `X phút` / `H giờ M phút` / `D ngày H giờ`), chấm xanh "đang online" (heartbeat trong 90s), sắp xếp theo `?sort=online_desc` (whitelist server-side).
+
 - **Bảo Mật Tầng Sâu (Defense-in-Depth):**
   - **Level Guard Middleware:** Bảo vệ static game files (`/level1/`, `/level2/`,...) bằng cookie HttpOnly `levelAccess` (thời hạn 2h), cache quyền $\le 60\text{s}$, chống Path Traversal (`..%2f`), gắn cờ `Cache-Control: private, no-store`.
   - **Phòng chống XSS:** Thư viện `assets/safe.js` mã hóa toàn bộ 6 ký tự nguy hiểm (`&`, `<`, `>`, `"`, `'`, `` ` ``), chỉ chấp nhận ảnh QR từ tên miền VietQR hợp lệ (`img.vietqr.io`, `api.vietqr.io`).
@@ -38,13 +47,13 @@
 
 ```
 EXEWEB/
-├── assets/                     # Assets dùng chung (audio, 3D models, safe.js, quests.json)
+├── assets/                     # Assets dùng chung (audio, 3D models, safe.js, activity.js, api.js, quests.json)
 ├── backend/                    # Backend RESTful API & Server
-│   ├── migrations/             # Database migrations (002 đến 007)
+│   ├── migrations/             # Database migrations (002 đến 008)
 │   ├── scripts/                # Automated test suites & utilities
 │   ├── src/
 │   │   ├── config/             # Cấu hình Database, Catalog, Setup
-│   │   ├── controllers/        # Điều hướng nghiệp vụ (Auth, Admin, Game, Payments, Level)
+│   │   ├── controllers/        # Điều hướng nghiệp vụ (Auth, Admin, Game, Payments, Level, Activity)
 │   │   ├── middleware/         # Auth, RequireAdmin, LevelGuard, ErrorHandler
 │   │   ├── payments/           # Webhook Providers (SePay Adapter, Casso)
 │   │   ├── routes/             # Định tuyến API
@@ -56,6 +65,7 @@ EXEWEB/
 ├── level2/                     # Màn chơi Level 2 (Protected)
 ├── level3/                     # Màn chơi Level 3 (Protected)
 ├── level4/                     # Màn chơi Level 4 (Protected)
+├── level5/                     # Màn chơi Level 5 (Protected)
 ├── deploy/                     # File triển khai production (Nginx, PM2, backup, SQL)
 ├── admin.html                  # Giao diện Quản trị viên (Audit log, Orders, Grant)
 ├── payment.html                # Trang thanh toán dự phòng
@@ -146,9 +156,9 @@ npm run test:all
 ### Thêm level mới
 1. Thêm object vào mảng `LEVELS` trong `backend/src/config/catalog.js`:
    ```js
-   { id: 5, url: '/level5/level5.html', title: 'Tên Level Mới' },
+   { id: 6, url: '/level6/level6.html', title: 'Tên Level Mới' },
    ```
-2. Tạo thư mục `level5/` với file `level5.html` trong thư mục gốc.
+2. Tạo thư mục `level6/` với file `level6.html` trong thư mục gốc.
 3. Nếu cần build lại Tailwind CSS: `npm run build:css`
 
 ### Cấp quyền thủ công
@@ -191,7 +201,19 @@ Xem hướng dẫn chi tiết tại [`deploy/DEPLOY.md`](deploy/DEPLOY.md).
   ```
 - **Rủi ro còn lại:** `admin.html` chưa có giao diện đổi mật khẩu admin; cần hoàn thiện form `POST /api/auth/change-password`. Inline `onclick=` handlers trong `index.html` chưa được chuyển sang `addEventListener` — nên thực hiện trong phase tiếp theo.
 
----
+### Theo dõi thời gian online
+- Bảng `user_activity` được tạo bởi migration `008_user_activity.sql` (chạy tự động qua `npm run setup-db`).
+- Xem tổng thời gian của 1 học sinh: đăng nhập admin → Tab **"👤 Danh Sách Thành Viên"** → cột **"Thời gian online"**.
+- Xem nhanh bằng SQL:
+  ```sql
+  SELECT u.username, ua.total_seconds, ua.last_heartbeat_at, ua.first_seen_at
+  FROM users u LEFT JOIN user_activity ua ON ua.user_id = u.id
+  ORDER BY ua.total_seconds DESC;
+  ```
+- Sửa dữ liệu test (ví dụ mô phỏng người dùng vừa online):
+  ```sql
+  UPDATE user_activity SET last_heartbeat_at = DATE_SUB(NOW(), INTERVAL 30 SECOND) WHERE user_id = ?;
+  ```
 
 ## 📋 Hướng Dẫn Vận Hành
 

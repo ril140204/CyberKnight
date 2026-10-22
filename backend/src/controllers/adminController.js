@@ -5,8 +5,8 @@
  *
  * Endpoints:
  * - GET /api/admin/stats           — Thống kê tổng quan
- * - GET /api/admin/users          — Danh sách users (phân trang, tìm kiếm)
- * - GET /api/admin/users/:id      — Chi tiết user + entitlements
+ * - GET /api/admin/users          — Danh sách users (phân trang, tìm kiếm, sắp xếp online)
+ * - GET /api/admin/users/:id      — Chi tiết user + entitlements + thời gian online
  * - POST /api/admin/users/:id/entitlements — Cấp entitlement cho user
  * - DELETE /api/admin/users/:id/entitlements/:packageId — Thu hồi entitlement
  * - GET /api/admin/orders         — Danh sách orders (phân trang, lọc)
@@ -18,6 +18,9 @@
 const db = require('../config/db');
 const { getPackageById } = require('../config/catalog');
 const { buildEntitlements } = require('./catalogController');
+
+// Ngưỡng "đang online": heartbeat trong vòng 90 giây gần nhất (3 nhịp × 30s)
+const ONLINE_WINDOW_SECONDS = 90;
 
 /**
  * GET /api/admin/stats
@@ -67,6 +70,10 @@ async function getStats(req, res) {
 /**
  * GET /api/admin/users
  * Query params: ?page=1&limit=20&search=
+ *
+ * LEFT JOIN user_activity để lấy tổng thời gian online (onlineSeconds)
+ * và trạng thái đang online (isOnlineNow = heartbeat trong 90 giây gần nhất).
+ * Tất cả điều kiện đều dùng placeholder `?` — KHÔNG nối chuỗi.
  */
 async function listUsers(req, res) {
   const page = Math.max(1, parseInt(req.query.page) || 1);
@@ -75,29 +82,55 @@ async function listUsers(req, res) {
   const search = (req.query.search || '').trim();
 
   try {
-    let countQuery = 'SELECT COUNT(*) AS total FROM users WHERE is_active = 1';
-    let dataQuery = `
-      SELECT id, username, email, role, level, points, created_at, last_login
-      FROM users
-      WHERE is_active = 1
+    // Count: LEFT JOIN không làm thay đổi số dòng (bảng activity 1 dòng / user)
+    let countQuery = `
+      SELECT COUNT(*) AS total
+      FROM users u
+      LEFT JOIN user_activity ua ON ua.user_id = u.id
+      WHERE u.is_active = 1
     `;
-    const params = [];
+    let dataQuery = `
+      SELECT u.id, u.username, u.email, u.role, u.level, u.points,
+             u.created_at, u.last_login,
+             COALESCE(ua.total_seconds, 0) AS online_seconds,
+             ua.last_heartbeat_at,
+             ua.first_seen_at,
+             (ua.last_heartbeat_at IS NOT NULL
+              AND ua.last_heartbeat_at >= DATE_SUB(NOW(), INTERVAL ? SECOND)) AS is_online_now
+      FROM users u
+      LEFT JOIN user_activity ua ON ua.user_id = u.id
+      WHERE u.is_active = 1
+    `;
+    // Tham số đầu tiên của dataQuery là tham số cho INTERVAL (placeholder trong SELECT)
+    const dataParams = [ONLINE_WINDOW_SECONDS];
+    const countParams = [];
 
     if (search) {
-      const searchCondition = ' AND (username LIKE ? OR email LIKE ?)';
+      const searchCondition = ' AND (u.username LIKE ? OR u.email LIKE ?)';
       countQuery += searchCondition;
       dataQuery += searchCondition;
       const searchPattern = `%${search}%`;
-      params.push(searchPattern, searchPattern);
+      countParams.push(searchPattern, searchPattern);
+      dataParams.push(searchPattern, searchPattern);
     }
 
-    dataQuery += ' ORDER BY created_at DESC LIMIT ? OFFSET ?';
+    // Sắp xếp: whitelist tuyệt đối — chỉ chấp nhận giá trị đã định nghĩa sẵn
+    const SORT_WHITELIST = {
+      newest: 'u.created_at DESC',
+      oldest: 'u.created_at ASC',
+      online_desc: 'online_seconds DESC, u.created_at DESC',
+      online_asc: 'online_seconds ASC, u.created_at DESC',
+    };
+    const sortKey = String(req.query.sort || 'newest').trim();
+    const orderBy = SORT_WHITELIST[sortKey] || SORT_WHITELIST.newest;
 
-    const [countResult] = await db.query(countQuery, params);
+    dataQuery += ` ORDER BY ${orderBy} LIMIT ? OFFSET ?`;
+
+    const [countResult] = await db.query(countQuery, countParams);
     const total = countResult[0].total;
 
     // Đặt limit/offset làm số
-    const [rows] = await db.query(dataQuery, [...params, limit, offset]);
+    const [rows] = await db.query(dataQuery, [...dataParams, limit, offset]);
 
     return res.json({
       success: true,
@@ -111,6 +144,10 @@ async function listUsers(req, res) {
           points: u.points,
           createdAt: u.created_at,
           lastLogin: u.last_login,
+          onlineSeconds: Number(u.online_seconds) || 0,
+          lastHeartbeatAt: u.last_heartbeat_at,
+          firstSeenAt: u.first_seen_at,
+          isOnlineNow: Boolean(u.is_online_now),
         })),
         pagination: {
           page,
@@ -165,6 +202,18 @@ async function getUserDetail(req, res) {
 
     const entitlements = buildEntitlements(entitlementsRows);
 
+    // Thống kê thời gian online (LEFT JOIN nên user chưa từng gửi heartbeat vẫn trả về 0)
+    const [activityRows] = await db.query(
+      `SELECT COALESCE(total_seconds, 0) AS online_seconds,
+              last_heartbeat_at,
+              first_seen_at,
+              (last_heartbeat_at IS NOT NULL
+               AND last_heartbeat_at >= DATE_SUB(NOW(), INTERVAL ? SECOND)) AS is_online_now
+       FROM user_activity WHERE user_id = ?`,
+      [ONLINE_WINDOW_SECONDS, userId]
+    );
+    const act = activityRows[0] || {};
+
     const u = users[0];
     return res.json({
       success: true,
@@ -183,6 +232,10 @@ async function getUserDetail(req, res) {
           avatarUrl: u.avatar_url,
           createdAt: u.created_at,
           lastLogin: u.last_login,
+          onlineSeconds: Number(act.online_seconds) || 0,
+          lastHeartbeatAt: act.last_heartbeat_at || null,
+          firstSeenAt: act.first_seen_at || null,
+          isOnlineNow: Boolean(act.is_online_now),
         },
         entitlements,
       },

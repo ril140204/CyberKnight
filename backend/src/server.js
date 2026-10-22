@@ -63,6 +63,7 @@ const catalogRoutes = require('./routes/catalog');
 const paymentRoutes = require('./routes/payments');
 const adminRoutes = require('./routes/admin');
 const myEntitlementsRoutes = require('./routes/myEntitlements');
+const activityRoutes = require('./routes/activity');
 const levelRoutes = require('./routes/levels');
 const privacyRoutes = require('./routes/privacy');
 const errorHandler = require('./middleware/errorHandler');
@@ -465,6 +466,8 @@ app.use('/api/catalog', catalogRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/me/entitlements', myEntitlementsRoutes);
+// Theo dõi thời gian online — mount TRƯỚC handler 404 '/api/*' phía dưới
+app.use('/api/me/activity', activityRoutes);
 app.use('/api/levels', levelRoutes);
 app.use('/api/privacy', privacyRoutes);
 

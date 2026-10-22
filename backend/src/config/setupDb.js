@@ -1,6 +1,11 @@
 /**
  * Script tự động tạo database, tạo bảng và chạy migrations
  * Chạy: node src/config/setupDb.js
+ *
+ * Migrations được áp dụng theo thứ tự tên file (002 → 008):
+ *   002_auth_complete, 003_create_feedbacks, 004_feedback_user_id,
+ *   005_payments, 006_user_role, 007_admin_audit_log, 008_user_activity
+ * Tất cả đều idempotent nên chạy lại bao nhiêu lần cũng an toàn.
  */
 const mysql2 = require('mysql2/promise');
 const fs     = require('fs');

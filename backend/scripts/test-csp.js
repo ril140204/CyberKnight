@@ -12,7 +12,7 @@
  * 4. Khi NODE_ENV !== 'production', CSP KHÔNG được chứa `upgrade-insecure-requests`
  *    để tránh lỗi không tải được tài nguyên trên http://localhost:5000.
  * 5. CSP frame-ancestors và X-Frame-Options phải cho phép 'self' (sameorigin)
- *    để các màn chơi game (level0..level4) chạy được bình thường trong iframe.
+ *    để các màn chơi game (level0..level5) chạy được bình thường trong iframe.
  * 6. CSP img-src phải hỗ trợ VietQR (img.vietqr.io, api.vietqr.io) và data:, blob:.
  * 7. CSP media-src phải hỗ trợ audio/sound effects trong game ('self', blob:, data:).
  *
@@ -151,7 +151,7 @@ async function run() {
 
   assert(
     frameAncestors && frameAncestors.includes("'self'"),
-    "frame-ancestors cho phép 'self' để iframe level0..level4 hiển thị trong web"
+    "frame-ancestors cho phép 'self' để iframe level0..level5 hiển thị trong web"
   );
   assert(
     frameSrc && frameSrc.includes("'self'"),

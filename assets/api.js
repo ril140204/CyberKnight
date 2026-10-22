@@ -4,7 +4,7 @@
  * - Quản lý Access Token thuần túy trong bộ nhớ (Memory-only, không lưu vào localStorage).
  * - Tự động đính kèm Authorization: Bearer và credentials: 'include'.
  * - Tự động gọi refresh-token khi gặp mã 401.
- * - Cung cấp các helper cho Auth, Catalog, Entitlements, Levels, Orders và Admin.
+ * - Cung cấp các helper cho Auth, Catalog, Entitlements, Levels, Orders, Activity và Admin.
  */
 
 (function (window) {
@@ -56,32 +56,56 @@
     }
   }
 
-  /**
-   * Làm mới Access Token bằng HttpOnly cookie refreshToken
+/**
+   * Khoá "single-flight" cho việc làm mới token.
+   *
+   * BẮT BUỘC: server XOAY VÒNG refresh token (token cũ bị xoá sau mỗi lần
+   * refresh). Nếu nhiều request cùng gặp 401 và cùng gọi refresh, chỉ request
+   * đến trước thắng, các request sau nhận 403 kèm `Set-Cookie: refreshToken=`
+   * -> trình duyệt XOÁ mất cookie hợp lệ -> người dùng bị đăng xuất oan.
+   *
+   * Vì vậy: mọi lời gọi refresh trong cùng một thời điểm Sẽ dùng chung MỘT
+   * promise, đảm bảo chỉ có đúng 1 HTTP request tới /api/auth/refresh-token.
    */
-  async function refreshToken() {
-    try {
-      const res = await fetch('/api/auth/refresh-token', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-      });
+  let refreshPromise = null;
 
-      if (!res.ok) {
+  /**
+   * Làm mới Access Token bằng HttpOnly cookie refreshToken.
+   * @returns {Promise<boolean>}
+   */
+  function refreshToken() {
+    // Đã có một lần refresh đang chạy -> chờ và dùng chung kết quả
+    if (refreshPromise) return refreshPromise;
+
+    refreshPromise = (async () => {
+      try {
+        const res = await fetch('/api/auth/refresh-token', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+        });
+
+        if (!res.ok) {
+          window.__accessToken = null;
+          return false;
+        }
+
+        const json = await res.json();
+        if (json.success && json.accessToken) {
+          window.__accessToken = json.accessToken;
+          return true;
+        }
+        return false;
+      } catch {
         window.__accessToken = null;
         return false;
+      } finally {
+        // Xoá khoá ở finally để lần gọi SAU có thể refresh lại bình thường
+        refreshPromise = null;
       }
+    })();
 
-      const json = await res.json();
-      if (json.success && json.accessToken) {
-        window.__accessToken = json.accessToken;
-        return true;
-      }
-      return false;
-    } catch {
-      window.__accessToken = null;
-      return false;
-    }
+    return refreshPromise;
   }
 
   /**
@@ -244,6 +268,27 @@
     },
   };
 
+  // ── Activity Services (thời gian online) ──────────────────────────
+  // Gửi heartbeat "còn sống" — máy chủ tự tính thời gian online
+  // (client KHÔNG gửi thời lượng). Dùng apiFetch để hưởng luồng refresh 401.
+  const activity = {
+    async heartbeat() {
+      const res = await apiFetch('/api/me/activity/heartbeat', {
+        method: 'POST',
+      });
+      try {
+        return await res.json();
+      } catch {
+        return { success: false, message: 'Không nhận được phản hồi từ máy chủ.' };
+      }
+    },
+
+    async getMyActivity() {
+      const res = await apiFetch('/api/me/activity/me');
+      return res.json();
+    },
+  };
+
   // ── Helper phòng vệ XSS ───────────────────────────────────────
   function escapeHtml(value) {
     if (value === null || value === undefined) return '';
@@ -271,6 +316,7 @@
     auth,
     payments,
     admin,
+    activity,
   };
 
 })(window);

@@ -306,7 +306,16 @@ async function refresh(req, res) {
     );
 
     if (rows.length === 0) {
-      res.clearCookie('refreshToken', { path: '/api/auth' });
+      // KHÔNG clearCookie ở đây.
+      //
+      // Lý do: refresh token được XOAY VÒNG (xoá bản ghi cũ sau mỗi lần
+      // refresh). Khi 2 request refresh chạy SONG SONG (nhiều tab, hoặc nhiều
+      // request admin cùng gặp 401), chỉ request đến trước thắng; request sau
+      // nhận 403 vì token của nó đã bị xoay đi. Nếu clearCookie() chạy ở đây,
+      // trình duyệt sẽ XOÁ mất cookie HỢP LỆ mà request thắng vừa cấp -> người
+      // dùng bị đăng xuất oan, phải đăng nhập lại dù phiên còn hợp lệ.
+      //
+      // Cookie cũ vẫn hợp lệ và sẽ được dùng lại ở lần refresh kế tiếp.
       return res.status(403).json({
         success: false,
         message: 'Phiên đăng nhập không hợp lệ hoặc đã hết hạn.',

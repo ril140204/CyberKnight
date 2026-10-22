@@ -42,6 +42,30 @@ CREATE INDEX idx_users_email    ON users(email);
 CREATE INDEX idx_users_username ON users(username);
 CREATE INDEX idx_refresh_token  ON refresh_tokens(token);
 
+-- Bảng tổng thời gian online của người dùng (migration 008)
+-- Chỉ lưu số giây + mốc thời gian, KHÔNG lưu IP/User-Agent/nội dung tương tác.
+CREATE TABLE IF NOT EXISTS user_activity (
+  user_id            INT             NOT NULL,
+  total_seconds      BIGINT UNSIGNED NOT NULL DEFAULT 0,
+  last_heartbeat_at  DATETIME        NULL,
+  first_seen_at      DATETIME        NULL,
+  updated_at         DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (user_id),
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  INDEX idx_activity_total     (total_seconds),
+  INDEX idx_activity_heartbeat (last_heartbeat_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Bảng thống kê thời gian online theo ngày (migration 008)
+CREATE TABLE IF NOT EXISTS user_activity_daily (
+  user_id  INT NOT NULL,
+  day      DATE NOT NULL,
+  seconds  INT NOT NULL DEFAULT 0,
+  PRIMARY KEY (user_id, day),
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  INDEX idx_activity_daily_day (day)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 -- NOTE: Tài khoản admin mẫu được tạo tự động bởi seed.js
 -- (dùng biến môi trường ADMIN_PASSWORD, băm bcrypt cost 12)
 -- File database.sql KHÔNG chứa INSERT admin cứng để tránh mâu thuẫn hash.

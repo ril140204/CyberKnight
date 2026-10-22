@@ -1105,7 +1105,7 @@
                         <div class="flex items-center justify-between">
                             <div class="text-sm font-bold text-gray-800 truncate" id="dropdownName">Người dùng</div>
                             <span id="userBadgeHeader" class="hidden text-[10px] px-2 py-0.5 rounded-full font-bold bg-amber-100 text-amber-800">👑 Premium</span>
-                        </div>
+                    </div>
                         <div class="text-xs text-gray-500 truncate" id="dropdownEmail">email@example.com</div>
                     </div>
                     <!-- Mục Gói của tôi -->
@@ -1153,7 +1153,7 @@
                             <span class="flex items-center gap-1.5">
                                 <span>🎮</span> CHỌN MÀN CHƠI
                             </span>
-                            <span class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full text-[10px] font-bold">5 Cấp độ</span>
+                            <span class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full text-[10px] font-bold">6 Cấp độ</span>
                         </div>
 
                         <!-- Option Level 0 -->
@@ -1233,6 +1233,22 @@
                                 </div>
                                 <div class="text-sm font-bold text-gray-900 group-hover/item:text-primary transition-colors truncate">Bức Ảnh Có Quá Nhiều Bí Mật</div>
                                 <div class="text-[11px] text-gray-500 line-clamp-1">Tìm & che thông tin riêng tư trước khi chia sẻ</div>
+                            </div>
+                        </button>
+
+                        <!-- Option Level 5 -->
+                        <button type="button" data-dd-level="5" onclick="selectAndPlayLevel('/level5/level5.html')" class="w-full text-left p-3 rounded-xl hover:bg-gradient-to-r hover:from-indigo-50 hover:to-violet-50 transition-all border border-transparent hover:border-indigo-300 flex items-center gap-3.5 group/item">
+                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center text-2xl shadow-md group-hover/item:scale-110 group-hover/item:rotate-3 transition-transform flex-shrink-0">
+                                🕵️
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center justify-between gap-1">
+                                    <span class="text-xs font-black text-gray-800 uppercase tracking-wide">Level 5</span>
+                                    <span class="text-[9px] bg-indigo-100 text-indigo-800 font-bold px-1.5 py-0.5 rounded-md">MỚI NHẤT 🆕</span>
+                                    <span class="level-badge-area-dd"></span>
+                                </div>
+                                <div class="text-sm font-bold text-gray-900 group-hover/item:text-primary transition-colors truncate">Thật Hay Giả? Đống Ảnh AI</div>
+                                <div class="text-[11px] text-gray-500 line-clamp-1">Nhận biết hình ảnh do AI tạo ra</div>
                             </div>
                         </button>
 
@@ -1844,7 +1860,7 @@
                     <div>
                         <div class="flex items-center justify-between mb-4">
                             <div class="flex items-center gap-2">
-                                <span class="px-2.5 py-1 rounded-lg bg-amber-100 text-amber-800 text-xs font-black tracking-wider">LEVEL 0 • CƠ BẢN</span>
+                            <span class="px-2.5 py-1 rounded-lg bg-amber-100 text-amber-800 text-xs font-black tracking-wider">LEVEL 0 • CƠ BẢN</span>
                                 <span class="level-badge-area"></span>
                             </div>
                             <span class="text-xs text-gray-500 font-semibold">Khoảng 2 - 3 phút</span>
@@ -1880,7 +1896,7 @@
                     <div>
                         <div class="flex items-center justify-between mb-4">
                             <div class="flex items-center gap-2">
-                                <span class="px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800 text-xs font-black tracking-wider">LEVEL 1 • MỚI NHẤT 🔥</span>
+                            <span class="px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800 text-xs font-black tracking-wider">LEVEL 1 • MỚI NHẤT 🔥</span>
                                 <span class="level-badge-area"></span>
                             </div>
                             <span class="text-xs text-gray-500 font-semibold">Khoảng 3 - 4 phút</span>
@@ -1953,7 +1969,7 @@
                     <div>
                         <div class="flex items-center justify-between mb-4">
                             <div class="flex items-center gap-2">
-                                <span class="px-2.5 py-1 rounded-lg bg-amber-100 text-amber-800 text-xs font-black tracking-wider">LEVEL 3 • MỚI NHẤT 🌟</span>
+                            <span class="px-2.5 py-1 rounded-lg bg-amber-100 text-amber-800 text-xs font-black tracking-wider">LEVEL 3 • MỚI NHẤT 🌟</span>
                                 <span class="level-badge-area"></span>
                             </div>
                             <span class="text-xs text-gray-500 font-semibold">Khoảng 6 - 8 phút</span>
@@ -1995,7 +2011,7 @@
                             <div class="flex items-center gap-2">
                                 <span class="px-2.5 py-1 rounded-lg bg-rose-100 text-rose-800 text-xs font-black tracking-wider">LEVEL 4 • MỚI NHẤT 🆕</span>
                                 <span class="level-badge-area"></span>
-                            </div>
+            </div>
                             <span class="text-xs text-gray-500 font-semibold">Khoảng 4 - 5 phút</span>
                         </div>
                         <div class="flex items-center gap-3 mb-3">
@@ -2022,6 +2038,46 @@
                     </div>
                     <button type="button" onclick="selectAndPlayLevel('/level4/level4.html')" class="level-play-btn w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white font-black text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 group-hover:translate-y-[-2px]">
                         <span>CHƠI LEVEL 4</span>
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    </button>
+                </div>
+
+                <!-- ============================================
+                     LEVEL 5 CARD — THẬT HAY GIẢ? ĐỐNG ẢNH AI
+                     ============================================ -->
+                <div class="level-card level-card-5 level-card group bg-white rounded-2xl border-2 border-indigo-200 p-5 hover:border-indigo-400 hover:shadow-xl transition-all cursor-pointer">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center gap-2">
+                                <span class="px-2.5 py-1 rounded-lg bg-indigo-100 text-indigo-800 text-xs font-black tracking-wider">LEVEL 5 • MỚI NHẤT 🆕</span>
+                                <span class="level-badge-area"></span>
+                            </div>
+                            <span class="text-xs text-gray-500 font-semibold">Khoảng 2 - 3 phút</span>
+                        </div>
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="text-4xl">🕵️</div>
+                            <div>
+                                <h4 class="text-lg font-black text-gray-900">Thật Hay Giả? Đống Ảnh AI</h4>
+                                <p class="text-xs text-gray-500 font-semibold uppercase tracking-wider">Săn ảnh AI tạo giả</p>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-4 leading-relaxed">
+                            Ảnh trên mạng có thể do <strong>AI tạo ra</strong> để lừa bạn! Soi từng chi tiết với <strong>Bút Thử AI</strong> và tìm ra 3 dấu hiệu của ảnh giả.
+                        </p>
+                        <div class="space-y-2 text-sm text-gray-700 mb-4">
+                            <div class="flex items-center gap-2">
+                                <span class="text-indigo-500 font-bold">✔</span> Video giới thiệu + câu hỏi soi chi tiết với Bút Thử AI
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-indigo-500 font-bold">✔</span> Nhận diện 3 dấu hiệu ảnh do AI tạo ra
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-indigo-500 font-bold">✔</span> Huy hiệu "Thám Tử Soi Ảnh AI"
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" onclick="selectAndPlayLevel('/level5/level5.html')" class="level-play-btn w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-600 hover:to-violet-600 text-white font-black text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 group-hover:translate-y-[-2px]">
+                        <span>CHƠI LEVEL 5</span>
                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                     </button>
                 </div>
@@ -2343,6 +2399,7 @@
     </div>
 
     <script src="/assets/safe.js"></script>
+    <script src="/assets/activity.js"></script>
     <script>
         // Navbar scroll effect
         window.addEventListener('scroll', () => {
@@ -2645,7 +2702,9 @@
             const frame = document.getElementById('gameFrame');
             if (modal && frame) {
                 frame.src = levelUrl;
-                if (levelUrl.includes('level4')) {
+                if (levelUrl.includes('level5')) {
+                    frame.title = 'CyberKnight Game Level 5 - Thật Hay Giả? Đống Ảnh AI';
+                } else if (levelUrl.includes('level4')) {
                     frame.title = 'CyberKnight Game Level 4 - Bức Ảnh Có Quá Nhiều Bí Mật';
                 } else if (levelUrl.includes('level3')) {
                     frame.title = 'CyberKnight Game Level 3 - Bốn Chìa Khóa Bí Mật';
@@ -2892,6 +2951,10 @@
                                 accessToken = data.accessToken;
                                 window.__accessToken = accessToken;
                                 if (data.user) currentUser = data.user;
+                                // Tự động tiếp tục ghi nhận thời gian online sau refresh
+                                if (window.CyberActivity && typeof window.CyberActivity.start === 'function') {
+                                    window.CyberActivity.start();
+                                }
                                 return true;
                             }
                             return false;
@@ -2993,6 +3056,11 @@
                     adminLink.classList.add('hidden');
                 }
             }
+
+            // Bắt đầu ghi nhận thời gian online (chỉ khi đã đăng nhập)
+            if (window.CyberActivity && typeof window.CyberActivity.start === 'function') {
+                window.CyberActivity.start();
+            }
             updateMyPackagesUI();
         }
 
@@ -3020,6 +3088,11 @@
 
             const adminLink = document.getElementById('adminDropdownLink');
             if (adminLink) adminLink.classList.add('hidden');
+
+            // Dừng ghi nhận thời gian online (khách / vừa đăng xuất)
+            if (window.CyberActivity && typeof window.CyberActivity.stop === 'function') {
+                window.CyberActivity.stop();
+            }
             updateMyPackagesUI();
         }
 
@@ -3152,7 +3225,7 @@
         }
 
         /**
-         * Add 🔒 Premium badge and update button text/style on the 5 level cards
+         * Add 🔒 Premium badge and update button text/style on the 6 level cards
          * inside #levelSelectModal and also the dropdown items, based on
          * window.__catalog and window.__entitlements.
          * Called after catalog/entitlements load and whenever auth state changes.
@@ -3186,7 +3259,8 @@
                             1: 'CHƠI LEVEL 1',
                             2: 'CHƠI LEVEL 2',
                             3: 'CHƠI LEVEL 3',
-                            4: 'CHƠI LEVEL 4'
+                            4: 'CHƠI LEVEL 4',
+                            5: 'CHƠI LEVEL 5'
                         };
                         playBtn.textContent = defaultTexts[level.id] || `CHƠI LEVEL ${level.id}`;
                         playBtn.setAttribute('onclick', `playLevel(${level.id})`);
@@ -3617,6 +3691,10 @@
 
         // ===== LOGOUT =====
         async function logout() {
+            // Dừng heartbeat TRƯỚC khi xóa token (flush 1 nhịp cuối nếu còn token)
+            if (window.CyberActivity && typeof window.CyberActivity.stop === 'function') {
+                window.CyberActivity.stop();
+            }
             try {
                 await fetch('/api/auth/logout', {
                     method: 'POST',

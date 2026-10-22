@@ -8,6 +8,8 @@
  * - 004_feedback_user_id.sql
  * - 005_payments.sql
  * - 006_user_role.sql
+ * - 007_admin_audit_log.sql
+ * - 008_user_activity.sql
  */
 
 const { describe, test } = require('node:test');
@@ -24,6 +26,7 @@ const EXPECTED_MIGRATIONS = [
   '005_payments.sql',
   '006_user_role.sql',
   '007_admin_audit_log.sql',
+  '008_user_activity.sql',
 ];
 
 describe('Migration files existence check', () => {
