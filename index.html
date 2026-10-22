@@ -2228,6 +2228,44 @@
                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                     </button>
                 </div>
+
+                <!-- Level 5 -->
+                <div class="level-card level-card-5 level-card group bg-white rounded-2xl border-2 border-indigo-200 p-5 hover:border-indigo-400 hover:shadow-xl transition-all cursor-pointer">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center gap-2">
+                                <span class="px-2.5 py-1 rounded-lg bg-indigo-100 text-indigo-800 text-xs font-black tracking-wider whitespace-nowrap">LEVEL 5 • MỚI</span>
+                                <span class="level-badge-area"></span>
+                            </div>
+                            <span class="text-xs text-gray-500 font-semibold whitespace-nowrap inline-flex items-center gap-1"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-clock"></use></svg> 5–7 phút</span>
+                        </div>
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-12 h-12 shrink-0 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center text-2xl text-white shadow-md"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-scan-face"></use></svg></div>
+                            <div>
+                                <h4 class="text-lg font-black text-gray-900">Thật Hay Giả? Đống Ảnh AI</h4>
+                                <p class="text-xs text-gray-500 font-semibold uppercase tracking-wider">Phát hiện ảnh do AI tạo</p>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-4 leading-relaxed">
+                            Ảnh đẹp bắt mắt chưa chắc là thật. Học cách soi dấu hiệu <strong>ảnh AI tạo</strong> để không bị lừa khi xem tin tức hoặc tin nhắn.
+                        </p>
+                        <div class="space-y-2 text-sm text-gray-700 mb-4">
+                            <div class="flex items-center gap-2">
+                                <svg class="icon text-indigo-500 text-base" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-check"></use></svg> 3 video tình huống (intro / hậu quả sai / hậu quả đúng)
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <svg class="icon text-indigo-500 text-base" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-check"></use></svg> Soi ảnh thật – giả theo dấu hiệu tay chân, bóng đổ, chi tiết
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <svg class="icon text-indigo-500 text-base" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-check"></use></svg> Minh họa "soi ảnh" — Ảnh AI được đánh dấu vào ảnh hậu quả
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" onclick="selectAndPlayLevel('/level5/level5.html')" class="level-play-btn w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-600 hover:to-violet-600 text-white font-black text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 group-hover:translate-y-[-2px]">
+                        <span>CHƠI LEVEL 5</span>
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -2514,6 +2552,8 @@
     </div>
 
     <script src="/assets/safe.js"></script>
+    <!-- Theo dõi thời gian online — heartbeat 30s, chỉ chạy khi đã đăng nhập -->
+    <script src="/assets/activity.js" defer></script>
     <script>
         // Icon Lucide từ sprite tự host — dùng trong HTML dựng bằng JS (toast, badge, modal động)
         function icon(name, extraClass = '') {
@@ -3187,6 +3227,21 @@
             if (contactNameInput && !contactNameInput.value.trim()) {
                 contactNameInput.value = (user.firstName ? (user.firstName + ' ' + (user.lastName || '')).trim() : user.username) || '';
             }
+
+            // Hiển thị link quản trị nếu là Admin
+            const adminLink = document.getElementById('adminDropdownLink');
+            if (adminLink) {
+                if (user.role === 'admin') {
+                    adminLink.classList.remove('hidden');
+                } else {
+                    adminLink.classList.add('hidden');
+                }
+            }
+
+            // Bắt đầu ghi nhận thời gian online (chỉ khi đã đăng nhập)
+            if (window.CyberActivity && typeof window.CyberActivity.start === 'function') {
+                window.CyberActivity.start();
+            }
             updateMyPackagesUI();
         }
 
@@ -3202,6 +3257,14 @@
                 contactEmailInput.classList.remove('bg-gray-100', 'cursor-not-allowed', 'text-gray-600');
             }
             if (contactEmailHint) contactEmailHint.classList.add('hidden');
+
+            const adminLink = document.getElementById('adminDropdownLink');
+            if (adminLink) adminLink.classList.add('hidden');
+
+            // Dừng ghi nhận thời gian online (khách / vừa đăng xuất)
+            if (window.CyberActivity && typeof window.CyberActivity.stop === 'function') {
+                window.CyberActivity.stop();
+            }
             updateMyPackagesUI();
         }
 

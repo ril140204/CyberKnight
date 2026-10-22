@@ -316,11 +316,12 @@
                 <th class="p-3.5">Vai trò</th>
                 <th class="p-3.5">Cấp độ</th>
                 <th class="p-3.5">Điểm</th>
+                <th class="p-3.5">Thời gian online</th>
                 <th class="p-3.5">Ngày tham gia</th>
               </tr>
             </thead>
             <tbody id="usersTableBody" class="divide-y divide-slate-800 text-slate-300">
-              <tr><td colspan="7" class="p-6 text-center text-slate-500">Đang tải dữ liệu...</td></tr>
+              <tr><td colspan="8" class="p-6 text-center text-slate-500">Đang tải dữ liệu...</td></tr>
             </tbody>
           </table>
         </div>
@@ -557,9 +558,35 @@
       }
     }
 
+    /**
+     * Định dạng tổng thời gian online (giây) sang chuỗi tiếng Việt dễ đọc.
+     * - 0 / null / undefined / lỗi số → 'Chưa có'
+     * - < 60 giây            → '< 1 phút'
+     * - < 3600 giây          → 'X phút'
+     * - < 24 giờ            → 'H giờ M phút'
+     * - >= 24 giờ           → 'D ngày H giờ'
+     * @param {number|string} seconds
+     * @returns {string}
+     */
+    function formatDuration(seconds) {
+      const total = Number(seconds);
+      if (!Number.isFinite(total) || total <= 0) return 'Chưa có';
+
+      const rounded = Math.floor(total);
+      if (rounded < 60) return '< 1 phút';
+      if (rounded < 3600) return Math.floor(rounded / 60) + ' phút';
+
+      const days = Math.floor(rounded / 86400);
+      const hours = Math.floor((rounded % 86400) / 3600);
+      const minutes = Math.floor((rounded % 3600) / 60);
+
+      if (days > 0) return days + ' ngày ' + hours + ' giờ';
+      return hours + ' giờ ' + minutes + ' phút';
+    }
+
     async function loadUsers(page = 1) {
       const tbody = document.getElementById('usersTableBody');
-      tbody.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-slate-500">Đang tải...</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="8" class="p-6 text-center text-slate-500">Đang tải...</td></tr>';
       try {
         const res = await window.CyberAPI.admin.getUsers({ page, limit: 15 });
         if (res.success && res.data && res.data.users) {
@@ -571,13 +598,14 @@
               <td class="p-3.5"><span class="px-2 py-0.5 rounded text-xs ${u.role === 'admin' ? 'bg-purple-900 text-purple-200 border border-purple-700' : 'bg-slate-800 text-slate-400'}">${escapeHtml(u.role)}</span></td>
               <td class="p-3.5 text-cyan-400 font-semibold">Cấp ${escapeHtml(u.level || 1)}</td>
               <td class="p-3.5 font-bold text-amber-400">${Number(u.points || 0)}</td>
+              <td class="p-3.5 text-xs text-emerald-400 whitespace-nowrap">${escapeHtml(formatDuration(u.onlineSeconds))}${u.isOnlineNow ? ' <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 align-middle" title="Đang online"></span>' : ''}</td>
               <td class="p-3.5 text-xs text-slate-400">${escapeHtml(new Date(u.createdAt).toLocaleDateString('vi-VN'))}</td>
             </tr>
           `).join('');
         }
       } catch (err) {
         console.error('Lỗi khi tải người dùng:', err);
-        tbody.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-rose-400">Lỗi tải danh sách người dùng.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" class="p-6 text-center text-rose-400">Lỗi tải danh sách người dùng.</td></tr>';
       }
     }
 

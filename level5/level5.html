@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CyberKnight — Level 5: Thật Hay Giả? Đống Ảnh AI</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+
+    <!-- Canvas Confetti CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <!-- Level 5 Stylesheet -->
+    <link rel="stylesheet" href="level5.css">
+</head>
+<body>
+
+    <div id="app-container">
+
+        <!-- ===================================================================
+             TOP BAR: THANH ĐIỀU KHIỂN HỆ THỐNG GÓC TRÊN BÊN PHẢI
+             =================================================================== -->
+        <div class="level5-top-bar" id="level5-top-bar">
+            <button id="btn-exit-level" class="btn-level5-exit" type="button" title="Thoát trò chơi (ESC)" aria-label="Thoát trò chơi">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+                <span>THOÁT</span>
+            </button>
+        </div>
+
+        <!-- Nút Bỏ Qua video - góc dưới bên phải (chỉ hiện ở các stage video) -->
+        <button id="btn-skip-video" class="btn-level5-skip hidden" type="button" title="Bỏ qua video" aria-label="Bỏ qua video">
+            <span>BỎ QUA ⏩</span>
+        </button>
+
+        <!-- ===================================================================
+             START OVERLAY
+             =================================================================== -->
+        <div id="start-overlay">
+            <div class="floating-sparkle star" style="left:10%;animation-duration:13s;animation-delay:0s;"></div>
+            <div class="floating-sparkle circle" style="left:30%;animation-duration:16s;animation-delay:1s;"></div>
+            <div class="floating-sparkle diamond" style="left:50%;animation-duration:11s;animation-delay:3s;"></div>
+            <div class="floating-sparkle star" style="left:70%;animation-duration:14s;animation-delay:2s;"></div>
+            <div class="floating-sparkle circle" style="left:88%;animation-duration:15s;animation-delay:4s;"></div>
+
+            <img src="../image/z8014995224177_069f99816bf77dda5fed3feb153a6c0e-removebg-preview.png" alt="CyberKnight Logo" class="overlay-brand-logo">
+
+            <div class="cyber-badge">LEVEL 5 • THẬT HAY GIẢ? ĐỐNG ẢNH AI</div>
+            <h1 class="cyber-title">THẬT HAY GIẢ? ĐỐNG ẢNH AI</h1>
+            <p class="cyber-subtitle">
+                Một bức ảnh đẹp lạ lùng có thể do AI vẽ ra. Cùng CyberKnight soi từng chi tiết
+                để biết ảnh thật hay ảnh giả nhé!
+            </p>
+            <button id="btn-start-level" class="btn-cyber-primary" aria-label="Bắt đầu level 5">
+                <span>▶ BẮT ĐẦU LEVEL 5</span>
+            </button>
+        </div>
+
+        <!-- ===================================================================
+             VIDEO STAGES: intro · good · bad
+             Mỗi cảnh có 1 thẻ <video> riêng (playsinline, preload=auto, CÓ TIẾNG)
+             =================================================================== -->
+        <div id="stage-intro" class="stage">
+            <div class="video-ambient-backdrop"></div>
+            <div class="video-container">
+                <video id="video-intro" class="video-player" playsinline preload="auto"></video>
+                <div class="video-loading-spinner hidden"></div>
+                <div class="video-loading-slow hidden">Mạng hơi chậm, chờ chút nhé</div>
+            </div>
+        </div>
+
+        <div id="stage-good" class="stage">
+            <div class="video-ambient-backdrop"></div>
+            <div class="video-container">
+                <video id="video-good" class="video-player" playsinline preload="auto"></video>
+                <div class="video-loading-spinner hidden"></div>
+                <div class="video-loading-slow hidden">Mạng hơi chậm, chờ chút nhé</div>
+            </div>
+        </div>
+
+        <div id="stage-bad" class="stage">
+            <div class="video-ambient-backdrop"></div>
+            <div class="video-container">
+                <video id="video-bad" class="video-player" playsinline preload="auto"></video>
+                <div class="video-loading-spinner hidden"></div>
+                <div class="video-loading-slow hidden">Mạng hơi chậm, chờ chút nhé</div>
+            </div>
+        </div>
+
+        <!-- ===================================================================
+             GAME STAGE (stage-photo) — "Thám Tử Soi Chi Tiết AI"
+             =================================================================== -->
+        <div id="stage-photo" class="stage">
+            <div class="cyber-grid"></div>
+
+            <div class="floating-sparkle star" style="left:4%;animation-duration:12s;animation-delay:0s;"></div>
+            <div class="floating-sparkle circle" style="left:15%;animation-duration:15s;animation-delay:2s;"></div>
+            <div class="floating-sparkle diamond" style="left:28%;animation-duration:18s;animation-delay:4s;"></div>
+            <div class="floating-sparkle star" style="left:40%;animation-duration:14s;animation-delay:1s;"></div>
+            <div class="floating-sparkle circle" style="left:55%;animation-duration:16s;animation-delay:3s;"></div>
+            <div class="floating-sparkle diamond" style="left:68%;animation-duration:11s;animation-delay:5s;"></div>
+            <div class="floating-sparkle star" style="left:80%;animation-duration:17s;animation-delay:2.5s;"></div>
+
+            <div class="deco-blob deco-blob-1"></div>
+            <div class="deco-blob deco-blob-2"></div>
+            <div class="deco-blob deco-blob-3"></div>
+
+            <img src="../image/z8014995224177_069f99816bf77dda5fed3feb153a6c0e-removebg-preview.png" alt="CyberKnight" class="character-logo-left">
+            <img src="../image/z8014995365895_a3eb178f5f7a17a45925b55e43e202be-removebg-preview.png" alt="SigmaBloom" class="brand-logo-right">
+
+            <div id="photo-container" class="ai-container">
+
+                <div class="ph-mission-badge">🕵️ THÁM TỬ SOI CHI TIẾT AI</div>
+                <h2 class="ph-mission-title">
+                    Bút Thử AI đã sẵn sàng! Bức ảnh mèo biết bay này là ảnh thật hay ảnh do AI vẽ?
+                </h2>
+
+                <div class="ai-tool-row">
+                    <button id="btn-magnifier" class="ai-magnify-btn" type="button" aria-pressed="false"
+                            aria-label="Bật hoặc tắt Bút Thử AI để phóng to ảnh">
+                        🔍 Bút Thử AI
+                    </button>
+                    <button id="btn-hint" class="ai-hint-btn" type="button" aria-label="Xem gợi ý">
+                        💡 Gợi ý
+                    </button>
+                </div>
+
+                <div class="ph-polaroid" id="ai-polaroid">
+                    <div class="ph-frame ai-zoom-frame" id="ai-zoom-frame" role="group"
+                         aria-label="Khung ảnh mèo biết bay do AI vẽ — bật Bút Thử AI rồi chạm vào ảnh để phóng to">
+                        <img id="ai-image" class="ai-zoom-img" alt="Ảnh con mèo có đôi cánh và nhiều chân, do AI tạo ra" draggable="false">
+                        <div class="ai-image-error hidden" id="ai-image-error">
+                            <div class="ai-image-error-inner">
+                                <div class="ai-image-error-icon">🖼️</div>
+                                <div class="ai-image-error-title">Không tải được bức ảnh 😢</div>
+                                <div class="ai-image-error-urls" id="ai-image-error-urls"></div>
+                                <div class="ai-image-error-buttons">
+                                    <button id="btn-image-retry" class="video-error-btn video-error-retry" type="button" aria-label="Thử tải lại ảnh">🔄 Thử lại</button>
+                                    <button id="btn-image-skip" class="video-error-btn video-error-skip" type="button" aria-label="Bỏ qua ảnh">⏭️ Bỏ qua</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ph-caption">Ảnh bạn Gấu gửi cho Sóc</div>
+                </div>
+
+                <div class="ph-bip ai-bip" id="ai-bip">
+                    <span class="ph-bip-icon">🤖</span>
+                    <span id="ai-bip-text">Bíp đây! Con dùng Bút Thử AI để soi kỹ từng chi tiết rồi chọn xem đây là ảnh thật hay ảnh do AI vẽ nhé!</span>
+                </div>
+
+                <div class="ai-answer-row" role="group" aria-label="Chọn đáp án: ảnh giả do AI vẽ hay ảnh thật">
+                    <button id="btn-answer-fake" class="ai-answer-btn" type="button" data-choice="fake"
+                            aria-label="Ảnh giả do AI vẽ">
+                        🔴 ẢNH GIẢ DO AI VẼ
+                    </button>
+                    <button id="btn-answer-real" class="ai-answer-btn" type="button" data-choice="real"
+                            aria-label="Ảnh thật 100 phần trăm">
+                        🟢 ẢNH THẬT 100%
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ===================================================================
+             WRONG RESULT OVERLAY (hiện sau khi xem xong video bad)
+             =================================================================== -->
+        <div id="result-overlay" class="ai-result-overlay hidden">
+            <div class="ai-result-card" id="ai-result-card"></div>
+        </div>
+
+        <!-- ===================================================================
+             SUMMARY STAGE
+             =================================================================== -->
+        <div id="stage-summary" class="stage">
+            <div class="floating-sparkle star" style="left:5%;animation-duration:14s;animation-delay:0.5s;"></div>
+            <div class="floating-sparkle circle" style="left:18%;animation-duration:16s;animation-delay:1.5s;"></div>
+            <div class="floating-sparkle diamond" style="left:35%;animation-duration:12s;animation-delay:3s;"></div>
+            <div class="floating-sparkle star" style="left:52%;animation-duration:15s;animation-delay:2s;"></div>
+            <div class="floating-sparkle circle" style="left:68%;animation-duration:13s;animation-delay:4s;"></div>
+            <div class="floating-sparkle diamond" style="left:82%;animation-duration:17s;animation-delay:1s;"></div>
+            <div class="floating-sparkle star" style="left:93%;animation-duration:14s;animation-delay:3.5s;"></div>
+
+            <div class="deco-blob deco-blob-1"></div>
+            <div class="deco-blob deco-blob-2"></div>
+            <div class="deco-blob deco-blob-3"></div>
+
+            <div class="deco-shield deco-shield-1">🛡️</div>
+            <div class="deco-shield deco-shield-3">⭐</div>
+            <div class="deco-shield deco-shield-4">💎</div>
+
+            <div id="summary-card-container" class="summary-card">
+                <!-- Nội dung được populate động -->
+            </div>
+        </div>
+
+        <!-- ===================================================================
+             FREEZE FRAME OVERLAY + PARTICLE CANVAS
+             =================================================================== -->
+        <canvas id="freeze-canvas"></canvas>
+        <canvas id="particle-canvas"></canvas>
+
+    </div>
+
+    <!-- Script điều khiển Level 5 -->
+    <script src="level5.js?v=1"></script>
+</body>
+</html>

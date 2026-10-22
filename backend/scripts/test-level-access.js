@@ -52,6 +52,7 @@ describe('PHASE 4 — Level Access Permission Logic', () => {
     it('level 0 tồn tại', () => assert.strictEqual(levelExists(0), true));
     it('level 1 tồn tại', () => assert.strictEqual(levelExists(1), true));
     it('level 4 tồn tại', () => assert.strictEqual(levelExists(4), true));
+    it('level 5 tồn tại', () => assert.strictEqual(levelExists(5), true));
     it('level 99 không tồn tại', () => assert.strictEqual(levelExists(99), false));
     it('level -1 không tồn tại', () => assert.strictEqual(levelExists(-1), false));
   });
@@ -109,6 +110,15 @@ describe('PHASE 4 — Level Access Permission Logic', () => {
       assert.strictEqual(userCanPlay(5, ent), false);
     });
 
+    it('level 5 với {premium: true} → true', () => {
+      assert.strictEqual(userCanPlay(5, { premium: true }), true);
+    });
+
+    it('level 5 với pack_5_10 → true (level 5 đã phát hành, nằm trong gói)', () => {
+      const ent = { premium: false, packages: [{ packageId: 'pack_5_10', levels: [5,6,7,8,9,10] }] };
+      assert.strictEqual(userCanPlay(5, ent), true);
+    });
+
     it('level 99 với premium=true → false (level 99 không tồn tại)', () => {
       assert.strictEqual(userCanPlay(99, { premium: true }), false);
     });
@@ -143,13 +153,13 @@ describe('PHASE 4 — Level Access Permission Logic', () => {
       assert.strictEqual(userCanPlay(0, { premium: false, packages: [] }), true);
     });
 
-    it('level 5 với pack_5_10 → false (level 5-10 chưa phát hành)', () => {
+    it('level 6 với pack_5_10 → false (level 6-10 chưa phát hành)', () => {
       const ent = { premium: false, packages: [{ packageId: 'pack_5_10', levels: [5,6,7,8,9,10] }] };
-      assert.strictEqual(userCanPlay(5, ent), false);
+      assert.strictEqual(userCanPlay(6, ent), false);
     });
 
-    it('tất cả level 1-4 đều playable với premium', () => {
-      for (let i = 1; i <= 4; i++) {
+    it('tất cả level 1-5 đều playable với premium', () => {
+      for (let i = 1; i <= 5; i++) {
         assert.strictEqual(userCanPlay(i, { premium: true }), true, `level ${i} với premium phải là true`);
       }
     });
@@ -184,9 +194,9 @@ describe('PHASE 4 — Level Access Permission Logic', () => {
       assert.deepStrictEqual(result, ['pack_1_4', 'premium']);
     });
 
-    it('level 5 → [pack_5_10] (premium không cover level 5 vì 5-10 chưa phát hành)', () => {
+    it('level 5 → [pack_5_10, premium] (premium cover level 5 vì đã phát hành)', () => {
       const result = getRequiredPackagesForLevel(5);
-      assert.deepStrictEqual(result, ['pack_5_10']);
+      assert.deepStrictEqual(result, ['pack_5_10', 'premium']);
     });
 
     it('level 99 → [] (không tồn tại)', () => {
@@ -197,9 +207,9 @@ describe('PHASE 4 — Level Access Permission Logic', () => {
       assert.deepStrictEqual(getRequiredPackagesForLevel(-1), []);
     });
 
-    it('requiredPackages luôn chứa premium cho level đã phát hành (1-4)', () => {
+    it('requiredPackages luôn chứa premium cho level đã phát hành (1-5)', () => {
       const pkgs = getPackages();
-      for (let i = 1; i <= 4; i++) {
+      for (let i = 1; i <= 5; i++) {
         const result = getRequiredPackagesForLevel(i);
         assert.ok(result.includes('premium'), `level ${i} phải bao gồm premium trong requiredPackages`);
         // premium phải luôn đắt hơn hoặc bằng gói khác
@@ -208,8 +218,8 @@ describe('PHASE 4 — Level Access Permission Logic', () => {
       }
     });
 
-    it('requiredPackages KHÔNG chứa premium cho level chưa phát hành (5-10)', () => {
-      for (let i = 5; i <= 10; i++) {
+    it('requiredPackages KHÔNG chứa premium cho level chưa phát hành (6-10)', () => {
+      for (let i = 6; i <= 10; i++) {
         const result = getRequiredPackagesForLevel(i);
         assert.ok(!result.includes('premium'), `level ${i} chưa phát hành → premium không nên nằm trong requiredPackages`);
       }
@@ -236,10 +246,10 @@ describe('PHASE 4 — Level Access Permission Logic', () => {
   // ── LEVELS consistency ─────────────────────────────────────────────────────
 
   describe('LEVELS consistency', () => {
-    it('LEVELS chứa đúng 5 level (0-4)', () => {
-      assert.strictEqual(LEVELS.length, 5);
+    it('LEVELS chứa đúng 6 level (0-5)', () => {
+      assert.strictEqual(LEVELS.length, 6);
       const ids = LEVELS.map(l => l.id);
-      assert.deepStrictEqual(ids, [0, 1, 2, 3, 4]);
+      assert.deepStrictEqual(ids, [0, 1, 2, 3, 4, 5]);
     });
   });
 

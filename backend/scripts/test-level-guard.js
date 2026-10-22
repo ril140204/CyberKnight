@@ -8,7 +8,7 @@
  * (b) Logged-in user without pack → POST /api/levels/1/launch → 403 LEVEL_LOCKED
  * (c) User with pack_1_4 → launch → 200 → GET /level1/level1.html (with cookie) → 200, body = level1.html
  *     GET /level1/level1.js, /level1/level1.css → 200 with correct content-types
- * (d) Same cookie → /level5/... → 403/404
+ * (d) Same cookie → /level5/... → 403 (level 5 cần gói pack_5_10)
  * (e) Tampered cookie signature → 403
  * (f) /level0/level0.html → 200, no login required
  * (g) /level1/..%2f..%2fbackend/.env → NOT leak .env (403/404, no .env content)
@@ -395,7 +395,7 @@ async function runTests() {
     );
   }
 
-  // ── Test (d): Same cookie cannot access level5 (not in catalog) ─
+  // ── Test (d): Same cookie cannot access level5 (needs pack_5_10) ─
   console.log('\n── TEST (d): Cookie from level1 pack → GET /level5/level5.html ──');
   {
     // Get a fresh levelAccess cookie (launch level 1)
@@ -407,7 +407,7 @@ async function runTests() {
     const cookies = parseSetCookie(launchRes.headers['set-cookie']);
     const levelAccessCookie = cookies['levelAccess'];
 
-    // level5 doesn't exist in catalog → should be 404
+    // level5 đã phát hành nhưng không nằm trong gói pack_1_4 → should be 403
     const res = await request({
       method: 'GET',
       path: '/level5/level5.html',
@@ -415,8 +415,22 @@ async function runTests() {
     });
 
     assert(
+      res.status === 403,
+      `(d) GET /level5/level5.html status = ${res.status} (expect 403 — level5 cần gói pack_5_10)`
+    );
+  }
+
+  // ── Test (d2): Level chưa phát hành (6) → 404 ────────────────
+  console.log('\n── TEST (d2): GET /level6/level6.html (chưa phát hành) ──');
+  {
+    const res = await request({
+      method: 'GET',
+      path: '/level6/level6.html',
+    });
+
+    assert(
       res.status === 404,
-      `(d) GET /level5/level5.html status = ${res.status} (expect 404 — level5 not in catalog)`
+      `(d2) GET /level6/level6.html status = ${res.status} (expect 404 — level6 not in catalog)`
     );
   }
 
