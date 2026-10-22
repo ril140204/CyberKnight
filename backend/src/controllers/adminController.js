@@ -28,7 +28,7 @@ const ONLINE_WINDOW_SECONDS = 90;
  */
 async function getStats(req, res) {
   try {
-    const [totalUsers] = await db.query('SELECT COUNT(*) AS cnt FROM users WHERE is_active = 1');
+    const [totalUsers] = await db.query('SELECT COUNT(*) AS cnt FROM users WHERE is_active = TRUE');
     const [totalPaidOrders] = await db.query(
       "SELECT COUNT(*) AS cnt FROM orders WHERE status = 'paid'"
     );
@@ -38,7 +38,7 @@ async function getStats(req, res) {
     );
     const [todayUsers] = await db.query(
       `SELECT COUNT(*) AS cnt FROM users
-       WHERE is_active = 1 AND DATE(created_at) = CURDATE()`
+       WHERE is_active = TRUE AND created_at::date = CURRENT_DATE`
     );
     const [totalMismatches] = await db.query(
       "SELECT COUNT(*) AS cnt FROM payment_transactions WHERE match_status IN ('no_order', 'underpaid', 'error')"
@@ -82,13 +82,7 @@ async function listUsers(req, res) {
   const search = (req.query.search || '').trim();
 
   try {
-    // Count: LEFT JOIN không làm thay đổi số dòng (bảng activity 1 dòng / user)
-    let countQuery = `
-      SELECT COUNT(*) AS total
-      FROM users u
-      LEFT JOIN user_activity ua ON ua.user_id = u.id
-      WHERE u.is_active = 1
-    `;
+    let countQuery = 'SELECT COUNT(*) AS total FROM users WHERE is_active = TRUE';
     let dataQuery = `
       SELECT u.id, u.username, u.email, u.role, u.level, u.points,
              u.created_at, u.last_login,
@@ -96,20 +90,20 @@ async function listUsers(req, res) {
              ua.last_heartbeat_at,
              ua.first_seen_at,
              (ua.last_heartbeat_at IS NOT NULL
-              AND ua.last_heartbeat_at >= DATE_SUB(NOW(), INTERVAL ? SECOND)) AS is_online_now
+              AND ua.last_heartbeat_at >= NOW() - make_interval(secs => ?)) AS is_online_now
       FROM users u
       LEFT JOIN user_activity ua ON ua.user_id = u.id
-      WHERE u.is_active = 1
+      WHERE u.is_active = TRUE
     `;
-    // Tham số đầu tiên của dataQuery là tham số cho INTERVAL (placeholder trong SELECT)
+    // Tham số đầu tiên của dataQuery là tham số cho cửa sổ "đang online".
+    // Lớp db.js tự chuyển `?` → `$n` theo thứ tự xuất hiện trong SQL.
     const dataParams = [ONLINE_WINDOW_SECONDS];
     const countParams = [];
 
     if (search) {
-      const searchCondition = ' AND (u.username LIKE ? OR u.email LIKE ?)';
-      countQuery += searchCondition;
-      dataQuery += searchCondition;
       const searchPattern = `%${search}%`;
+      countQuery += ' AND (username ILIKE ? OR email ILIKE ?)';
+      dataQuery += ' AND (u.username ILIKE ? OR u.email ILIKE ?)';
       countParams.push(searchPattern, searchPattern);
       dataParams.push(searchPattern, searchPattern);
     }
@@ -208,8 +202,8 @@ async function getUserDetail(req, res) {
               last_heartbeat_at,
               first_seen_at,
               (last_heartbeat_at IS NOT NULL
-               AND last_heartbeat_at >= DATE_SUB(NOW(), INTERVAL ? SECOND)) AS is_online_now
-       FROM user_activity WHERE user_id = ?`,
+               AND last_heartbeat_at >= NOW() - make_interval(secs => ?)) AS is_online_now
+       FROM user_activity WHERE user_id = $2`,
       [ONLINE_WINDOW_SECONDS, userId]
     );
     const act = activityRows[0] || {};
@@ -282,7 +276,7 @@ async function grantEntitlement(req, res) {
   try {
     // Kiểm tra user tồn tại
     const [users] = await db.query(
-      'SELECT id FROM users WHERE id = ? AND is_active = 1',
+      'SELECT id FROM users WHERE id = ? AND is_active = TRUE',
       [userId]
     );
     if (users.length === 0) {
@@ -305,9 +299,9 @@ async function grantEntitlement(req, res) {
     await db.query(
       `INSERT INTO user_entitlements (user_id, package_id, source, expires_at)
        VALUES (?, ?, 'admin_grant', ?)
-       ON DUPLICATE KEY UPDATE
+       ON CONFLICT (user_id, package_id) DO UPDATE SET
          source = 'admin_grant',
-         expires_at = VALUES(expires_at)`,
+         expires_at = EXCLUDED.expires_at`,
       [userId, packageId, expiresAtValue]
     );
 
@@ -426,7 +420,7 @@ async function listAdminOrders(req, res) {
     }
 
     if (search) {
-      whereConditions.push('(o.order_code LIKE ? OR u.username LIKE ? OR u.email LIKE ?)');
+      whereConditions.push('(o.order_code ILIKE ? OR u.username ILIKE ? OR u.email ILIKE ?)');
       const pattern = `%${search}%`;
       params.push(pattern, pattern, pattern);
     }
@@ -596,8 +590,7 @@ async function grantPackageDirect(req, res) {
 
     if (!targetUserId && email) {
       const [userRows] = await db.query(
-        'SELECT id FROM users WHERE email = ? AND is_active = 1',
-        [email.trim()]
+        'SELECT id FROM users WHERE LOWER(email) = LOWER(?) AND is_active = TRUE', [email.trim()]
       );
       if (userRows.length > 0) {
         targetUserId = userRows[0].id;
@@ -613,7 +606,7 @@ async function grantPackageDirect(req, res) {
 
     // Kiểm tra user có tồn tại và active
     const [targetUser] = await db.query(
-      'SELECT id, username, email FROM users WHERE id = ? AND is_active = 1',
+      'SELECT id, username, email FROM users WHERE id = ? AND is_active = TRUE',
       [targetUserId]
     );
 
@@ -628,7 +621,7 @@ async function grantPackageDirect(req, res) {
     await db.query(
       `INSERT INTO user_entitlements (user_id, package_id, source, granted_at, expires_at)
        VALUES (?, ?, 'admin_grant', NOW(), NULL)
-       ON DUPLICATE KEY UPDATE
+       ON CONFLICT (user_id, package_id) DO UPDATE SET
          source = 'admin_grant',
          granted_at = NOW(),
          expires_at = NULL`,
@@ -827,8 +820,8 @@ async function reconcileTransaction(req, res) {
       await conn.query(
         `INSERT INTO user_entitlements (user_id, package_id, order_id, source, granted_at, expires_at)
          VALUES (?, ?, ?, 'purchase', NOW(), NULL)
-         ON DUPLICATE KEY UPDATE
-           order_id = VALUES(order_id),
+         ON CONFLICT (user_id, package_id) DO UPDATE SET
+           order_id = EXCLUDED.order_id,
            source = 'purchase',
            granted_at = NOW(),
            expires_at = NULL`,

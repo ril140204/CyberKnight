@@ -1,0 +1,13 @@
+# Không đưa vào slug Heroku (giảm dung lượng, không cần lúc chạy)
+video-src/
+legacy-mysql/
+backend/legacy-mysql/
+deploy/
+scripts/
+docs/
+*.md
+CHANGES.md
+PROMPT_*.md
+DEPLOY_FIX_REPORT.md
+repomix.config.json
+tailwind.config.js

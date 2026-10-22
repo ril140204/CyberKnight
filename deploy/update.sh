@@ -15,7 +15,7 @@
 #   2. Backup DB via backup-db.sh
 #   3. git fetch + git pull --ff-only
 #   4. npm ci --omit=dev
-#   5. Chạy setup-db (với migrate user)
+#   5. Chạy setup-db (migration PostgreSQL/Supabase, đọc backend/.env)
 #   6. pm2 reload cyberknight
 #   7. Verify health endpoint
 #   8. Rollback nếu health check fail
@@ -155,28 +155,14 @@ run bash -c "cd backend && npm ci --omit=dev 2>&1 | tail -10"
 
 # ── 5. Migration (setup-db) ────────────────────────────────
 echo ""
-echo "--- Bước 5/6: Chạy setup-db (migration) ---"
-
-# Kiểm tra .env.migrate tồn tại chưa
-MIGRATE_ENV="$REPO_PATH/backend/.env.migrate"
-if [ ! -f "$MIGRATE_ENV" ]; then
-  echo "LỖI: $MIGRATE_ENV chưa tồn tại."
-  echo "     Tạo file này với DB_USER=sigmabloom_migrate và DB_PASSWORD=<mật khẩu>"
-  echo "     (chmod 600)"
+echo "--- Bước 5/6: Chạy setup-db (migration PostgreSQL/Supabase) ---"
+# Dùng DIRECT_URL / DATABASE_URL trong backend/.env (schema DB_SCHEMA).
+# Migration idempotent, ghi nhận trong bảng schema_migrations.
+if [ ! -f "$REPO_PATH/backend/.env" ]; then
+  echo "LỖI: $REPO_PATH/backend/.env chưa tồn tại (cần DATABASE_URL, DIRECT_URL, DB_SCHEMA)."
   exit 1
 fi
-chmod 600 "$MIGRATE_ENV"
-
-# Đọc migrate password từ env (không in ra)
-source "$MIGRATE_ENV"
-MIGPW="${DB_PASSWORD:-}"
-if [ -z "$MIGPW" ]; then
-  echo "LỖI: DB_PASSWORD trong .env.migrate bị trống."
-  exit 1
-fi
-
-echo "(Migrate password: **** — không in ra)"
-if ! run bash -c "cd backend && DB_USER=sigmabloom_migrate DB_PASSWORD='$MIGPW' npm run setup-db 2>&1"; then
+if ! run bash -c "cd backend && npm run setup-db -- --no-seed 2>&1"; then
   echo ""
   echo "LỖI: setup-db thất bại — đang rollback..."
   run git checkout "$OLD"
@@ -186,11 +172,6 @@ if ! run bash -c "cd backend && DB_USER=sigmabloom_migrate DB_PASSWORD='$MIGPW' 
   echo "Hãy kiểm tra lỗi và thử lại."
   exit 1
 fi
-
-# Xóa biến khỏi bộ nhớ
-unset MIGPW MIG_PW DB_PASSWORD
-unset MIGPW MIG_PW 2>/dev/null || true
-
 echo "[OK] setup-db hoàn tất."
 
 # ── 6. PM2 reload ──────────────────────────────────────────

@@ -15,32 +15,11 @@
         GRACE_SECONDS: 5,          // 5 giây gia hạn khi hết giờ lần đầu
         TRANSITION_MS: 500,        // Thời gian chuyển cảnh crossfade
         OUTRO_FALLBACK_TIMEOUT_MS: 60000, // 60s fallback CHỈ khi video KHÔNG LOAD ĐƯỢC (load mạng chậm)
-        VIDEO_PATHS: {
-            // Mỗi mảng là danh sách đường dẫn dự phòng, browser sẽ thử lần lượt nếu file này 404
-            intro: [
-                '../video/level 1/intro.mp4',
-                '../../video/level 1/intro.mp4',
-                'video/level 1/intro.mp4',
-                '/video/level 1/intro.mp4'
-            ],
-            bad: [
-                '../video/level 1/bad.mp4',
-                '../../video/level 1/bad.mp4',
-                'video/level 1/bad.mp4',
-                '/video/level 1/bad.mp4'
-            ],
-            middle: [
-                '../video/level 1/middle.mp4',
-                '../../video/level 1/middle.mp4',
-                'video/level 1/middle.mp4',
-                '/video/level 1/middle.mp4'
-            ],
-            good: [
-                '../video/level 1/good.mp4',
-                '../../video/level 1/good.mp4',
-                'video/level 1/good.mp4',
-                '/video/level 1/good.mp4'
-            ]
+        VIDEO_SOURCES: {
+            intro: { hls: '/video/level1/hls/intro/master.m3u8', mp4: '/video/level1/intro.mp4' },
+            bad: { hls: '/video/level1/hls/bad/master.m3u8', mp4: '/video/level1/bad.mp4' },
+            middle: { hls: '/video/level1/hls/middle/master.m3u8', mp4: '/video/level1/middle.mp4' },
+            good: { hls: '/video/level1/hls/good/master.m3u8', mp4: '/video/level1/good.mp4' },
         }
     };
 
@@ -463,10 +442,11 @@
             this.preloadMiddle = document.getElementById('preload-middle');
             this.preloadGood = document.getElementById('preload-good');
 
-            this.setupVideoFallback(this.introVideo, CONFIG.VIDEO_PATHS.intro);
-            this.setupVideoFallback(this.preloadBad, CONFIG.VIDEO_PATHS.bad);
-            this.setupVideoFallback(this.preloadMiddle, CONFIG.VIDEO_PATHS.middle);
-            this.setupVideoFallback(this.preloadGood, CONFIG.VIDEO_PATHS.good);
+            this.setupVideoFallback(this.introVideo, CONFIG.VIDEO_SOURCES.intro);
+            // 3 nhánh hậu quả: chỉ làm ấm cache playlist HLS (vài KB) — không tải trước dữ liệu
+            CKVideo.prefetch(CONFIG.VIDEO_SOURCES.bad, { whenPlaying: this.introVideo });
+            CKVideo.prefetch(CONFIG.VIDEO_SOURCES.middle, { whenPlaying: this.introVideo });
+            CKVideo.prefetch(CONFIG.VIDEO_SOURCES.good, { whenPlaying: this.introVideo });
 
             // Bắt sự kiện gần hết video mở đầu
             if (this.introVideo) {
@@ -498,96 +478,34 @@
 
         // Hàm helper: thử load video qua danh sách đường dẫn dự phòng,
         // trả về Promise resolve(true) khi tìm được file phát được, false khi thất bại hết.
-        tryLoadWithFallback(videoEl, pathList, onSuccess, onAllFailed) {
-            if (!videoEl || !pathList || pathList.length === 0) {
+        // Tải video qua CKVideo: HLS thích ứng (360p/480p/720p theo băng thông) → MP4 dự phòng.
+        // onSuccess khi metadata sẵn sàng (nhanh, vài KB) — không chờ tải cả file như trước.
+        tryLoadWithFallback(videoEl, sources, onSuccess, onAllFailed) {
+            if (!videoEl || !sources) {
                 if (onAllFailed) onAllFailed();
                 return;
             }
-
-            // HARD TIMEOUT: Nếu không load được sau 3s per path → thử path tiếp theo
-            // Ngăn chặn trường hợp browser treo mãi không fire error trên file không tồn tại
-            const HARD_TIMEOUT_MS = 3000;
-            let loadTimeoutId = null;
-            let currentIdx = 0;
-            let isResolved = false;
-
-            const resolve = (fn) => {
-                if (isResolved) return;
-                isResolved = true;
-                if (loadTimeoutId) clearTimeout(loadTimeoutId);
-                fn();
-            };
-
-            const tryNext = () => {
-                if (currentIdx >= pathList.length) {
-                    resolve(() => {
-                        console.warn('❌ Tất cả đường dẫn dự phòng đều thất bại');
-                        if (onAllFailed) onAllFailed();
-                    });
-                    return;
-                }
-
-                const currentPath = pathList[currentIdx];
-                console.log(`🔄 Đang thử đường dẫn [${currentIdx + 1}/${pathList.length}]: ${currentPath}`);
-
-                // Reset trạng thái video trước khi thử đường dẫn mới
-                videoEl.removeAttribute('src');
-                videoEl.load();
-                videoEl.src = currentPath;
-                videoEl.load();
-
-                // HARD TIMEOUT: Nếu path này không load được trong 3s → thử path tiếp theo
-                loadTimeoutId = setTimeout(() => {
-                    console.warn(`⏰ Timeout [${currentIdx + 1}] — chuyển sang path tiếp theo`);
-                    handleError();
-                }, HARD_TIMEOUT_MS);
-            };
-
-            const handleSuccess = () => {
-                resolve(() => {
-                    videoEl.removeEventListener('loadeddata', handleSuccess);
-                    videoEl.removeEventListener('canplay', handleSuccess);
-                    videoEl.removeEventListener('error', handleError);
-                    console.log(`✅ Load thành công: ${pathList[currentIdx]}`);
+            CKVideo.load(videoEl, sources, { timeoutMs: 45000 })
+                .then((mode) => {
+                    console.log(`✅ Video sẵn sàng (${mode}): ${sources.hls || sources.mp4}`);
                     if (onSuccess) onSuccess();
+                })
+                .catch((err) => {
+                    console.warn('❌ Không tải được video:', err && err.message);
+                    if (onAllFailed) onAllFailed();
                 });
-            };
-
-            const handleError = () => {
-                if (isResolved) return;
-                videoEl.removeEventListener('loadeddata', handleSuccess);
-                videoEl.removeEventListener('canplay', handleSuccess);
-                videoEl.removeEventListener('error', handleError);
-                if (loadTimeoutId) clearTimeout(loadTimeoutId);
-                currentIdx++;
-                tryNext();
-            };
-
-            videoEl.addEventListener('loadeddata', handleSuccess, { once: true });
-            videoEl.addEventListener('canplay', handleSuccess, { once: true });
-            videoEl.addEventListener('error', handleError, { once: true });
-
-            tryNext();
         },
 
-        setupVideoFallback(videoEl, pathList) {
-            // Backward compatible: chỉ set src đầu tiên cho các lần gọi init
-            // (Preload sẽ tự try thêm nếu file đầu 404)
-            if (!videoEl || !pathList || pathList.length === 0) return;
-            videoEl.src = pathList[0];
-
-            // Tự retry nếu file đầu không load được
-            videoEl.addEventListener('error', () => {
-                console.warn(`🔄 Preload fallback triggered for video src: ${pathList[0]}`);
-                // Logic retry đầy đủ sẽ chạy trong playOutro
-            });
+        setupVideoFallback(videoEl, sources) {
+            if (!videoEl || !sources) return;
+            CKVideo.load(videoEl, sources).catch(() => {});
         },
 
         playIntro() {
             stopAllVideos();
             if (!this.introVideo) return;
             this.introEndHandlerTriggered = false;
-            this.setupVideoFallback(this.introVideo, CONFIG.VIDEO_PATHS.intro);
+            this.setupVideoFallback(this.introVideo, CONFIG.VIDEO_SOURCES.intro);
             this.introVideo.currentTime = 0;
             const playPromise = this.introVideo.play();
             if (playPromise !== undefined) {
@@ -605,6 +523,14 @@
                 switchStage('game');
                 MinigameScene.start();
             });
+            // Mini-game không có video → tải trước trọn 3 video hậu quả (tuần tự, tự dừng khi có video phát)
+            // Khoảng rảnh có thể ngắn → ưu tiên 12s đầu của MỖI nhánh trước, rồi mới tải trọn
+            CKVideo.warm(CONFIG.VIDEO_SOURCES.bad, { seconds: 12 });
+            CKVideo.warm(CONFIG.VIDEO_SOURCES.middle, { seconds: 12 });
+            CKVideo.warm(CONFIG.VIDEO_SOURCES.good, { seconds: 12 });
+            CKVideo.warm(CONFIG.VIDEO_SOURCES.bad);
+            CKVideo.warm(CONFIG.VIDEO_SOURCES.middle);
+            CKVideo.warm(CONFIG.VIDEO_SOURCES.good);
         },
 
         playOutro(branch) {
@@ -645,11 +571,9 @@
             }
 
             // Bước 5: Kiểm tra video preload đã sẵn sàng chưa
-            const preloadMap = { 'A': this.preloadBad, 'B': this.preloadMiddle, 'C': this.preloadGood };
-            const preloadVideo = preloadMap[branch];
-            const branchPaths = branch === 'A' ? CONFIG.VIDEO_PATHS.bad :
-                                branch === 'B' ? CONFIG.VIDEO_PATHS.middle :
-                                CONFIG.VIDEO_PATHS.good;
+            const branchPaths = branch === 'A' ? CONFIG.VIDEO_SOURCES.bad :
+                                branch === 'B' ? CONFIG.VIDEO_SOURCES.middle :
+                                CONFIG.VIDEO_SOURCES.good;
 
             // Bước 6: Listener "huỷ fallback timeout khi video sẵn sàng phát"
             // Đây là FIX ROOT CAUSE: video play đến khi bị ngắt là vì timeout huỷ video khi vẫn còn đang phát
@@ -929,8 +853,6 @@
 
         init() {
             this.canvas = document.getElementById('particle-canvas');
-            // Agent telemetry disabled - endpoint unavailable
-            // fetch('http://127.0.0.1:7270/ingest/...', ...).catch(()=>{});
             if (this.canvas) {
                 this.ctx = this.canvas.getContext('2d');
                 this.resize();
@@ -964,8 +886,6 @@
         },
 
         burstGlitch() {
-            // Agent telemetry disabled - endpoint unavailable
-            // fetch('http://127.0.0.1:7270/ingest/...', ...).catch(()=>{});
             if (!this.canvas) return;
             for (let i = 0; i < 40; i++) {
                 this.particles.push({
@@ -982,8 +902,6 @@
         },
 
         burstQuestion() {
-            // Agent telemetry disabled - endpoint unavailable
-            // fetch('http://127.0.0.1:7270/ingest/...', ...).catch(()=>{});
             if (!this.canvas) return;
             for (let i = 0; i < 35; i++) {
                 this.particles.push({
@@ -1000,8 +918,6 @@
         },
 
         burstShield() {
-            // Agent telemetry disabled - endpoint unavailable
-            // fetch('http://127.0.0.1:7270/ingest/...', ...).catch(()=>{});
             if (!this.canvas) return;
             for (let i = 0; i < 45; i++) {
                 this.particles.push({
@@ -1185,7 +1101,7 @@
             this.card.style.visibility = 'visible';
             this.card.style.zIndex = '50';
             this.card.innerHTML = `
-                <img src="../image/z8014995224177_069f99816bf77dda5fed3feb153a6c0e-removebg-preview.png" alt="CyberKnight" style="width: 130px; margin-top: -6px; filter: drop-shadow(0 6px 16px rgba(0, 102, 255, 0.18)); animation: icon-bounce 2s ease-in-out infinite;">
+                <img src="../image/z8014995224177_069f99816bf77dda5fed3feb153a6c0e-removebg-preview.webp" alt="CyberKnight" style="width: 130px; margin-top: -6px; filter: drop-shadow(0 6px 16px rgba(0, 102, 255, 0.18)); animation: icon-bounce 2s ease-in-out infinite;">
                 <div class="summary-icon-badge">${badgeIcon}</div>
                 <h2 class="summary-title">${titleText}</h2>
                 <div class="summary-reward-box">

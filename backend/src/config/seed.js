@@ -100,7 +100,7 @@ async function seedAdmin() {
         const hashedPassword = await bcrypt.hash(adminPassword, 12);
         await pool.query(
           `UPDATE users
-           SET password = ?, role = 'admin', level = 'Admin', points = 9999, is_active = 1
+           SET password = ?, role = 'admin', level = 'Admin', points = 9999, is_active = TRUE
            WHERE id = ?`,
           [hashedPassword, rows[0].id]
         );
@@ -112,7 +112,7 @@ async function seedAdmin() {
       const hashedPassword = await bcrypt.hash(adminPassword, 12);
       await pool.query(
         `INSERT INTO users (first_name, last_name, username, email, password, birth_year, level, role, points, is_active)
-         VALUES ('Admin', 'Sigmabloom', ?, ?, ?, 2000, 'Admin', 'admin', 9999, 1)`,
+         VALUES ('Admin', 'Sigmabloom', ?, ?, ?, 2000, 'Admin', 'admin', 9999, TRUE)`,
         [adminUsername, adminEmail, hashedPassword]
       );
       console.log('✅ Đã khởi tạo tài khoản Admin mẫu thành công!');

@@ -21,6 +21,7 @@ const express = require('express');
 const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
+const compression = require('compression');
 const jwt = require('jsonwebtoken');
 
 // ── Cấu hình dotenv nạp .env từ đúng thư mục backend ────────────
@@ -175,10 +176,23 @@ if (process.env.CORS_ORIGINS) {
     });
 }
 
+/**
+ * Request cùng origin (Origin == scheme://host của chính request, ví dụ khi vào bằng
+ * tên miền tuỳ chỉnh www.cyberknight.store) luôn hợp lệ, không phụ thuộc CORS_ORIGINS.
+ * `trust proxy` đã bật nên req.protocol lấy từ X-Forwarded-Proto của Heroku/Nginx.
+ */
+function isSameOrigin(req, origin) {
+  const host = req.get('host');
+  return Boolean(host) && origin === `${req.protocol}://${host}`;
+}
+function isAllowedOrigin(req, origin) {
+  return !origin || allowedOrigins.includes(origin) || isSameOrigin(req, origin);
+}
+
 // Chặn origin không hợp lệ với mã 403 thay vì ném lỗi Error (tránh mã 500)
 app.use((req, res, next) => {
   const origin = req.headers.origin;
-  if (!origin || allowedOrigins.includes(origin)) {
+  if (isAllowedOrigin(req, origin)) {
     return next();
   }
   return res.status(403).json({
@@ -188,25 +202,77 @@ app.use((req, res, next) => {
   });
 });
 
-app.use(
-  cors({
-    origin: (origin, cb) => {
-      if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
-      return cb(null, false);
-    },
-    credentials: true,
-  })
-);
+app.use((req, res, next) => cors({
+  origin: (origin, cb) => cb(null, isAllowedOrigin(req, origin)),
+  credentials: true,
+})(req, res, next));
+
+// ── 5a. File định danh site cho crawler & bộ lọc phishing ─────
+// robots.txt / sitemap.xml / security.txt: site minh bạch, có đầu mối liên hệ — tín hiệu tin cậy
+// cho Google Safe Browsing, SmartScreen... (đặt TRƯỚC khối chặn /.* bên dưới).
+const siteOrigin = () => (process.env.FRONTEND_URL || `http://localhost:${PORT}`).replace(/\/$/, '');
+const contactEmail = () => process.env.CONTACT_EMAIL || 'cyberknight.official.vn@gmail.com';
+
+app.get('/robots.txt', (req, res) => {
+  res.type('text/plain').set('Cache-Control', 'public, max-age=86400').send(
+    [
+      'User-agent: *',
+      'Allow: /',
+      'Disallow: /api/',
+      'Disallow: /admin',
+      'Disallow: /payment',
+      'Disallow: /reset-password',
+      'Disallow: /level',
+      `Sitemap: ${siteOrigin()}/sitemap.xml`,
+      '',
+    ].join('\n')
+  );
+});
+
+app.get('/sitemap.xml', (req, res) => {
+  const urls = ['/', '/privacy', '/terms', '/refund']
+    .map((p) => `  <url><loc>${siteOrigin()}${p}</loc></url>`)
+    .join('\n');
+  res
+    .type('application/xml')
+    .set('Cache-Control', 'public, max-age=86400')
+    .send(`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`);
+});
+
+app.get(['/.well-known/security.txt', '/security.txt'], (req, res) => {
+  const expires = new Date(Date.now() + 365 * 24 * 3600 * 1000).toISOString();
+  res.type('text/plain').set('Cache-Control', 'public, max-age=86400').send(
+    [
+      `Contact: mailto:${contactEmail()}`,
+      `Expires: ${expires}`,
+      'Preferred-Languages: vi, en',
+      `Canonical: ${siteOrigin()}/.well-known/security.txt`,
+      `Policy: ${siteOrigin()}/privacy`,
+      '',
+    ].join('\n')
+  );
+});
+
+app.get('/favicon.ico', (req, res) => {
+  res.set('Cache-Control', 'public, max-age=604800');
+  res.sendFile(path.join(rootDir, 'image', 'favicon.ico'));
+});
 
 // ── 5. Hard-deny sensitive files & SEO Noindex ───────────────
 app.use((req, res, next) => {
-  // Gắn header X-Robots-Tag cho /admin* và /payment*
-  if (req.path.startsWith('/admin') || req.path.startsWith('/payment')) {
+  // Gắn header X-Robots-Tag cho /admin*, /payment* và trang game (/levelN/ là tình huống MÔ PHỎNG
+  // lừa đảo để dạy trẻ — không để máy tìm kiếm lập chỉ mục tách khỏi ngữ cảnh giáo dục)
+  if (
+    req.path.startsWith('/admin') ||
+    req.path.startsWith('/payment') ||
+    req.path.startsWith('/reset-password') ||
+    /^\/level\d+/i.test(req.path)
+  ) {
     res.setHeader('X-Robots-Tag', 'noindex, nofollow');
   }
 
   const path_ = req.path;
-  if (/^\/backend|^\/\.|^\/node_modules/.test(path_)) {
+  if (/^\/backend|^\/\.|^\/node_modules|^\/video-src/.test(path_)) {
     return res.status(403).send('Not found');
   }
   const extMatch = path_.match(/\.[^.]+$/);
@@ -219,24 +285,73 @@ app.use((req, res, next) => {
   next();
 });
 
+// ── 5b. Gzip cho HTML/CSS/JS/JSON/playlist (KHÔNG nén video/ảnh — đã nén sẵn) ─────
+// Giúp hls.js 346 KB → ~108 KB, CSS/JS level giảm ~70% — quan trọng với mạng yếu.
+app.use(
+  compression({
+    threshold: 1024,
+    filter: (req, res) => {
+      if (/\.(ts|mp4|m4s|png|jpg|jpeg|webp|gif|woff2?|glb)$/i.test(req.path)) return false;
+      return compression.filter(req, res);
+    },
+  })
+);
+
 // ── 6. Static assets (public) ─────────────────────────────────
 const rootDir = process.env.EXEWEB_ROOT
   ? path.resolve(process.env.EXEWEB_ROOT)
   : path.join(__dirname, '../../');
 
-for (const mount of [
-  { url: '/assets', dir: 'assets' },
-  { url: '/image', dir: 'image' },
-  { url: '/video', dir: 'video' },
-]) {
+// Cache tĩnh:
+//  - /video: segment HLS (.ts) & MP4 không đổi theo tên → cache 30 ngày; playlist .m3u8 cache 1 giờ
+//    (express.static hỗ trợ Range request → tua/stream được). Production nên để Nginx phục vụ
+//    /video/ trực tiếp từ đĩa (xem deploy/nginx.conf.example) để Node không phải stream file lớn.
+const STATIC_MOUNTS = [
+  { url: '/assets', dir: 'assets', opts: { maxAge: '1d', etag: true } },
+  { url: '/image', dir: 'image', opts: { maxAge: '7d', etag: true } },
+  {
+    url: '/video',
+    dir: 'video',
+    opts: {
+      maxAge: '30d',
+      immutable: true,
+      etag: true,
+      lastModified: true,
+      acceptRanges: true,
+      setHeaders(res, filePath) {
+        if (filePath.endsWith('.m3u8')) {
+          res.setHeader('Content-Type', 'application/vnd.apple.mpegurl');
+          res.setHeader('Cache-Control', 'public, max-age=3600');
+        } else if (filePath.endsWith('.ts')) {
+          res.setHeader('Content-Type', 'video/mp2t');
+        }
+      },
+    },
+  },
+];
+
+for (const mount of STATIC_MOUNTS) {
   const resolved = path.join(rootDir, mount.dir);
   if (fs.existsSync(resolved)) {
-    app.use(mount.url, express.static(resolved));
+    app.use(mount.url, express.static(resolved, mount.opts));
   }
 }
 
+// Trang chủ: thay __SITE_ORIGIN__ (canonical, og:url, og:image, JSON-LD) bằng FRONTEND_URL — link chia sẻ
+// lên Facebook/Zalo có ảnh xem trước và địa chỉ tuyệt đối đúng. Production đọc file 1 lần rồi giữ trong RAM.
+let indexHtmlCache = null;
+function sendIndexHtml(req, res) {
+  if (!indexHtmlCache || !isProd) {
+    indexHtmlCache = fs
+      .readFileSync(path.join(rootDir, 'index.html'), 'utf8')
+      .replaceAll('__SITE_ORIGIN__', siteOrigin());
+  }
+  res.set('Cache-Control', 'public, max-age=0');
+  return res.type('html').send(indexHtmlCache);
+}
+
 // Direct HTML routes
-app.get('/index.html', (req, res) => res.sendFile(path.join(rootDir, 'index.html')));
+app.get('/index.html', sendIndexHtml);
 app.get('/reset-password.html', (req, res) => res.sendFile(path.join(rootDir, 'reset-password.html')));
 app.get('/payment.html', (req, res) => res.sendFile(path.join(rootDir, 'payment.html')));
 app.get('/admin.html', (req, res) => res.sendFile(path.join(rootDir, 'admin.html')));
@@ -306,7 +421,7 @@ function sendBlockedHtml(res, status, heading, bodyText, buttonText, buttonLink,
         .filter(Boolean)
         .join(', ') + '.';
   }
-  const html = `<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(heading)} — CyberKnight</title><link rel="stylesheet" href="/assets/tailwind.css"><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet"><style>body{font-family:'Poppins',sans-serif}</style></head><body class="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-950 via-purple-900 to-indigo-950"><div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl p-10 max-w-md w-full mx-4 text-center shadow-2xl"><div class="text-6xl mb-6">🛡️</div><h1 class="text-2xl font-extrabold text-white mb-4">${escapeHtml(heading)}</h1><p class="text-indigo-200 mb-8 leading-relaxed">${bodyText}${pkgList}</p><a href="${buttonLink}" class="inline-block bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-300 hover:to-blue-400 text-white font-bold px-8 py-3 rounded-full text-lg shadow-lg transition-all duration-200 transform hover:scale-105">${escapeHtml(buttonText)}</a><p class="text-indigo-400 text-sm mt-6"><a href="/" class="hover:text-indigo-200">← Quay về trang chủ</a></p></div></body></html>`;
+  const html = `<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(heading)} — CyberKnight</title><link rel="stylesheet" href="/assets/tailwind.css?v=be46b625"><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet"><style>body{font-family:'Poppins',sans-serif}</style></head><body class="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-950 via-purple-900 to-indigo-950"><div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl p-10 max-w-md w-full mx-4 text-center shadow-2xl"><div class="mb-6 flex justify-center" style="color:#67e8f9"><svg width="64" height="64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-shield-check"></use></svg></div><h1 class="text-2xl font-extrabold text-white mb-4">${escapeHtml(heading)}</h1><p class="text-indigo-200 mb-8 leading-relaxed">${bodyText}${pkgList}</p><a href="${buttonLink}" class="inline-block bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-300 hover:to-blue-400 text-white font-bold px-8 py-3 rounded-full text-lg shadow-lg transition-all duration-200 transform hover:scale-105">${escapeHtml(buttonText)}</a><p class="text-indigo-400 text-sm mt-6"><a href="/" class="hover:text-indigo-200 inline-flex items-center gap-1"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-arrow-left"></use></svg> Quay về trang chủ</a></p></div></body></html>`;
   return res.status(status).type('text/html').send(html);
 }
 
@@ -332,7 +447,9 @@ function serveStaticLevelFile(res, levelId, filePath, levelDir) {
     }
     return res.status(404).type('text/plain').send('Not found');
   }
-  res.set('Cache-Control', 'private, no-store');
+  // private, no-cache: trình duyệt được lưu bản riêng nhưng PHẢI hỏi lại server mỗi lần dùng
+  // → request vẫn đi qua level guard (bảo mật như cũ), nhưng file không đổi chỉ tốn 304, không tốn bytes.
+  res.set('Cache-Control', 'private, no-cache');
   return res.sendFile(filePath);
 }
 
@@ -481,12 +598,28 @@ app.use('/api/*', (req, res) => {
   res.status(404).json({ success: false, message: 'Không tìm thấy API endpoint này.' });
 });
 
-// ── 11. SPA Fallback (không bao gồm /levelN/) ───────────────
+// ── 11. Trang chủ + 404 thật ─────────────────────────────────
+// Trước đây mọi đường dẫn lạ (/login, /verify, /wp-admin...) đều trả index.html kèm form đăng nhập với
+// mã 200 — đúng dấu hiệu "phishing kit" mà các bộ quét tự động tìm. Giờ chỉ "/" là trang chủ.
+app.get('/', sendIndexHtml);
+
 app.get('*', (req, res) => {
-  if (/^\/level\d+/i.test(req.path)) {
+  if (req.accepts(['html', 'json']) !== 'html') {
     return res.status(404).type('text/plain').send('Not found');
   }
-  res.sendFile(path.join(rootDir, 'index.html'));
+  return res
+    .status(404)
+    .type('text/html')
+    .send(
+      '<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">' +
+        '<meta name="robots" content="noindex"><title>Không tìm thấy trang — CyberKnight</title><link rel="icon" href="/favicon.ico">' +
+        '<style>body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:system-ui,-apple-system,sans-serif;background:#F0F7FF;color:#1a365d;padding:16px;box-sizing:border-box}' +
+        'main{max-width:420px;text-align:center}h1{font-size:1.5rem;margin:.5rem 0}p{color:#475569;line-height:1.6}' +
+        'a{display:inline-block;margin-top:1rem;padding:.75rem 1.5rem;border-radius:999px;background:#0066FF;color:#fff;text-decoration:none;font-weight:600}</style></head>' +
+        '<body><main><div style="color:#0066FF"><svg width="56" height="56" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-shield-check"></use></svg></div><h1>Không tìm thấy trang</h1>' +
+        '<p>Đường dẫn này không tồn tại trên CyberKnight. Nếu ai đó gửi link này kèm lời mời nhận quà hay yêu cầu nhập mật khẩu, hãy cẩn thận — đó có thể là lừa đảo.</p>' +
+        '<a href="/">Về trang chủ CyberKnight</a></main></body></html>'
+    );
 });
 
 // ── 12. Error handler ─────────────────────────────────────────
@@ -503,13 +636,13 @@ const server = app.listen(PORT, () => {
 
 // ── Graceful shutdown ─────────────────────────────────────────
 const shutdown = async (signal) => {
-  console.log(`\n🛑 Nhận tín hiệu ${signal}. Đang đóng server & kết nối MySQL...`);
+  console.log(`\n🛑 Nhận tín hiệu ${signal}. Đang đóng server & kết nối PostgreSQL...`);
   server.close(async () => {
     try {
       await db.end();
-      console.log('✅ Đã đóng MySQL Pool thành công.');
+      console.log('✅ Đã đóng PostgreSQL Pool thành công.');
     } catch (err) {
-      console.error('❌ Lỗi khi đóng MySQL pool:', err.message);
+      console.error('❌ Lỗi khi đóng PostgreSQL pool:', err.message);
     }
     process.exit(0);
   });

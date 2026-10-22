@@ -6,13 +6,12 @@
 
 ## 🌟 Tính Năng Nổi Bật
 
-- **Hành Trình Màn Chơi (Level 0 – 5):**
+- **Hành Trình Màn Chơi (Level 0 – 4):**
   - **Level 0 (Miễn phí):** *Hộp Quà Bí Ẩn* — Nhận diện mã độc và đường link quà tặng khả nghi.
   - **Level 1 (Gói Trả Phí):** *Lớp Trưởng Gửi Link Nhận Quà* — Mini-game Lưới Lọc An Toàn và 3 nhánh kết cục độc lập.
   - **Level 2 (Gói Trả Phí):** *Kết Bạn Online* — Ghép cửa căn cứ, phân loại đối tượng lạ trên không gian mạng.
   - **Level 3 (Gói Trả Phí):** *Bốn Chìa Khóa Bí Mật* — Quản lý 4 quyền truy cập nhạy cảm (Camera, Micro, Vị trí, Thư viện ảnh).
   - **Level 4 (Gói Trả Phí):** *Bức Ảnh Có Quá Nhiều Bí Mật* — Công thức Nhìn – Che – Hỏi trước khi chia sẻ ảnh mạng xã hội.
-  - **Level 5 (Gói Trả Phí):** *Thật Hay Giả? Đống Ảnh AI* — Nhận biết hình ảnh do AI tạo ra với Bút Thử AI.
 
 - **Thanh Toán Tự Động VietQR & SePay:**
   - Sinh mã đơn hàng ngẫu nhiên 10 ký tự chuẩn **Crockford Base32** (`CK` + 8 ký tự an toàn, loại bỏ triệt để ký tự dễ nhầm lẫn `0, O, 1, I, L`).
@@ -27,14 +26,6 @@
   - **Nhật ký kiểm toán (Audit Logging):** Mọi hành động can thiệp đặc quyền (`grant_package`, `revoke_package`, `reconcile_transaction`) đều được ghi nhận trong bảng `admin_audit_log`. **Lưu ý:** `sigmabloom_app` user có quyền DML trên bảng này, nên tính bất biến chỉ được đảm bảo ở tầng ứng dụng (không phải tầng DB).
   - **Giao diện quản trị hiện đại (`admin.html`):** Theo dõi 6 chỉ số thời gian thực (doanh thu, đơn hàng, người dùng, giao dịch lỗi), quản lý phân quyền và modal đối soát giao dịch 1 chạm.
 
-- **Theo Dõi Thời Gian Online (Activity Tracking):**
-  - **Client chỉ "báo sống", máy chủ tự tính:** `assets/activity.js` gửi `POST /api/me/activity/heartbeat` mỗi **30 giây**, **không gửi thời lượng** — server tự tính `delta = NOW() - last_heartbeat_at`. Chống gian lận ở tầng server, không tin tuyệt đối vào client.
-  - **Điều kiện gửi:** đã đăng nhập + `document.visibilityState === 'visible'` + có tương tác thật (mouse/key/touch/scroll) trong **5 phút gần nhất** → không tính máy bị bỏ quên. Đóng tab/ẩn tab → dừng timer + gửi 1 nhịp cuối bằng `fetch(keepalive:true)`.
-  - **Chống đếm trùng khi mở nhiều tab:** `delta < 20s` → bỏ qua; `delta > 90s` → coi là phiên mới, chỉ cộng tối đa 30s; nhịp thường cộng `min(delta, 60s)`. Toàn bộ thao tác trong 1 transaction `SELECT ... FOR UPDATE` (pessimistic locking) nên không race condition.
-  - **Rate limit riêng:** 6 lần/phút mỗi user (`express-rate-limit`), trả `429 {success:false, message}`.
-  - **Bảng dữ liệu:** `user_activity` (tổng giây + `first_seen_at` / `last_heartbeat_at`) và `user_activity_daily` (theo ngày, cộng trong cùng transaction). **Chỉ lưu số giây + mốc thời gian — không lưu IP/User-Agent/nội dung tương tác.**
-  - **Trang quản trị:** cột "Thời gian online" (định dạng `< 1 phút` / `X phút` / `H giờ M phút` / `D ngày H giờ`), chấm xanh "đang online" (heartbeat trong 90s), sắp xếp theo `?sort=online_desc` (whitelist server-side).
-
 - **Bảo Mật Tầng Sâu (Defense-in-Depth):**
   - **Level Guard Middleware:** Bảo vệ static game files (`/level1/`, `/level2/`,...) bằng cookie HttpOnly `levelAccess` (thời hạn 2h), cache quyền $\le 60\text{s}$, chống Path Traversal (`..%2f`), gắn cờ `Cache-Control: private, no-store`.
   - **Phòng chống XSS:** Thư viện `assets/safe.js` mã hóa toàn bộ 6 ký tự nguy hiểm (`&`, `<`, `>`, `"`, `'`, `` ` ``), chỉ chấp nhận ảnh QR từ tên miền VietQR hợp lệ (`img.vietqr.io`, `api.vietqr.io`).
@@ -47,13 +38,14 @@
 
 ```
 EXEWEB/
-├── assets/                     # Assets dùng chung (audio, 3D models, safe.js, activity.js, api.js, quests.json)
+├── assets/                     # Assets dùng chung (video-loader.js, vendor/hls.light.min.js, 3D models, safe.js, quests.json)
 ├── backend/                    # Backend RESTful API & Server
-│   ├── migrations/             # Database migrations (002 đến 008)
-│   ├── scripts/                # Automated test suites & utilities
+│   ├── migrations/             # PostgreSQL migrations (001_init_schema.sql, ...)
+│   ├── legacy-mysql/           # Schema/migration MySQL cũ (chỉ tham khảo)
+│   ├── scripts/                # Test suites, migrate-mysql-to-pg.js, utilities
 │   ├── src/
 │   │   ├── config/             # Cấu hình Database, Catalog, Setup
-│   │   ├── controllers/        # Điều hướng nghiệp vụ (Auth, Admin, Game, Payments, Level, Activity)
+│   │   ├── controllers/        # Điều hướng nghiệp vụ (Auth, Admin, Game, Payments, Level)
 │   │   ├── middleware/         # Auth, RequireAdmin, LevelGuard, ErrorHandler
 │   │   ├── payments/           # Webhook Providers (SePay Adapter, Casso)
 │   │   ├── routes/             # Định tuyến API
@@ -65,8 +57,10 @@ EXEWEB/
 ├── level2/                     # Màn chơi Level 2 (Protected)
 ├── level3/                     # Màn chơi Level 3 (Protected)
 ├── level4/                     # Màn chơi Level 4 (Protected)
-├── level5/                     # Màn chơi Level 5 (Protected)
-├── deploy/                     # File triển khai production (Nginx, PM2, backup, SQL)
+├── video/                      # Video đã encode: level<N>/<name>.mp4 (720p) + level<N>/hls/<name>/ (HLS 360/480/720p)
+├── video-src/                  # Video GỐC (gitignored) — nguồn cho scripts/encode-videos.sh
+├── scripts/encode-videos.sh    # ffmpeg: video-src/ → video/ (MP4 faststart + HLS ABR)
+├── deploy/                     # File triển khai production (Nginx, PM2, backup pg_dump)
 ├── admin.html                  # Giao diện Quản trị viên (Audit log, Orders, Grant)
 ├── payment.html                # Trang thanh toán dự phòng
 ├── reset-password.html         # Trang đặt lại mật khẩu an toàn
@@ -83,7 +77,8 @@ EXEWEB/
   curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
   sudo apt-get install -y nodejs
   ```
-- **MySQL Server:** v8.0 hoặc v8.4 (InnoDB, utf8mb4).
+- **PostgreSQL trên Supabase:** tạo project tại [supabase.com](https://supabase.com), lấy 2 chuỗi kết nối ở *Project Settings → Database → Connection string* (Transaction pooler cổng 6543 và Session pooler cổng 5432). **Không cần cài DB cục bộ.**
+- **ffmpeg** (chỉ khi cần encode lại video): `brew install ffmpeg` / `apt install ffmpeg`.
 
 ### 1. Cấu hình Biến Môi Trường (`backend/.env`)
 Sao chép file mẫu và điền giá trị thật:
@@ -99,7 +94,10 @@ nano backend/.env    # hoặc editor bạn quen dùng
 | `PORT` | Không | Cổng server (mặc định 5000) |
 | `NODE_ENV` | Có (prod) | `development` hoặc `production` |
 | `FRONTEND_URL` | Có | URL trang chủ (production phải `https://`) |
-| `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` | Có | Kết nối MySQL |
+| `DATABASE_URL` | Có | Chuỗi kết nối PostgreSQL (Supabase **transaction pooler**, cổng 6543) — dùng lúc chạy app |
+| `DIRECT_URL` | Có | Chuỗi kết nối **session pooler** (cổng 5432) — dùng cho `npm run setup-db` và `pg_dump` |
+| `DB_SCHEMA` | Không | Schema chứa bảng ứng dụng (mặc định `local`; mỗi môi trường một schema trong cùng project Supabase) |
+| `DB_SSL` | Không | `true` (mặc định khi host không phải localhost) |
 | `JWT_SECRET` | Có | Secret JWT access token (≥ 32 ký tự, sinh bằng `node -e "..."`) |
 | `JWT_REFRESH_SECRET` | Có | Secret JWT refresh token (≥ 32 ký tự, **khác** JWT_SECRET) |
 | `LEVEL_ACCESS_SECRET` | Có | Secret cookie levelAccess (≥ 32 ký tự, **khác** 2 secret trên) |
@@ -121,11 +119,20 @@ node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
 
 > ⚠️ **KHÔNG** copy secret mẫu từ tài liệu vào production. Startup check sẽ từ chối khởi động nếu phát hiện secret yếu/mặc định/trùng nhau.
 
-### 2. Thiết lập Cơ Sở Dữ Liệu
+### 2. Thiết lập Cơ Sở Dữ Liệu (Supabase PostgreSQL)
 ```bash
 cd backend
-npm run setup-db
+npm run setup-db          # tạo schema DB_SCHEMA, chạy migrations/*.sql (ghi nhận trong schema_migrations), seed admin
 ```
+- Migration là file SQL PostgreSQL trong `backend/migrations/` (hiện tại `001_init_schema.sql`). Runner chạy mỗi file trong 1 transaction với `search_path` = `DB_SCHEMA`, nên **không ghi tên schema cứng trong SQL**.
+- Lớp `backend/src/config/db.js` giữ API kiểu mysql2 (`db.query('... ?', [..])`, `insertId`, `affectedRows`, `getConnection()`), tự chuyển `?` → `$n`, tự gắn schema vào tên bảng và thêm `RETURNING id` cho INSERT. SQL mới phải viết theo **PostgreSQL** (`ON CONFLICT`, `ILIKE`, `NOW() - INTERVAL '1 hour'`, `is_active = TRUE`).
+- Thêm bảng mới: tạo file `backend/migrations/00N_<ten>.sql` **và** thêm tên bảng vào `APP_TABLES` trong `db.js`.
+- Chuyển dữ liệu từ MySQL cũ (chạy một lần, nơi còn truy cập được MySQL):
+  ```bash
+  cd backend
+  MYSQL_HOST=127.0.0.1 MYSQL_USER=root MYSQL_PASSWORD=... MYSQL_DATABASE=sigmabloom npm run migrate-data   # thêm --dry-run để xem trước
+  ```
+- SQL MySQL cũ được giữ lại để tham khảo trong `backend/legacy-mysql/`.
 
 ### 3. Khởi Chạy Máy Chủ
 ```bash
@@ -136,6 +143,50 @@ npm run dev
 npm start
 ```
 Truy cập trang web tại: `http://localhost:5000`
+
+---
+
+## 🎬 Video & Streaming (HLS thích ứng)
+
+Video của các level được phát qua `assets/video-loader.js` (`window.CKVideo`): **HLS thích ứng** bằng hls.js (tự đổi 360p/480p/720p theo băng thông, chỉ tải trước ~20–30 giây), HLS native trên Safari/iOS, và **MP4 720p** làm fallback cuối. Mỗi level chỉ chuẩn bị trước *cảnh kế tiếp* (nạp playlist, chưa tải segment) nên không còn tranh băng thông như cách preload toàn bộ trước đây.
+
+| | Trước | Sau |
+|--|--|--|
+| Bitrate | 8–10 Mbps (1080p/720p) | 720p ≈1.2 Mbps · 480p ≈0.7 · 360p ≈0.42 · **240p ≈0.25 Mbps** (segment 2s, bắt đầu phát sau ~60 KB) |
+| Dung lượng `video/` | ≈ 1 GB | ≈ 306 MB (4 bậc HLS + MP4) |
+| Preload | 3–6 video cùng lúc, `preload="auto"` | chỉ cảnh/nhánh kế tiếp: playlist + segment đầu bậc 240p (~60 KB) |
+| Khởi động | tải file 8 Mbps từ đầu | hls.js luôn bắt đầu ở 240p (~57 KB/segment 2s) rồi leo bậc theo băng thông đo được |
+| Trang level | script CDN chặn parse, hls.js tải sau cùng, logo PNG 388 KB | `<link rel=preload>` hls.js, mọi script `defer`, gzip (hls.js 346 → 108 KB), logo WebP 56 KB |
+
+**Đo trên Chrome giả lập mạng (cache trống, tính từ lúc DOM sẵn sàng tới khi video phát):**
+
+| Mạng giả lập | Trước vòng tối ưu trang | Sau |
+|--|--|--|
+| 3G yếu — 400 kbps, RTT 400 ms | 22,3 s | **7,2 s**, giữ 240p, 0 frame rớt |
+| 3G — 1 Mbps, RTT 200 ms | 9,2 s | **3,2 s**, lên 360p, không giật |
+| 4G yếu — 2,5 Mbps, RTT 100 ms | 4,0 s | **1,6 s**, lên 720p, không giật |
+
+**Tải trước có kiểm soát (`CKVideo.warm`)** — tận dụng các "khoảng rảnh" không có video đang phát:
+
+| Khoảng rảnh | Tải trước gì |
+|--|--|
+| Màn "Bắt đầu" (level 3/4) | 10 s đầu cảnh 1 ở 240p (~250 KB) |
+| Mini-game / door puzzle (level 0/1/2) | 12 s đầu của **mỗi** nhánh hậu quả trước, rồi tải trọn từng nhánh |
+| Câu hỏi giữa các cảnh (level 3/4) | trọn cảnh video kế tiếp |
+| Trang chủ: rê chuột / chạm vào nút chơi | hls.js, video-loader, playlist video mở đầu (`<link rel="prefetch">`) |
+
+Nguyên tắc của `warm()`: tải **tuần tự** từng segment ở **bậc mà ABR sẽ chọn** (theo băng thông hls.js đã đo, trong ngân sách `navigator.connection`: 2G/saveData → 240p 8 s; 3G → ≤360p; khác → ≤480p); **tự dừng** ngay khi có video bắt đầu phát và tiếp tục khi video dừng; video đã warm **trọn** sẽ phát khóa ở đúng bậc đó → 0 byte mạng, không thể giật. Đo (Chrome, 3G 1 Mbps): 12 s đầu của 2 nhánh level 0 sẵn sàng sau 17 s, trọn 2 nhánh sau 60 s; bấm nhánh → phát sau 320 ms, 21/21 segment từ cache.
+
+**Thêm / thay video:**
+```bash
+# 1. Đặt file gốc vào video-src/level<N>/   (thư mục này KHÔNG commit)
+# 2. Thêm dòng "level<N>/<name>|level<N>/<file goc>.mp4" vào MANIFEST trong scripts/encode-videos.sh
+# 3. Encode (idempotent; FORCE=1 để encode lại; JOBS=2 giảm tải CPU)
+npm run encode:videos
+# → video/level<N>/<name>.mp4  +  video/level<N>/hls/<name>/master.m3u8
+# 4. Trong level<N>.js tham chiếu: { hls: '/video/level<N>/hls/<name>/master.m3u8', mp4: '/video/level<N>/<name>.mp4' }
+```
+Trên production, Nginx phục vụ `/video/`, `/assets/`, `/image/` trực tiếp từ đĩa với `sendfile`, keep-alive dài + cache dài (xem `deploy/nginx.conf.example`); Express cũng đặt `Cache-Control` tương đương khi chạy không có Nginx. VPS nên bật **TCP BBR** (`bootstrap-server.sh` bước 11 tự làm) — giúp rõ rệt với 3G/4G rớt gói.
 
 ---
 
@@ -156,9 +207,9 @@ npm run test:all
 ### Thêm level mới
 1. Thêm object vào mảng `LEVELS` trong `backend/src/config/catalog.js`:
    ```js
-   { id: 6, url: '/level6/level6.html', title: 'Tên Level Mới' },
+   { id: 5, url: '/level5/level5.html', title: 'Tên Level Mới' },
    ```
-2. Tạo thư mục `level6/` với file `level6.html` trong thư mục gốc.
+2. Tạo thư mục `level5/` với file `level5.html` trong thư mục gốc.
 3. Nếu cần build lại Tailwind CSS: `npm run build:css`
 
 ### Cấp quyền thủ công
@@ -201,19 +252,7 @@ Xem hướng dẫn chi tiết tại [`deploy/DEPLOY.md`](deploy/DEPLOY.md).
   ```
 - **Rủi ro còn lại:** `admin.html` chưa có giao diện đổi mật khẩu admin; cần hoàn thiện form `POST /api/auth/change-password`. Inline `onclick=` handlers trong `index.html` chưa được chuyển sang `addEventListener` — nên thực hiện trong phase tiếp theo.
 
-### Theo dõi thời gian online
-- Bảng `user_activity` được tạo bởi migration `008_user_activity.sql` (chạy tự động qua `npm run setup-db`).
-- Xem tổng thời gian của 1 học sinh: đăng nhập admin → Tab **"👤 Danh Sách Thành Viên"** → cột **"Thời gian online"**.
-- Xem nhanh bằng SQL:
-  ```sql
-  SELECT u.username, ua.total_seconds, ua.last_heartbeat_at, ua.first_seen_at
-  FROM users u LEFT JOIN user_activity ua ON ua.user_id = u.id
-  ORDER BY ua.total_seconds DESC;
-  ```
-- Sửa dữ liệu test (ví dụ mô phỏng người dùng vừa online):
-  ```sql
-  UPDATE user_activity SET last_heartbeat_at = DATE_SUB(NOW(), INTERVAL 30 SECOND) WHERE user_id = ?;
-  ```
+---
 
 ## 📋 Hướng Dẫn Vận Hành
 
@@ -231,7 +270,7 @@ Sau khi deploy thành công, tham khảo các tài liệu sau để vận hành 
 
 **Quick checklist sau mỗi deploy:**
 ```bash
-bash deploy/postdeploy-check.sh --domain <TEN_MIEN> --db-password "$DB_PASSWORD"
+bash deploy/postdeploy-check.sh --domain <TEN_MIEN>
 ```
 
 ---

@@ -2,7 +2,7 @@
  * Test Suite: Kiểm thử gia cố xác thực (Auth Hardening) — Phase D
  *
  * Chạy: node backend/scripts/test-auth-hardening.js
- * Yêu cầu: server đang chạy trên PORT (mặc định 5000), MySQL sẵn sàng
+ * Yêu cầu: server đang chạy trên PORT (mặc định 5000), PostgreSQL (Supabase) sẵn sàng
  *
  * Kịch bản kiểm thử:
  *  1. Đăng nhập sai không lộ user tồn tại (cùng message cho user có/không có)
@@ -211,7 +211,7 @@ async function run() {
   const tokenHash = hashToken(rawToken);
   await db.query(
     `INSERT INTO password_resets (user_id, token_hash, expires_at, ip_address)
-     VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 15 MINUTE), '127.0.0.1')`,
+     VALUES (?, ?, NOW() + INTERVAL '15 minutes', '127.0.0.1')`,
     [userId, tokenHash]
   );
 

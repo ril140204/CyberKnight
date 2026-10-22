@@ -4,17 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>CyberKnight — Level 0: Hộp Quà Bí Ẩn ("Máy Soi Kim Cương")</title>
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="description" content="CyberKnight — game giáo dục an toàn mạng cho trẻ em. Màn chơi là tình huống mô phỏng để học, không thu thập mật khẩu hay thông tin thanh toán.">
 
     <!-- Google Fonts -->
+    <!-- Tải sớm hls.js (ưu tiên cao) để video khởi động nhanh trên mạng yếu -->
+    <link rel="preload" href="/assets/vendor/hls.light.min.js" as="script">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
 
     <!-- Canvas Confetti CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js" defer></script>
 
     <!-- GSAP Animation Library CDN (with safe vanilla fallback) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
 
     <!-- Level 0 Stylesheet -->
     <link rel="stylesheet" href="level0.css">
@@ -35,13 +39,14 @@
             <div class="floating-sparkle circle" style="left:88%;animation-duration:15s;animation-delay:4s;"></div>
 
             <!-- CyberKnight Logo -->
-            <img src="../image/z8014995224177_069f99816bf77dda5fed3feb153a6c0e-removebg-preview.png" alt="CyberKnight Logo" style="width: clamp(160px, 30vw, 300px); margin-bottom: -10px; animation: gift-icon-bounce 3s ease-in-out infinite; filter: drop-shadow(0 8px 24px rgba(0, 102, 255, 0.2));">
+            <img src="../image/z8014995224177_069f99816bf77dda5fed3feb153a6c0e-removebg-preview.webp" alt="CyberKnight Logo" style="width: clamp(160px, 30vw, 300px); margin-bottom: -10px; animation: gift-icon-bounce 3s ease-in-out infinite; filter: drop-shadow(0 8px 24px rgba(0, 102, 255, 0.2));">
 
             <div class="cyber-badge">LEVEL 0 • AN TOÀN TRỰC TUYẾN</div>
             <h1 class="cyber-title">HỘP QUÀ BÍ ẨN</h1>
             <p class="cyber-subtitle">
                 Trải nghiệm tình huống tương tác thực tế: Cảnh giác trước những món quà miễn phí bất ngờ trên không gian mạng!
             </p>
+            <p class="sim-note" role="note"><svg width="16" height="16" fill="none" stroke="#0066FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;vertical-align:-3px;margin-right:4px" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-shield-check"></use></svg>Đây là tình huống <b>mô phỏng</b> để học an toàn mạng. Không có quà thật — CyberKnight không bao giờ hỏi mật khẩu, mã OTP hay thông tin ngân hàng.</p>
             <button id="btn-start-level" class="btn-cyber-primary">
                 <span>▶ BẮT ĐẦU LEVEL 0</span>
             </button>
@@ -51,7 +56,7 @@
              STAGE 1: VIDEO MỞ ĐẦU
              =================================================================== -->
         <div id="stage-intro" class="stage">
-            <video id="video-intro" class="video-player" playsinline preload="auto"></video>
+            <video id="video-intro" class="video-player" playsinline preload="metadata"></video>
             <button id="btn-skip-intro" class="video-skip-btn" aria-label="Bỏ qua video">
                 Bỏ qua ⏭
             </button>
@@ -88,10 +93,10 @@
             <div class="deco-shield deco-shield-4">💎</div>
 
             <!-- CyberKnight Logo (Left) — transparent PNG with both characters -->
-            <img src="../image/z8014995224177_069f99816bf77dda5fed3feb153a6c0e-removebg-preview.png" alt="CyberKnight" class="character-logo-left">
+            <img src="../image/z8014995224177_069f99816bf77dda5fed3feb153a6c0e-removebg-preview.webp" alt="CyberKnight" class="character-logo-left">
 
             <!-- SigmaBloom Logo (Right corner) -->
-            <img src="../image/z8014995365895_a3eb178f5f7a17a45925b55e43e202be-removebg-preview.png" alt="SigmaBloom" class="brand-logo-right">
+            <img src="../image/z8014995365895_a3eb178f5f7a17a45925b55e43e202be-removebg-preview.webp" alt="SigmaBloom" class="brand-logo-right">
 
             <!-- Thanh thông số đầu game -->
             <div class="game-header">
@@ -228,7 +233,7 @@
              STAGE 3: VIDEO HẬU QUẢ (Rẽ nhánh)
              =================================================================== -->
         <div id="stage-outro" class="stage">
-            <video id="video-outro" class="video-player" playsinline></video>
+            <video id="video-outro" class="video-player" playsinline preload="metadata"></video>
             <button id="btn-skip-outro" class="video-skip-btn" aria-label="Bỏ qua video">
                 Bỏ qua ⏭
             </button>
@@ -267,13 +272,12 @@
              =================================================================== -->
         <canvas id="freeze-canvas"></canvas>
 
-        <!-- Preload 2 video hậu quả ngầm để chuyển cảnh tức thì -->
-        <video id="preload-bad" preload="auto" style="display:none;"></video>
-        <video id="preload-good" preload="auto" style="display:none;"></video>
-
     </div>
 
+    <!-- Bộ nạp video dùng chung (HLS thích ứng + MP4 fallback) -->
+    <script src="/assets/video-loader.js" defer></script>
+
     <!-- Script điều khiển Level 0 -->
-    <script src="level0.js"></script>
+    <script src="level0.js" defer></script>
 </body>
 </html>

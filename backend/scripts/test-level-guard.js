@@ -14,7 +14,7 @@
  * (g) /level1/..%2f..%2fbackend/.env → NOT leak .env (403/404, no .env content)
  *
  * Prerequisites:
- *   - MySQL running with sigmabloom DB created (npm run setup-db)
+ *   - PostgreSQL schema created (npm run setup-db)
  *   - Server running: npm run dev
  *   - LEVEL_ACCESS_SECRET set in .env
  *
@@ -161,7 +161,7 @@ async function grantPack14ToUser(userEmail) {
     await db.query(
       `INSERT INTO user_entitlements (user_id, package_id, source, granted_at)
        VALUES (?, 'pack_1_4', 'admin_grant', NOW())
-       ON DUPLICATE KEY UPDATE source = 'admin_grant', granted_at = NOW()`,
+       ON CONFLICT (user_id, package_id) DO UPDATE SET source = 'admin_grant', granted_at = NOW()`,
       [userId]
     );
 

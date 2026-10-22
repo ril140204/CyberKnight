@@ -25,7 +25,7 @@ async function forgotPassword(req, res) {
   try {
     // 1. Kiểm tra user có tồn tại không
     const [users] = await db.query(
-      'SELECT id, username, email FROM users WHERE email = ? AND is_active = 1',
+      'SELECT id, username, email FROM users WHERE email = ? AND is_active = TRUE',
       [cleanEmail]
     );
 
@@ -42,7 +42,7 @@ async function forgotPassword(req, res) {
     // 2. Rate limit theo email: tối đa 3 lần / 1 giờ / mỗi email (ở môi trường Prod)
     const [recentResets] = await db.query(
       `SELECT COUNT(*) as count FROM password_resets
-       WHERE user_id = ? AND created_at > DATE_SUB(NOW(), INTERVAL 1 HOUR)`,
+       WHERE user_id = ? AND created_at > NOW() - INTERVAL '1 hour'`,
       [user.id]
     );
 

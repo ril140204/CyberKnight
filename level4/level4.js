@@ -26,12 +26,7 @@
     // =========================================================================
 
     const CONFIG = {
-        VIDEO_BASES: [
-            '../video/level4/',
-            '../video/level 4/',
-            'video/level4/',
-            './'
-        ],
+        VIDEO_BASE: '/video/level4/',
         VIDEO_SCENES: ['scene1', 'scene2', 'reveal', 'scene3', 'scene4', 'scene5'],
         // Scenes whose video is optional — if file is missing on server, we
         // silently skip to the next stage instead of showing the error panel.
@@ -58,11 +53,14 @@
         scene5: { next: 'summary' }
     };
 
-    // VideoSource: attempt-index based base discovery (never derive from URL)
+    // VideoSource: nguồn HLS/MP4 cho từng cảnh (đường dẫn tuyệt đối, không suy từ URL trang)
     const VideoSource = {
-        baseIdx: null,
-        urlFor(scene, idx) {
-            return encodeURI(CONFIG.VIDEO_BASES[idx] + scene + '.mp4');
+        baseIdx: 0,             // giữ để tương thích (nút "Thử lại" đặt về null)
+        sourcesFor(scene) {
+            return {
+                hls: `${CONFIG.VIDEO_BASE}hls/${scene}/master.m3u8`,
+                mp4: `${CONFIG.VIDEO_BASE}${scene}.mp4`,
+            };
         }
     };
 
@@ -548,8 +546,15 @@
     }
 
     /**
-     * Main scene playback using VideoSource attempt index.
+     * Phát một cảnh. Nguồn video do CKVideo quản lý:
+     *   HLS thích ứng (hls.js, tự đổi 360p/480p/720p theo băng thông)
+     *   → HLS native (Safari) → MP4 720p (fallback cuối).
+     * Chỉ cảnh KẾ TIẾP được chuẩn bị trước (nạp playlist, chưa tải segment)
+     * để không tranh băng thông với cảnh đang phát trên mạng yếu.
      * @param {string} sceneName - e.g. 'scene1', 'reveal'
+     * @param {Object} options
+     * @param {Function} [options.onEnded] - callback when scene ends
+     * @param {boolean} [options.forceReload] - nạp lại nguồn (nút "Thử lại")
      */
     function _playScene(sceneName, options = {}) {
         const { onEnded, forceReload } = options;
@@ -562,330 +567,79 @@
             return;
         }
 
-        // ---- Preload NEXT scene in flow (only one at a time to save decoders) ----
+        // ---- Chuẩn bị cảnh KẾ TIẾP theo SCENE_FLOW (playlist + segment đầu 240p), chỉ SAU KHI
+        //      cảnh này đã phát 2s để không tranh băng thông lúc khởi động ----
         const flow = SCENE_FLOW[sceneName];
         const nextSceneName = flow && flow.next ? flow.next : null;
-
-        // Keep all video elements' preload state intact (set in HTML as
-        // preload="auto"). Touching preload here forces the browser to
-        // re-evaluate the network request on every scene transition, which
-        // can re-buffer the audio track and cause visible "lost audio"
-        // gaps at scene boundaries. We only ensure the next scene's src
-        // is wired so it can begin preloading in parallel.
-        if (nextSceneName && VideoSource.baseIdx !== null) {
+        const prepareNext = () => {
+            if (!nextSceneName) return;
             const nextVideo = document.getElementById(`video-${nextSceneName}`);
             if (nextVideo) {
-                const expectedUrl = VideoSource.urlFor(nextSceneName, VideoSource.baseIdx);
-                const currentDecoded = decodeURI(videoEl.getAttribute('src') || '');
-                const expectedDecoded = decodeURI(expectedUrl);
-                if (currentDecoded !== expectedDecoded) {
-                    nextVideo.src = expectedUrl;
-                }
+                CKVideo.load(nextVideo, VideoSource.sourcesFor(nextSceneName), { preloadOnly: true }).catch(() => {});
             }
-        }
+        };
+        videoEl.addEventListener('playing', () => setTimeout(prepareNext, 2000), { once: true });
 
         // ---- Loading state helpers ----
-        let loadingShown = false;
+        const container = videoEl.closest('.video-container');
+        const spinner = container ? container.querySelector('.video-loading-spinner') : null;
+        const slowNote = container ? container.querySelector('.video-loading-slow') : null;
         let loadingTimer = null;
-        let slowLoadingTimer = null;
 
         function showLoading() {
-            if (loadingShown) return;
-            loadingShown = true;
-            const container = videoEl.closest('.video-container');
-            if (!container) return;
-            const spinner = container.querySelector('.video-loading-spinner');
             if (spinner) spinner.classList.remove('hidden');
         }
-
         function hideLoading() {
-            const container = videoEl.closest('.video-container');
-            if (container) {
-                const spinner = container.querySelector('.video-loading-spinner');
-                if (spinner) spinner.classList.add('hidden');
-                const slow = container.querySelector('.video-loading-slow');
-                if (slow) slow.classList.add('hidden');
-            }
+            if (spinner) spinner.classList.add('hidden');
+            if (slowNote) slowNote.classList.add('hidden');
             clearTimeout(loadingTimer);
-            clearTimeout(slowLoadingTimer);
         }
 
         showLoading();
         loadingTimer = setTimeout(() => {
-            const container = videoEl.closest('.video-container');
-            if (container) {
-                const slow = container.querySelector('.video-loading-slow');
-                if (slow) slow.classList.remove('hidden');
-            }
+            if (slowNote) slowNote.classList.remove('hidden');
         }, CONFIG.LOADING_TIMEOUT_MS);
 
-        const isFirstLoad = VideoSource.baseIdx === null;
+        const sources = VideoSource.sourcesFor(sceneName);
+        if (_isDebugMode()) console.log(`[Level4] Scene ${sceneName} →`, sources);
 
-        if (!isFirstLoad) {
-            const idx = VideoSource.baseIdx;
-            const url = VideoSource.urlFor(sceneName, idx);
-            const currentSrc = videoEl.getAttribute('src') || videoEl.src;
-            if (currentSrc !== url && !forceReload) {
-                videoEl.removeAttribute('src');
-                videoEl.load();
-            }
-            if (videoEl.getAttribute('src') !== url || forceReload) {
-                // KHÔNG set muted — level 4 video có tiếng.
-                videoEl.src = url;
-            }
-            videoEl.preload = 'auto';
-
-            if (_isDebugMode()) {
-                const abs = new URL(url, location.href).href;
-                console.log(`[Level4] Scene ${sceneName} → ${abs}`);
-            }
-
-            let errorHandled = false;
-            function onError() {
-                if (errorHandled) return;
-                errorHandled = true;
-                hideLoading();
-                cleanupListeners();
-                VideoSource.baseIdx = null;
-                const tried = CONFIG.VIDEO_BASES.map((_, i) => new URL(VideoSource.urlFor(sceneName, i), location.href).href);
-                if (_isDebugMode()) console.error('[Level4] All bases failed for', sceneName, tried);
-                // Same optional-skip behaviour as the first-load probe path.
-                if (CONFIG.OPTIONAL_VIDEO_SCENES && CONFIG.OPTIONAL_VIDEO_SCENES.includes(sceneName)) {
-                    if (_isDebugMode()) {
-                        console.warn(`[Level4] Optional scene '${sceneName}' has no video — auto-skipping.`);
-                    }
-                    _handleSkipScene(sceneName);
-                    return;
-                }
-                const sceneNum = sceneName.startsWith('reveal') ? 'reveal'
-                    : sceneName.replace('scene', '');
-                _showVideoErrorPanel(sceneName, sceneNum, CONFIG.VIDEO_BASES.map((b, i) => VideoSource.urlFor(sceneName, i)));
-            }
-
-            function onCanPlay() {
-                VideoSource.baseIdx = idx;
-                hideLoading();
-            }
-
-            function cleanupListeners() {
-                videoEl.removeEventListener('canplay', onCanPlay);
-                videoEl.removeEventListener('error', onError);
-            }
-
-            videoEl.addEventListener('canplay', onCanPlay, { once: true });
-            videoEl.addEventListener('error', onError);
-
-            let endedTriggered = false;
-            function triggerEnd() {
-                if (endedTriggered) return;
-                endedTriggered = true;
-                cleanupListeners();
-                hideLoading();
-                _triggerSceneEnd(sceneName, onEnded);
-            }
-            videoEl.onended = triggerEnd;
-            videoEl.ontimeupdate = () => {
-                if (videoEl.duration && !endedTriggered) {
-                    if (videoEl.duration - videoEl.currentTime <= 0.15) triggerEnd();
-                }
-            };
-
-            // Only reset currentTime if it's not already at 0. Setting
-            // currentTime=0 on a freshly loaded, paused video can confuse
-            // some Chromium builds into swallowing the subsequent play().
-            if (videoEl.currentTime !== 0) {
-                videoEl.currentTime = 0;
-            }
-            const startPlayback = () => {
-                const playPromise = videoEl.play();
-                if (playPromise !== undefined) {
-                    playPromise.catch((err) => {
-                        if (err.name === 'NotAllowedError') {
-                            // Autoplay bị chặn vì video có tiếng (không mute).
-                            // Hiển thị play overlay để user bấm — KHÔNG mute video,
-                            // vì level 4 cần phát audio.
-                            hideLoading();
-                            _showPlayButtonOverlay(videoEl, sceneName);
-                        } else if (err.name === 'NotSupportedError' || err.name === 'AbortError') {
-                            onError();
-                        }
-                    });
-                }
-            };
-            // Always re-check after a microtask so the currentTime=0 reset
-            // has settled before we attempt to play.
-            Promise.resolve().then(() => {
-                if (videoEl.readyState >= 3 && videoEl.paused) {
-                    startPlayback();
-                } else {
-                    videoEl.addEventListener('canplay', function once() {
-                        videoEl.removeEventListener('canplay', once);
-                        startPlayback();
-                    });
-                }
-            });
-
-            switchStage(sceneName);
-            TopBar.updateVisibility(sceneName);
-            return;
-        }
-
-        // ---- First load: probe bases sequentially ----
-        const triedAbsoluteUrls = CONFIG.VIDEO_BASES.map((_, i) => new URL(VideoSource.urlFor(sceneName, i), location.href).href);
-
-        let probeIdx = 0;
         let errorHandled = false;
-
-        function tryProbe(idx) {
-            if (idx >= CONFIG.VIDEO_BASES.length) {
-                if (errorHandled) return;
-                errorHandled = true;
-                hideLoading();
-                cleanupProbeListeners();
-                if (_isDebugMode()) {
-                    console.error('[Level4] All bases failed for', sceneName, triedAbsoluteUrls);
-                }
-                // If this scene is marked as optional (transitional clip whose
-                // asset may not exist yet), skip silently to the next stage
-                // instead of blocking the user with an error panel.
-                if (CONFIG.OPTIONAL_VIDEO_SCENES && CONFIG.OPTIONAL_VIDEO_SCENES.includes(sceneName)) {
-                    if (_isDebugMode()) {
-                        console.warn(`[Level4] Optional scene '${sceneName}' has no video — auto-skipping.`);
-                    }
-                    _handleSkipScene(sceneName);
-                    return;
-                }
-                const sceneNum = sceneName.startsWith('reveal') ? 'reveal'
-                    : sceneName.replace('scene', '');
-                _showVideoErrorPanel(sceneName, sceneNum, triedAbsoluteUrls);
+        function onError() {
+            if (errorHandled) return;
+            errorHandled = true;
+            hideLoading();
+            cleanupListeners();
+            if (_isDebugMode()) console.error('[Level4] Video failed for', sceneName, sources);
+            // Cảnh tuỳ chọn (clip chuyển cảnh chưa có file) → bỏ qua êm, không hiện panel lỗi
+            if (CONFIG.OPTIONAL_VIDEO_SCENES && CONFIG.OPTIONAL_VIDEO_SCENES.includes(sceneName)) {
+                if (_isDebugMode()) console.warn(`[Level4] Optional scene '${sceneName}' has no video — auto-skipping.`);
+                _handleSkipScene(sceneName);
                 return;
             }
-
-            const url = VideoSource.urlFor(sceneName, idx);
-            if (_isDebugMode()) {
-                console.log(`[Level4] Probing ${sceneName} @ base[${idx}] → ${new URL(url, location.href).href}`);
-            }
-
-            videoEl.removeAttribute('src');
-            videoEl.load();
-            // NOTE: KHÔNG ép muted — level 4 video có tiếng (giọng kể/dẫn dắt).
-            // Nếu browser chặn autoplay có âm thanh, onProbeCanPlay hoặc
-            // Promise.catch bên dưới sẽ hiển thị play overlay để user bấm.
-            videoEl.src = url;
-            videoEl.preload = 'auto';
-            // Kick off playback immediately, in the same call stack as the
-            // caller's user gesture. Muted videos normally succeed here
-            // because the element already has a src; if the call rejects
-            // (e.g. NotSupportedError when data hasn't arrived yet), the
-            // onProbeCanPlay handler below will retry once a frame is
-            // available. This two-pronged approach survives Electron 42's
-            // stricter autoplay gating.
-            if (idx === 0) {
-                const p = videoEl.play();
-                if (p) {
-                    p.then(() => {
-                        if (_isDebugMode()) console.log(`[Level4] tryProbe[0] play OK scene=${sceneName}`);
-                    }).catch((err) => {
-                        if (_isDebugMode()) console.log(`[Level4] tryProbe[0] play FAIL scene=${sceneName} err=${err.name}`);
-                        // Swallow — onProbeCanPlay will retry once data is ready.
-                    });
-                }
-            }
+            const sceneNum = sceneName.startsWith('reveal') ? 'reveal' : sceneName.replace('scene', '');
+            _showVideoErrorPanel(sceneName, sceneNum, [sources.hls, sources.mp4]);
+        }
+        function onCanPlay() { hideLoading(); }
+        function onWaiting() { showLoading(); }   // đang buffer giữa chừng → hiện spinner
+        function onPlaying() { hideLoading(); }
+        function cleanupListeners() {
+            videoEl.removeEventListener('canplay', onCanPlay);
+            videoEl.removeEventListener('error', onError);
+            videoEl.removeEventListener('waiting', onWaiting);
+            videoEl.removeEventListener('playing', onPlaying);
         }
 
-        function onProbeCanPlay() {
-            if (VideoSource.baseIdx !== null) return;
-            VideoSource.baseIdx = probeIdx;
-            hideLoading();
-            cleanupProbeListeners();
-            if (_isDebugMode()) {
-                console.log(`[Level4] baseIdx confirmed = ${probeIdx}`);
-            }
-            // Muted videos always autoplay, so we only need the play button
-            // as a last-resort fallback. Even muted play() can fail in
-            // Electron 42 when the user-gesture token has already expired
-            // (the canplay event fires async, well after the originating
-            // click handler returned). In that case, arm a one-shot click
-            // listener on the document: the very next user click anywhere
-            // (skip button, Q-option, zone tap, …) will resume playback.
-            if (videoEl.paused && videoEl.currentTime === 0) {
-                // KHÔNG set muted — video level 4 có tiếng.
-                // Nếu autoplay bị chặn (do có âm thanh), retry sẽ catch và arm click fallback.
-                const retry = videoEl.play();
-                if (retry) {
-                    retry.then(() => {
-                        if (_isDebugMode()) console.log(`[Level4] onProbeCanPlay play OK scene=${sceneName} ct=${videoEl.currentTime}`);
-                    }).catch((err) => {
-                        if (_isDebugMode()) console.log(`[Level4] onProbeCanPlay play FAIL scene=${sceneName} err=${err.name} — arming click fallback`);
-                        const armClick = () => {
-                            document.removeEventListener('click', armClick, true);
-                            document.removeEventListener('pointerdown', armClick, true);
-                            // KHÔNG set muted — bấm là để đáp ứng gesture, video sẽ phát có tiếng
-                            videoEl.play().catch(() => {
-                                _showPlayButtonOverlay(videoEl, level4State.currentScene);
-                            });
-                        };
-                        document.addEventListener('click', armClick, true);
-                        document.addEventListener('pointerdown', armClick, true);
-                    });
-                }
-            }
-        }
+        videoEl.addEventListener('canplay', onCanPlay, { once: true });
+        videoEl.addEventListener('error', onError);
+        videoEl.addEventListener('waiting', onWaiting);
+        videoEl.addEventListener('playing', onPlaying);
 
-        function onProbeError() {
-            if (VideoSource.baseIdx !== null) return;
-            if (errorHandled) return;
-            probeIdx++;
-            tryProbe(probeIdx);
-        }
-
-        function cleanupProbeListeners() {
-            videoEl.removeEventListener('canplay', onProbeCanPlay);
-            videoEl.removeEventListener('error', onProbeError);
-            if (silentFailTimer) { clearTimeout(silentFailTimer); silentFailTimer = null; }
-        }
-
-        videoEl.addEventListener('canplay', onProbeCanPlay, { once: true });
-        videoEl.addEventListener('error', onProbeError);
-
-        // Safety net for silent failure: when the server returns 200 with an
-        // HTML body (e.g. custom 404 page), the video element may reach
-        // readyState=4 without firing 'error' or 'canplay'. Detect that by
-        // checking if readyState=4 but the decoded data is not real video
-        // (videoWidth/videoHeight stay 0). Using a self-rescheduling
-        // setTimeout (instead of setInterval) so the timer stops firing
-        // once a working base is found, eliminating per-1.5s overhead
-        // throughout the rest of playback.
-        let silentFailTimer = null;
-        function scheduleSilentFailCheck() {
-            if (silentFailTimer) clearTimeout(silentFailTimer);
-            silentFailTimer = setTimeout(() => {
-                if (errorHandled || VideoSource.baseIdx !== null) {
-                    silentFailTimer = null;
-                    return;
-                }
-                if (videoEl.readyState >= 1 && videoEl.videoWidth === 0 && videoEl.videoHeight === 0) {
-                    silentFailTimer = null;
-                    if (probeIdx < CONFIG.VIDEO_BASES.length - 1) {
-                        probeIdx++;
-                        tryProbe(probeIdx);
-                        scheduleSilentFailCheck();
-                    } else {
-                        tryProbe(CONFIG.VIDEO_BASES.length);
-                    }
-                } else {
-                    // Data looks valid; no need to retry. Let timer stay null.
-                    silentFailTimer = null;
-                }
-            }, 1500);
-        }
-        scheduleSilentFailCheck();
-
+        // End detection: 'ended' primary, ontimeupdate fallback
         let endedTriggered = false;
         function triggerEnd() {
             if (endedTriggered) return;
             endedTriggered = true;
-            cleanupProbeListeners();
+            cleanupListeners();
             hideLoading();
             _triggerSceneEnd(sceneName, onEnded);
         }
@@ -896,18 +650,48 @@
             }
         };
 
-        videoEl.currentTime = 0;
-        tryProbe(0);
+        // Gắn nguồn (tái dùng instance nếu cảnh này đã được chuẩn bị trước),
+        // rồi gọi play() NGAY trong call stack hiện tại để giữ quyền autoplay.
+        CKVideo.load(videoEl, sources, { force: Boolean(forceReload) }).catch(onError);
+        if (videoEl.currentTime !== 0) {
+            try { videoEl.currentTime = 0; } catch (e) { /* chưa có metadata */ }
+        }
+        // Level 4 video CÓ TIẾNG (giọng kể) → KHÔNG mute. play() được gọi ngay trong call stack
+        // của click nên thường được phép; nếu trình duyệt vẫn chặn autoplay có tiếng thì hiện
+        // nút "Bấm để xem tiếp" và cú click kế tiếp ở bất kỳ đâu cũng sẽ phát.
+        const playPromise = videoEl.play();
+        if (playPromise !== undefined) {
+            playPromise.catch((err) => {
+                if (errorHandled || endedTriggered) return;
+                if (_isDebugMode()) console.log(`[Level4] play FAIL scene=${sceneName} err=${err && err.name}`);
+                if (err && err.name === 'NotAllowedError') {
+                    hideLoading();
+                    _showPlayButtonOverlay(videoEl, sceneName);
+                    const armClick = () => {
+                        document.removeEventListener('click', armClick, true);
+                        document.removeEventListener('pointerdown', armClick, true);
+                        videoEl.play().then(() => {
+                            const ov = videoEl.closest('.video-container')?.querySelector('.video-play-overlay');
+                            if (ov) ov.remove();
+                        }).catch(() => {});
+                    };
+                    document.addEventListener('click', armClick, true);
+                    document.addEventListener('pointerdown', armClick, true);
+                } else {
+                    // Chưa có dữ liệu lúc gọi play(), hoặc play() bị huỷ (AbortError) vì nguồn
+                    // được gắn ngay sau đó → thử lại khi có thể phát
+                    const retryPlay = () => {
+                        if (errorHandled || endedTriggered || !videoEl.paused) return;
+                        videoEl.play().catch(() => _showPlayButtonOverlay(videoEl, sceneName));
+                    };
+                    if (videoEl.readyState >= 3) retryPlay();
+                    else videoEl.addEventListener('canplay', retryPlay, { once: true });
+                }
+            });
+        }
 
         switchStage(sceneName);
         TopBar.updateVisibility(sceneName);
-
-        // NOTE: We do NOT call play() here. The first-load probe path uses
-        // onProbeCanPlay to start playback once a working base is found,
-        // and trying to play() before video data is available causes
-        // NotSupportedError in Electron 42 / Chromium. The
-        // onProbeCanPlay handler is the single source of truth for
-        // autoplaying after the probe succeeds.
     }
 
     function _showPlayButtonOverlay(videoEl, sceneName) {
@@ -955,8 +739,20 @@
                 onEnded();
                 return;
             }
+            _warmAfterScene(sceneName);
             _advanceAfterSceneEnd(sceneName);
         });
+    }
+
+    /**
+     * Khi một cảnh kết thúc và sắp vào câu hỏi (không có video) → tải trước TRỌN
+     * các cảnh video kế tiếp để bấm "Tiếp tục" là phát ngay. 'reveal' chưa có file → bỏ qua êm.
+     */
+    const WARM_AFTER_SCENE = { scene2: ['reveal', 'scene3'], scene3: ['scene4'], scene4: ['scene5'] };
+    function _warmAfterScene(sceneName) {
+        const list = WARM_AFTER_SCENE[sceneName];
+        if (!list || !window.CKVideo) return;
+        list.forEach((name) => CKVideo.warm(VideoSource.sourcesFor(name)));
     }
 
     /**
@@ -1648,7 +1444,7 @@
 
         // Compose summary card
         card.innerHTML = `
-            <img src="../image/z8014995224177_069f99816bf77dda5fed3feb153a6c0e-removebg-preview.png"
+            <img src="../image/z8014995224177_069f99816bf77dda5fed3feb153a6c0e-removebg-preview.webp"
                  alt="CyberKnight" class="summary-logo">
             <div class="summary-icon-badge">📸</div>
             <h2 class="summary-title">LEVEL 4 COMPLETED!</h2>
@@ -1983,6 +1779,17 @@
 
         const isSkipped = handleDebugFlags();
         if (isSkipped) return;
+
+        // Chuẩn bị sẵn cảnh 1 ngay khi mở trang (playlist + segment đầu bậc thấp nhất)
+        // → bấm "Bắt đầu" là phát ngay, kể cả mạng yếu.
+        try {
+            const firstVideo = document.getElementById('video-scene1');
+            if (firstVideo && window.CKVideo) {
+                CKVideo.load(firstVideo, VideoSource.sourcesFor('scene1'), { preloadOnly: true }).catch(() => {});
+                // Màn "Bắt đầu": tải sẵn 10s đầu của cảnh 1 ở bậc thấp nhất (~250 KB)
+                CKVideo.warm(VideoSource.sourcesFor('scene1'), { level: 'lowest', seconds: 10 });
+            }
+        } catch (e) { if (_isDebugMode()) console.warn('[Level4] preload scene1:', e); }
 
         const btnStart = document.getElementById('btn-start-level');
         const startOverlay = document.getElementById('start-overlay');

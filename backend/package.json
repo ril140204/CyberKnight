@@ -1,27 +1,26 @@
 {
   "name": "sigmabloom-backend",
   "version": "1.0.0",
-  "description": "Backend API cho Sigmabloom - CyberKnight (Đăng nhập / Đăng ký)",
+  "description": "Backend API cho Sigmabloom - CyberKnight (Express + PostgreSQL/Supabase)",
   "main": "src/server.js",
   "scripts": {
-    "prestart": "node scripts/ensure-mysql.js",
     "start": "node src/server.js",
     "start:prod": "node src/server.js",
-    "predev": "node scripts/ensure-mysql.js",
     "dev": "nodemon src/server.js",
     "setup-db": "node src/config/setupDb.js",
     "build:css": "echo \"Build CSS from project root, not backend. See README.md: npm run build:css.\" && exit 1",
     "test-smtp": "node scripts/test-smtp.js",
-    "test": "node --test scripts/check-migrations.js scripts/test-payments.js scripts/test-catalog.js scripts/test-level-access.js scripts/smoke-level-access.js scripts/test-activity.js",
+"test": "node --test scripts/check-migrations.js scripts/test-payments.js scripts/test-catalog.js scripts/test-level-access.js scripts/smoke-level-access.js scripts/test-activity.js",
     "test:activity": "node scripts/test-activity.js",
     "test:all": "node scripts/test-env-failfast.js && node scripts/test-csp.js && node scripts/test-static-block.js && node scripts/test-xss.js && node scripts/test-catalog.js && node scripts/test-level-access.js && node scripts/test-level-guard.js && node scripts/test-payment-flow.js && node scripts/test-admin.js && node scripts/test-activity.js && node scripts/test-auth-hardening.js && node --test scripts/check-migrations.js scripts/test-payments.js",
-    "start-mysql": "powershell -Command \"Start-Process 'C:\\Program Files\\MySQL\\MySQL Server 8.4\\bin\\mysqld.exe' --datadir='C:\\ProgramData\\MySQL\\MySQL Server 8.4\\Data' -WindowStyle Hidden\""
+    "migrate-data": "node scripts/migrate-mysql-to-pg.js"
   },
   "engines": {
     "node": ">=20"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
+    "compression": "^1.8.2",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
@@ -31,7 +30,8 @@
     "helmet": "^7.1.0",
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.10.1",
-    "nodemailer": "^6.9.13"
+    "nodemailer": "^6.9.13",
+    "pg": "^8.23.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.4"

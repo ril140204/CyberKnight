@@ -9,7 +9,7 @@
 ## Mục Lục
 
 1. [Phase 4 — Đăng nhập VPS, tạo deployer, SSH hardening](#phase-4--đăng-nhập-vps-tạo-deployer-ssh-hardening)
-2. [Phase 5 — APT, Node 22, MySQL, 3 users, swap, low-mem config](#phase-5--apt-node-22-mysql-3-users-swap-low-mem-config)
+2. [Phase 5 — APT, Node 22, postgresql-client, swap](#phase-5--apt-node-22-postgresql-client-swap)
 3. [Phase 6 — Code, .env, setup-db, PM2](#phase-6--code-env-setup-db-pm2)
 4. [Phase 7 — Nginx, HTTPS (certbot), www→apex, SePay, test thanh toán, backup](#phase-7--nginx-https-certbot-www-apex-sepay-test-thanh-toán-backup)
 5. [Phase 8 — Acceptance, vận hành, bảo trì, pháp lý](#phase-8--acceptance-vận-hành-bảo-trì-pháp-lý)
@@ -31,7 +31,7 @@ ssh root@<IP_VPS>
 # Copy bootstrap script lên VPS (từ máy local)
 scp deploy/bootstrap-server.sh root@<IP_VPS>:/root/
 
-# Chạy bootstrap (nhấn Enter khi được hỏi mysql_secure_installation)
+# Chạy bootstrap (không còn bước MySQL — DB là Supabase)
 sudo bash /root/bootstrap-server.sh \
   --domain <TEN_MIEN> \
   --email  <EMAIL> \
@@ -61,7 +61,7 @@ ssh -i $env:USERPROFILE\.ssh\cyberknight_admin deployer@<IP_VPS> "whoami"
 # Chạy SSH hardening:
 sudo bash /opt/cyberknight/deploy/finish-ssh-hardening.sh
 ```
-**Script sẽ hỏi bạn thực hiện `mysql_secure_installation` thủ công khi được hỏi.**
+**Script không cài DB server (DB chạy trên Supabase); chỉ cài `postgresql-client-17` cho backup.**
 
 ### Tùy chọn B: Làm thủ công từng bước
 
@@ -221,7 +221,9 @@ timedatectl show --property=Timezone --value
 
 ---
 
-## Phase 5 — APT, Node 22, MySQL, 3 users, swap, low-mem config
+## Phase 5 — APT, Node 22, postgresql-client, swap
+
+> **Database chạy trên Supabase (PostgreSQL 17, managed).** VPS KHÔNG cài MySQL/PostgreSQL server — chỉ cài `postgresql-client-17` để `pg_dump` backup. Lấy chuỗi kết nối tại Supabase → *Project Settings → Database → Connection string* (Transaction pooler :6543 cho app, Session pooler :5432 cho migration/backup).
 
 ### Tùy chọn A: Dùng bootstrap script
 
@@ -247,7 +249,7 @@ echo '/swapfile none swap sw 0 0' >> /etc/fstab
 #### 5.2. Cài gói cơ bản
 
 ```bash
-apt install -y nginx mysql-server git curl rsync ufw fail2ban unattended-upgrades
+apt install -y nginx git curl rsync ufw fail2ban unattended-upgrades ca-certificates gnupg lsb-release
 ```
 
 #### 5.3. Node 22 LTS
@@ -262,71 +264,30 @@ npm i -g pm2
 pm2 --version
 ```
 
-#### 5.4. MySQL low-mem config (nếu RAM ≤ 2GB)
+#### 5.4. Cài postgresql-client-17 (pg_dump / psql cho backup)
 
 ```bash
-cat > /etc/mysql/mysql.conf.d/zz-lowmem.cnf << 'EOF'
-[mysqld]
-bind-address=127.0.0.1
-innodb_buffer_pool_size=128M
-performance_schema=OFF
-EOF
-systemctl restart mysql
+# Repo PGDG — cần client cùng phiên bản với Supabase (PostgreSQL 17)
+install -d /usr/share/postgresql-common/pgdg
+curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc
+sh -c 'echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+apt update && apt install -y postgresql-client-17
+pg_dump --version   # Phải thấy 17.x
 ```
 
-#### 5.5. MySQL secure installation
+#### 5.5. Database: Supabase PostgreSQL
+
+1. Tạo project tại https://supabase.com (chọn region gần người dùng, vd. Tokyo/Singapore).
+2. *Project Settings → Database → Connection string* → copy 2 chuỗi:
+   - **Transaction pooler** (cổng `6543`) → `DATABASE_URL` (app runtime)
+   - **Session pooler** (cổng `5432`) → `DIRECT_URL` (migration `setup-db`, `pg_dump`)
+3. Mật khẩu DB: *Project Settings → Database → Reset database password* nếu quên.
+4. Mỗi môi trường dùng một **schema** riêng trong cùng project: `DB_SCHEMA=local` (dev) / `DB_SCHEMA=production`… `npm run setup-db` tự tạo schema.
+
+#### 5.6. Xác nhận VPS không mở cổng DB
 
 ```bash
-mysql_secure_installation
-
-# Checklist khi được hỏi:
-#   [1] Switch to unix_socket authentication → Y
-#   [2] Change root password? → Y (đặt mật khẩu root MySQL mạnh)
-#   [3] Remove anonymous users? → Y
-#   [4] Disallow root login remotely? → Y
-#   [5] Remove test database? → Y
-#   [6] Reload privilege tables? → Y
-```
-
-#### 5.6. Tạo database + 3 users MySQL
-
-> Các mật khẩu được sinh ngẫu nhiên — **LƯU VÀO TRÌNH QUẢN LÝ MẬT KHẨU**.
-
-```bash
-# Sinh mật khẩu
-APP_PW=$(openssl rand -hex 24)
-MIG_PW=$(openssl rand -hex 24)
-BK_PW=$(openssl rand -hex 24)
-
-sudo mysql --defaults-file=/etc/mysql/debian.cnf << SQL
-CREATE DATABASE IF NOT EXISTS sigmabloom
-  CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE USER IF NOT EXISTS 'sigmabloom_app'@'localhost'
-  IDENTIFIED BY '${APP_PW}';
-GRANT SELECT, INSERT, UPDATE, DELETE
-  ON sigmabloom.* TO 'sigmabloom_app'@'localhost';
-CREATE USER IF NOT EXISTS 'sigmabloom_migrate'@'localhost'
-  IDENTIFIED BY '${MIG_PW}';
-GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, ALTER, INDEX, REFERENCES, DROP
-  ON sigmabloom.* TO 'sigmabloom_migrate'@'localhost';
-CREATE USER IF NOT EXISTS 'sigmabloom_backup'@'localhost'
-  IDENTIFIED BY '${BK_PW}';
-GRANT SELECT, SHOW VIEW, TRIGGER, LOCK TABLES
-  ON sigmabloom.* TO 'sigmabloom_backup'@'localhost';
-FLUSH PRIVILEGES;
-SQL
-
-# In ra để lưu
-echo "APP:     $APP_PW"
-echo "MIG_PW:  $MIG_PW"
-echo "BK_PW:   $BK_PW"
-```
-
-#### 5.7. Xác nhận MySQL chỉ bind 127.0.0.1
-
-```bash
-ss -tlnp | grep 3306
-# Phải thấy: 127.0.0.1:3306 hoặc không có dòng nào (OK)
+ss -tlnp | grep -E ':(3306|5432)' || echo "Không có DB cục bộ (OK)"
 ```
 
 #### 5.8. Tạo thư mục ứng dụng
@@ -387,12 +348,11 @@ NODE_ENV=production
 PORT=5000
 FRONTEND_URL=https://<TEN_MIEN>
 
-# Database — dùng user APP (không dùng root)
-DB_HOST=localhost
-DB_PORT=3306
-DB_USER=sigmabloom_app
-DB_PASSWORD=<APP_PW>
-DB_NAME=sigmabloom
+# Database — Supabase PostgreSQL (Project Settings → Database → Connection string)
+DATABASE_URL="postgresql://postgres.<PROJECT_REF>:<DB_PASSWORD>@aws-0-<REGION>.pooler.supabase.com:6543/postgres"
+DIRECT_URL="postgresql://postgres.<PROJECT_REF>:<DB_PASSWORD>@aws-0-<REGION>.pooler.supabase.com:5432/postgres"
+DB_SCHEMA=production
+DB_SSL=true
 
 # JWT Secrets (sinh 3 lệnh riêng biệt)
 #   node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
@@ -429,17 +389,9 @@ FEEDBACK_TO=<email_nhận_phản_hồi>
 
 > **Mã BIN phổ biến:** VietinBank=`970415`, Vietcombank=`970436`, MBBank=`970422`, BIDV=`970418`, Techcombank=`970407`, ACB=`970416`, TPBank=`970423`.
 
-### 6.4. Tạo file .env.migrate (cho update script)
+### 6.4. (Không còn) .env.migrate
 
-```bash
-nano backend/.env.migrate
-# chmod 600 backend/.env.migrate
-```
-
-```env
-DB_USER=sigmabloom_migrate
-DB_PASSWORD=<MIG_PW>
-```
+Migration dùng `DIRECT_URL` trong `backend/.env` — **không cần** file `.env.migrate` hay user migrate riêng.
 
 ### 6.5. Cài dependencies (production)
 
@@ -451,21 +403,21 @@ npm ci --omit=dev
 ### 6.6. Chạy setup-db (tạo DB + migrations)
 
 ```bash
-# Dùng migrate user (có quyền CREATE/ALTER)
 cd /opt/cyberknight/backend
-DB_USER=sigmabloom_migrate DB_PASSWORD=<MIG_PW> npm run setup-db
+npm run setup-db            # tạo schema DB_SCHEMA + chạy migrations + seed admin
 ```
 
 **Kết quả mong đợi:**
 ```
-✅ Kết nối MySQL thành công!
-✅ Đã tạo database gốc và bảng cơ bản!
-✅ Đã áp dụng migration 002_*.sql!
-✅ Đã áp dụng migration 003_*.sql!
-...
-🎉 Setup cơ sở dữ liệu hoàn tất!
-✅ Đã khởi tạo tài khoản Admin mẫu!
+✅ Kết nối PostgreSQL thành công (db=postgres, schema=production)
+   PostgreSQL 17.x on x86_64-pc-linux-gnu
+✅ Đã áp dụng migration 001_init_schema.sql
+🎉 Đã chạy 1 migration mới.
+✅ Đã khởi tạo tài khoản Admin mẫu thành công!
 ```
+
+> Có dữ liệu từ MySQL cũ? Chạy một lần trên máy còn truy cập MySQL:
+> `MYSQL_HOST=... MYSQL_USER=... MYSQL_PASSWORD=... MYSQL_DATABASE=sigmabloom npm run migrate-data`
 
 ### 6.7. CSS đã build sẵn (không cần build trên VPS)
 
@@ -592,18 +544,9 @@ sudo certbot renew --dry-run
 
 ### 7.7. Thiết lập backup
 
-#### 7.7.1. Tạo file xác thực MySQL cho backup user
+#### 7.7.1. Backup đọc chuỗi kết nối từ backend/.env
 
-```bash
-nano ~/.my.cnf
-chmod 600 ~/.my.cnf
-```
-
-```ini
-[mysqldump]
-user=sigmabloom_backup
-password=<BK_PW>
-```
+`backup-db.sh` dùng `pg_dump` với `DIRECT_URL` (hoặc `DATABASE_URL`) và `DB_SCHEMA` đọc từ `backend/.env` (chmod 600) — không cần file xác thực riêng. Cần `postgresql-client-17` (Phase 5.4).
 
 #### 7.7.2. Chạy thử backup
 
@@ -679,8 +622,8 @@ bash /opt/cyberknight/deploy/test-restore.sh /var/backups/cyberknight/sigmabloom
 - [ ] Cookie `refreshToken` và `levelAccess` có `HttpOnly; Secure; SameSite`
 
 #### Hạ tầng
-- [ ] `ss -tlnp` trên VPS: chỉ 22/80/443 công khai; 3306 và 5000 chỉ ở `127.0.0.1`
-- [ ] Tắt MySQL tạm thời → level trả phí không phục vụ (fail-closed)
+- [ ] `ss -tlnp` trên VPS: chỉ 22/80/443 công khai; 5000 chỉ ở `127.0.0.1`; không có 3306/5432
+- [ ] Đặt sai `DATABASE_URL` tạm thời → level trả phí không phục vụ (fail-closed 503)
 
 ### 8.2. Vận hành hằng ngày
 
@@ -808,16 +751,15 @@ rclone config
 ### Hạ tầng
 - [ ] VPS: Ubuntu ___, RAM ___, Ổ ___
 - [ ] Node.js: ___, PM2: ___
-- [ ] MySQL: ___, bind 127.0.0.1 ✓
+- [ ] postgresql-client-17 (pg_dump 17.x) ✓
 - [ ] Nginx + Certbot: HTTPS ✓
 - [ ] UFW active: SSH + Nginx Full ✓
 - [ ] fail2ban: sshd jail ✓
 - [ ] unattended-upgrades: configured ✓
 
 ### Database
-- [ ] Database `sigmabloom` tạo ✓
-- [ ] 3 user: sigmabloom_app, sigmabloom_migrate, sigmabloom_backup ✓
-- [ ] Migrations: 002 → 007 applied ✓
+- [ ] Supabase project + `DATABASE_URL`/`DIRECT_URL`/`DB_SCHEMA` trong `backend/.env` ✓
+- [ ] Migrations: `001_init_schema.sql` applied (bảng `schema_migrations`) ✓
 - [ ] Admin seed: username `admin` tạo ✓
 - [ ] backup-db.sh chạy OK ✓
 
@@ -858,14 +800,13 @@ rclone config
 | `bootstrap-server.sh` | One-shot setup VPS (Phase 4–5 tự động) |
 | `finish-ssh-hardening.sh` | SSH hardening riêng (chạy sau khi deployer login thành công) |
 | `update.sh` | Cập nhật code trên production (chạy as deployer) |
-| `backup-db.sh` | Sao lưu MySQL hằng ngày |
-| `restore-db.sh` | Khôi phục MySQL (mặc định vào DB test) |
+| `backup-db.sh` | Sao lưu PostgreSQL (pg_dump schema, định dạng custom) hằng ngày |
+| `restore-db.sh` | Khôi phục PostgreSQL (mặc định vào schema `<DB_SCHEMA>_restore_test`; `--force` để đè production) |
 | `test-restore.sh` | Test restore tự động (chọn file mới nhất) |
 | `crontab.example` | Mẫu crontab cho deployer |
 | `nginx.conf.example` | Cấu hình Nginx (port 80 → certbot sẽ thêm 443) |
 | `nginx-proxy-params.conf` | Proxy headers chung cho Nginx |
 | `ecosystem.config.js` | Cấu hình PM2 |
-| `mysql-user.sql` | Ghi chú SQL tạo user (đã chuyển vào bootstrap) |
 
 ---
 

@@ -16,10 +16,12 @@ const {
   computePlayableLevels,
   listPackageLevels,
 } = require('../config/catalog');
+const { isPaymentConfigured } = require('../utils/paymentConfig');
 
 /**
  * GET /api/catalog/levels
- * Trả về danh sách toàn bộ level — không cần đăng nhập
+ * Trả về danh sách toàn bộ level — không cần đăng nhập.
+ * paymentsEnabled: trang chủ dùng để khoá nút mua khi cổng thanh toán chưa cấu hình thật.
  */
 async function getLevelsHandler(req, res) {
   try {
@@ -27,6 +29,7 @@ async function getLevelsHandler(req, res) {
     return res.json({
       success: true,
       data: levels,
+      paymentsEnabled: isPaymentConfigured(),
     });
   } catch (err) {
     console.error('❌ Lỗi getLevels:', err);
@@ -48,6 +51,7 @@ async function getPackagesHandler(req, res) {
     return res.json({
       success: true,
       data: packages,
+      paymentsEnabled: isPaymentConfigured(),
     });
   } catch (err) {
     console.error('❌ Lỗi getPackages:', err);
@@ -99,7 +103,7 @@ async function getCatalogMe(req, res) {
   try {
     // Lấy user info cơ bản
     const [users] = await db.query(
-      `SELECT id, username, role FROM users WHERE id = ? AND is_active = 1`,
+      `SELECT id, username, role FROM users WHERE id = ? AND is_active = TRUE`,
       [req.user.id]
     );
 

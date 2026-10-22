@@ -5,13 +5,20 @@
   "description": "CyberKnight Web Project",
   "scripts": {
     "dev": "npm --prefix backend run dev",
-    "start": "npm --prefix backend start",
+    "start": "node backend/src/server.js",
     "test": "npm --prefix backend test",
     "test:all": "npm --prefix backend run test:all",
-    "start-mysql": "npm --prefix backend run start-mysql",
-    "build:css": "tailwindcss -i ./assets/tailwind-input.css -o ./assets/tailwind.css --minify"
+    "build:css": "tailwindcss -i ./assets/tailwind-input.css -o ./assets/tailwind.css --minify && python3 -I scripts/stamp-assets.py",
+    "build:icons": "bash scripts/build-icons.sh",
+    "setup-db": "npm --prefix backend run setup-db",
+    "encode:videos": "bash scripts/encode-videos.sh",
+    "heroku-postbuild": "npm --prefix backend ci --omit=dev"
   },
   "devDependencies": {
     "tailwindcss": "^3.4.19"
+  },
+  "engines": {
+    "node": "22.x",
+    "npm": "10.x"
   }
 }

@@ -5,72 +5,28 @@ Mục tiêu: Hoàn thiện kiến trúc an ninh, thanh toán tự động VietQR
 
 ---
 
-## [Phase 8] — Theo Dõi Thời Gian Online (Activity Tracking)
+## [2026-10-19] — Chuyển DB sang Supabase PostgreSQL & tối ưu video streaming (HLS)
 
-### Bối cảnh
-Ghi nhận **tổng thời gian người dùng sử dụng trang web** và hiển thị trong trang Quản trị (`admin.html`).
-Nguyên tắc bảo mật: **client KHÔNG bao giờ gửi thời lượng** — client chỉ báo "tôi còn sống" (heartbeat),
-máy chủ tự tính `delta = NOW() - last_heartbeat_at` rồi mới cộng.
+### 1. Database: MySQL → PostgreSQL (Supabase), schema `local`
+- **`backend/src/config/db.js`** viết lại trên driver `pg` nhưng **giữ nguyên API mysql2** (`[rows] = await db.query('... ?')`, `result.insertId`, `result.affectedRows`, `getConnection()/beginTransaction/commit/rollback/release`, `db.end()`): tự chuyển `?` → `$n` (bỏ qua `?` trong chuỗi), tự gắn schema `DB_SCHEMA` (mặc định `local`) vào mọi bảng ứng dụng (vì transaction pooler của Supabase không giữ `search_path`), tự thêm `RETURNING id` cho INSERT, `BIGINT`/`NUMERIC` → Number, `isDuplicateError()` thay `ER_DUP_ENTRY`.
+- **`backend/migrations/001_init_schema.sql`**: schema PostgreSQL hợp nhất (users, refresh_tokens, password_resets, game_saves JSONB, feedbacks, orders, payment_transactions JSONB, user_entitlements, admin_audit_log), `IDENTITY`, `TIMESTAMPTZ`, CHECK thay ENUM, trigger `set_updated_at`, unique index `LOWER(username)/LOWER(email)` (giữ hành vi không phân biệt hoa/thường của MySQL).
+- **`backend/src/config/setupDb.js`**: runner mới — `CREATE SCHEMA IF NOT EXISTS`, bảng `schema_migrations`, mỗi file chạy trong 1 transaction với `SET LOCAL search_path`, dùng `DIRECT_URL` (session pooler). `--no-seed` để bỏ seed admin.
+- SQL trong controller chuyển sang PostgreSQL: `ON DUPLICATE KEY UPDATE` → `ON CONFLICT ... DO UPDATE SET ... EXCLUDED`, `DATE_SUB/DATE_ADD` → `INTERVAL`, `DATE()=CURDATE()` → `::date = CURRENT_DATE`, `LIKE` → `ILIKE`, `is_active = 1` → `TRUE`, đăng ký/kiểm tra username so sánh `LOWER()`.
+- `.env`: `DATABASE_URL` (6543), `DIRECT_URL` (5432), `DB_SCHEMA`, `DB_SSL`, `DB_POOL_MAX`; `startupCheck` yêu cầu `DATABASE_URL` ở production. Bỏ `prestart/predev` (ensure-mysql.js), `start-mysql`.
+- **`backend/scripts/migrate-mysql-to-pg.js`** (`npm run migrate-data`): chép dữ liệu từ MySQL cũ sang PG theo thứ tự FK, giữ id, `ON CONFLICT (id) DO NOTHING`, reset sequence; `--dry-run`, `--truncate`.
+- SQL MySQL cũ chuyển vào `backend/legacy-mysql/`. Test: `npm test` 126/126; smoke E2E (auth, JSONB save, refresh rotation, webhook SePay underpaid/matched/duplicate/no_order, admin grant/reconcile, level guard) pass trên Supabase.
+- Deploy: `backup-db.sh` → `pg_dump --format=custom --schema`, `restore-db.sh` khôi phục vào schema `<schema>_restore_test` (hoặc `--force`), `test-restore.sh`, `update.sh` chạy `npm run setup-db -- --no-seed` (không còn `.env.migrate`), `bootstrap-server.sh` cài `postgresql-client-17` thay vì MySQL server, `postdeploy-check.sh` kiểm tra PG qua `db.js`.
 
-### 1. File ĐÃ TẠO MỚI
-| File | Mô tả |
-|---|---|
-| `backend/migrations/008_user_activity.sql` | Tạo `user_activity` + `user_activity_daily` (idempotent, InnoDB/utf8mb4) |
-| `backend/src/controllers/activityController.js` | Logic tính delta, transaction `SELECT ... FOR UPDATE`, cộng tổng + bảng daily trong **cùng** transaction |
-| `backend/src/routes/activity.js` | Router `POST /heartbeat` (+ `GET /me`), rate limit riêng 6 req/phút |
-| `assets/activity.js` | IIFE phía client, expose `window.CyberActivity = { start, stop, isRunning, idleSeconds }` |
-| `backend/scripts/test-activity.js` | 56 assertion, chạy trong `npm test` và `npm run test:all` |
-
-### 2. File ĐÃ SỬA
-| File | Thay đổi |
-|---|---|
-| `backend/src/server.js` | Mount `app.use('/api/me/activity', activityRoutes)` **trước** handler 404 `/api/*` |
-| `backend/src/controllers/adminController.js` | `listUsers` LEFT JOIN `user_activity` → `onlineSeconds`, `isOnlineNow`, `lastHeartbeatAt`, `firstSeenAt`; thêm `?sort=` whitelist (`newest`, `oldest`, `online_desc`, `online_asc`); `getUserDetail` trả thêm 4 trường thống kê |
-| `assets/api.js` | Thêm `CyberAPI.activity.heartbeat()` + `CyberAPI.activity.getMyActivity()` |
-| `assets/activity.js` | (mới) |
-| `index.html` | Nạp `/assets/activity.js`; gọi `CyberActivity.start()` trong `showUserState()` và sau refresh token; gọi `stop()` trong `showGuestState()` và `logout()` |
-| `admin.html` | Thêm `<th>Thời gian online</th>` + `<td>`; `colspan` 7 → **8** cho bảng users; thêm `formatDuration()`; chấm xanh `isOnlineNow` |
-| `privacy.html` | Bổ sung câu trong mục 2.3 "Dữ liệu sử dụng dịch vụ" về thời gian sử dụng tổng hợp |
-| `backend/database.sql` | Thêm 2 bảng activity (idempotent) cho DB mới |
-| `backend/scripts/check-migrations.js` | Đăng ký `008_user_activity.sql` |
-| `backend/src/config/setupDb.js` | Cập nhật chú thích danh sách migration 002 → 008 |
-| `backend/package.json` | `test:activity` + thêm `scripts/test-activity.js` vào `test` và `test:all` |
-| `README.md` | Mục tính năng + cấu trúc thư mục + ghi chú vận hành |
-
-### 3. Quy tắc tính thời gian (anti-cheat)
-```
-delta = NOW() - last_heartbeat_at
-
-delta <  20s        → BỎ QUA (chống spam / mở nhiều tab), chỉ chốt mốc thời gian
-20s ≤ delta ≤ 90s   → cộng min(delta, 60s)          → reason 'counted'
-delta >  90s        → PHIÊN MỚI: cộng tối đa 30s   → reason 'new_session'
-last_heartbeat NULL → nhịp đầu: KHÔNG cộng          → reason 'first_seen'
-```
-- Toàn bộ thao tác nằm trong **1 transaction** với `SELECT ... FOR UPDATE` (pessimistic locking, cùng style `paymentController.js`) → không race condition, không deadlock.
-- Bảng daily được cộng trong **cùng transaction** → `SUM(daily.seconds) == user_activity.total_seconds` luôn đúng.
-
-### 4. Quyết định thiết kế & lý do
-1. **Tính thời gian cho MỌI tài khoản, kể cả admin** (đề xuất của spec, chọn để đơn giản & nhất quán).
-   `user_activity` là bảng phụ của `users`, không có logic loại trừ role — nếu sau này muốn loại admin chỉ cần thêm điều kiện ở tầng query đọc.
-2. **Không dùng `INSERT ... ON DUPLICATE KEY UPDATE` thuần** vì cần đọc `last_heartbeat_at` để quyết định cộng bao nhiêu → buộc phải đọc-rồi-ghi. Đã dùng `INSERT IGNORE` (đảm bảo dòng tồn tại) + `SELECT ... FOR UPDATE` + `UPDATE` trong transaction. Đây cũng là style đã dùng ở payments.
-3. **Endpoint không nhận body** → tương thích giới hạn `express.json({limit:'10kb'})`, không nguy cơ payload lớn.
-4. **`window.__accessToken` là nguồn token duy nhất** của `assets/activity.js`. `index.html` định nghĩa `apiFetch()` bên trong thẻ `<script>` (không global) nên file này **không thể** gọi `apiFetch()` của trang nhà. Nó tự implement vòng refresh riêng: ưu tiên `CyberAPI.fetch` (nếu trang có nạp `api.js`) → fallback `fetch` + `POST /api/auth/refresh`. **Đã kiểm chứng runtime**: `hasCyberAPI: false` trên `index.html` và heartbeat vẫn trả **200**.
-5. **Flush khi đóng tab dùng `fetch(..., {keepalive:true})` + header `Authorization`**, KHÔNG dùng `navigator.sendBeacon` vì beacon không gửi được header Authorization (yêu cầu Bearer).
-6. **Không thêm file nào vào level1..level5** — `index.html` mở game bằng **iframe** (`<iframe id="gameFrame" src="/level0/level0.html">`), nên heartbeat ở trang cha đã đủ và không phá Level Guard.
-
-### 5. Đối chiếu deploy
-`deploy/DEPLOY.md` cấp quyền theo dạng `GRANT ... ON sigmabloom.*` (toàn database) cho `sigmabloom_app` / `sigmabloom_migrate` / `sigmabloom_backup`, nên **KHÔNG cần** thêm GRANT cho `user_activity` / `user_activity_daily`. Nếu sau này chuyển sang cấp quyền **theo từng bảng**, phải thêm:
-```sql
-GRANT SELECT, INSERT, UPDATE ON sigmabloom.user_activity          TO 'sigmabloom_app'@'localhost';
-GRANT SELECT, INSERT, UPDATE ON sigmabloom.user_activity_daily    TO 'sigmabloom_app'@'localhost';
-```
-
-### 6. Hạn chế đã biết
-- **Sai số ±30 giây / nhịp**: heartbeat chạy mỗi 30s nên tổng thời gian có sai số cộng dồn. Ngưỡng `<20s` bị bỏ qua nên các nhịp hơi sớm không cộng; cap 60s/nhịp khi delta vượt 60s (network chậm, máy ngủ).
-- **Không có dữ liệu trước thời điểm triển khai** — `user_activity` mới tạo nên mọi user cũ hiển thị "Chưa có".
-- **Idle detection phía client**: ngừng gửi sau 5 phút không tương tác (mouse/key/touch/scroll/wheel). Máy tính bật nhưng không ai dùng sẽ không được tính — đây là chủ ý.
-- **Chống gian lận chỉ ở mức cơ bản**: không chống được trường hợp user sửa mã nguồn client gửi heartbeat dày đặc (rate limit 6/phút là trần); không có cơ chế xác thực thiết bị.
-- `user_activity_daily` hiện chỉ ghi để dự phòng — chưa có API/UI đọc thống kê theo ngày.
+### 2. Video level 0–4: lag trên mạng yếu → HLS thích ứng
+- Nguyên nhân: video gốc 8–10 Mbps (1080p/720p, ~1 GB), các level preload 3–6 video cùng lúc (`preload="auto"`), file stream qua Node sau proxy Nginx, không cache.
+- **`scripts/encode-videos.sh`** (ffmpeg): `video-src/` (gốc, gitignored) → `video/level<N>/<name>.mp4` (720p H.264 Main, CRF 23, maxrate 1.4 Mbps, faststart) + `video/level<N>/hls/<name>/master.m3u8` (720p/480p/360p, GOP 2s, segment TS 4s). Tên file ASCII thống nhất (`intro/bad/middle/good`, `scene1..6`). Tổng ≈ 290 MB.
+- **`assets/video-loader.js`** (`window.CKVideo`): hls.js (vendored `assets/vendor/hls.light.min.js` 1.6.13) → HLS native (Safari) → MP4; buffer 20–30 s, ABR bắt đầu dè dặt (600 kbps) rồi lên dần, `capLevelToPlayerSize`; HLS lỗi → tự đổi sang MP4; mọi nguồn hỏng → phát sự kiện `error` cho code level xử lý như cũ.
+- Level 0/1/2: bỏ thẻ `<video>` preload ẩn, chỉ `prefetch` playlist các nhánh; `tryLoadWithFallback` dùng CKVideo (timeout 45 s, resolve khi có metadata thay vì chờ tải cả file). Level 3/4: `_playScene` viết lại — chỉ cảnh kế tiếp được chuẩn bị (`preloadOnly`), `preload="none"` cho mọi thẻ, bỏ instrumentation debug gửi log tới `127.0.0.1:7768`.
+- Server: Express `/video` `Cache-Control: public, max-age=30d, immutable` (.ts/.mp4), 1 h cho `.m3u8`, Range OK; `deploy/nginx.conf.example` thêm `location /video/`, `/assets/`, `/image/` phục vụ trực tiếp từ đĩa (`sendfile`, `aio threads`, gzip playlist).
+- Kiểm chứng (Chrome headless): intro level 0 phát qua hls.js 720p, 0 frame rớt, chỉ tải playlist các nhánh; fallback HLS hỏng → MP4 OK.
+- **Vòng 2 — tối ưu cho mạng yếu nhất (VPS):** thêm bậc 240p (~250 kbps), segment HLS 2s (GOP 2s); hls.js `startLevel: 0` (luôn khởi động 240p rồi leo bậc), ước lượng ban đầu 300 kbps; `CKVideo.prefetch` tải sẵn playlist + **segment đầu bậc thấp nhất** cho nhánh/cảnh kế tiếp; level 3/4 chuẩn bị scene1 ngay khi mở trang; nginx keep-alive dài + `open_file_cache`; VPS bật TCP BBR (`bootstrap-server.sh` bước 11). `CKVideo.stats(video)` để đo bậc/băng thông.
+- **Vòng 3 — tải trang level nhanh trên mạng yếu:** `compression` (gzip) trong Express cho HTML/CSS/JS/playlist (không nén video/ảnh) — hls.js 346 → 108 KB; `<link rel="preload" as="script">` hls.js ở `<head>` 5 level; mọi `<script src>` của level chuyển sang `defer` (các level đều init trong `DOMContentLoaded`); prefetch nhánh/cảnh kế tiếp chỉ chạy **sau khi** video hiện tại đã phát 2 s (`prefetch(src, { whenPlaying })`); 240p hạ còn ~210 kbps + audio 32k; logo PNG 388/107 KB → WebP 56/26 KB (cập nhật tham chiếu ở index + 5 level); Google Fonts của 5 level chỉ còn weight thực dùng (bỏ Poppins 500, Space Grotesk; Inter chỉ ở level 1/2).
+- **Vòng 4 — tải trước có kiểm soát (`CKVideo.warm`):** hàng đợi tải trước tuần tự từng segment ở bậc ABR sẽ chọn (băng thông hls.js đo được × 0.8, trong ngân sách `navigator.connection`), **tự dừng khi có video đang phát** (theo dõi `playing/pause/ended` của mọi thẻ video CKVideo quản lý, abort fetch đang chạy) và tiếp tục khi rảnh; video đã warm trọn → `startLevel` + `autoLevelCapping` khoá ở bậc đó (đặt SAU `loadSource` vì hls.js reset) → phát 100% từ cache. Điểm gọi: level 0/1/2 khi vào mini-game (12 s đầu mỗi nhánh rồi trọn), level 3/4 ở màn Bắt đầu (10 s cảnh 1, 240p) và khi vào câu hỏi (trọn cảnh kế tiếp); trang chủ prefetch hls.js/video-loader/playlist khi rê/chạm nút chơi. File level (`/levelN/*`) đổi `Cache-Control` từ `no-store` sang `private, no-cache` (vẫn qua guard, 304 nếu không đổi). `CKVideo.warmStatus()`/`cancelWarm()` để đo và huỷ. Đo Chrome giả lập (cache trống, từ DOM ready → phát): 3G yếu 400 kbps 22,3 s → 7,2 s; 3G 1 Mbps 9,2 s → 3,2 s; 4G yếu 4,0 s → 1,6 s.
 
 ---
 
