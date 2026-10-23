@@ -69,10 +69,12 @@ async function getStats(req, res) {
 
 /**
  * GET /api/admin/users
- * Query params: ?page=1&limit=20&search=
+ * Query params: ?page=1&limit=20&search=&sort=
  *
  * LEFT JOIN user_activity để lấy tổng thời gian online (onlineSeconds)
  * và trạng thái đang online (isOnlineNow = heartbeat trong 90 giây gần nhất).
+ * LEFT JOIN (subquery) lấy các gói đã đăng ký (packageIds) — chỉ tính gói
+ * còn hiệu lực (expires_at IS NULL = vĩnh viễn, hoặc expires_at > NOW()).
  * Tất cả điều kiện đều dùng placeholder `?` — KHÔNG nối chuỗi.
  */
 async function listUsers(req, res) {
@@ -84,15 +86,23 @@ async function listUsers(req, res) {
   try {
     let countQuery = 'SELECT COUNT(*) AS total FROM users WHERE is_active = TRUE';
     let dataQuery = `
-      SELECT u.id, u.username, u.email, u.role, u.level, u.points,
+      SELECT u.id, u.username, u.email, u.role,
              u.created_at, u.last_login,
              COALESCE(ua.total_seconds, 0) AS online_seconds,
              ua.last_heartbeat_at,
              ua.first_seen_at,
              (ua.last_heartbeat_at IS NOT NULL
-              AND ua.last_heartbeat_at >= NOW() - make_interval(secs => ?)) AS is_online_now
+              AND ua.last_heartbeat_at >= NOW() - make_interval(secs => ?)) AS is_online_now,
+             COALESCE(ent.package_ids, '') AS package_ids
       FROM users u
       LEFT JOIN user_activity ua ON ua.user_id = u.id
+      LEFT JOIN (
+        SELECT user_id,
+               STRING_AGG(package_id, ',' ORDER BY package_id) AS package_ids
+        FROM user_entitlements
+        WHERE expires_at IS NULL OR expires_at > NOW()
+        GROUP BY user_id
+      ) ent ON ent.user_id = u.id
       WHERE u.is_active = TRUE
     `;
     // Tham số đầu tiên của dataQuery là tham số cho cửa sổ "đang online".
@@ -134,8 +144,15 @@ async function listUsers(req, res) {
           username: u.username,
           email: u.email,
           role: u.role || 'user',
-          level: u.level,
-          points: u.points,
+          // Danh sách gói đã đăng ký còn hiệu lực (tên gói lấy từ catalog)
+          packages: String(u.package_ids || '')
+            .split(',')
+            .map(pid => pid.trim())
+            .filter(Boolean)
+            .map(pid => {
+              const pkg = getPackageById(pid);
+              return pkg ? pkg.name : pid;
+            }),
           createdAt: u.created_at,
           lastLogin: u.last_login,
           onlineSeconds: Number(u.online_seconds) || 0,

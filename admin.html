@@ -303,7 +303,21 @@
     <section id="tabContent-users" class="hidden space-y-4">
       <div class="flex justify-between items-center">
         <h3 class="text-base font-bold text-white">Danh Sách Thành Viên Hệ Thống</h3>
-        <button type="button" onclick="loadUsers(1)" class="text-sm text-cyan-400 hover:underline"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-refresh-cw"></use></svg> Làm mới</button>
+        <button type="button" onclick="loadUsers(currentUsersPage)" class="text-sm text-cyan-400 hover:underline"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=515b3290#i-refresh-cw"></use></svg> Làm mới</button>
+      </div>
+      <div class="flex flex-wrap gap-2 items-center">
+        <input type="text" id="usersSearchInput" placeholder="Tìm theo tên đăng nhập hoặc email..."
+               onkeydown="if (event.key === 'Enter') { currentUsersPage = 1; loadUsers(1); }"
+               class="flex-1 min-w-[220px] bg-slate-900/70 border border-slate-800 rounded-xl px-3.5 py-2 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-600" />
+        <select id="usersSortSelect" onchange="currentUsersPage = 1; loadUsers(1);"
+                class="bg-slate-900/70 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-300 focus:outline-none focus:border-cyan-600">
+          <option value="newest">Mới nhất</option>
+          <option value="oldest">Cũ nhất</option>
+          <option value="online_desc">Online nhiều nhất</option>
+          <option value="online_asc">Online ít nhất</option>
+        </select>
+        <button type="button" onclick="currentUsersPage = 1; loadUsers(1);"
+                class="px-4 py-2 bg-cyan-600/20 hover:bg-cyan-600/30 border border-cyan-700 text-cyan-300 rounded-xl text-sm font-semibold transition-colors">Tìm kiếm</button>
       </div>
       <div class="glass-card rounded-2xl overflow-hidden border border-slate-800">
         <div class="overflow-x-auto">
@@ -314,18 +328,18 @@
                 <th class="p-3.5">Tên đăng nhập</th>
                 <th class="p-3.5">Email</th>
                 <th class="p-3.5">Vai trò</th>
-                <th class="p-3.5">Cấp độ</th>
-                <th class="p-3.5">Điểm</th>
+                <th class="p-3.5">Gói đã đăng ký</th>
                 <th class="p-3.5">Thời gian online</th>
                 <th class="p-3.5">Ngày tham gia</th>
               </tr>
             </thead>
             <tbody id="usersTableBody" class="divide-y divide-slate-800 text-slate-300">
-              <tr><td colspan="8" class="p-6 text-center text-slate-500">Đang tải dữ liệu...</td></tr>
+              <tr><td colspan="7" class="p-6 text-center text-slate-500">Đang tải dữ liệu...</td></tr>
             </tbody>
           </table>
         </div>
       </div>
+      <div id="usersPagination" class="flex justify-between items-center text-xs text-slate-400 px-2"></div>
     </section>
 
   </main>
@@ -369,6 +383,9 @@
   <script src="/assets/api.js"></script>
   <script>
     let currentOrderPage = 1;
+    // Số thành viên hiển thị mỗi trang trong tab Danh Sách Thành Viên
+    const USERS_PAGE_SIZE = 20;
+    let currentUsersPage = 1;
 
     // Khởi tạo trang
     document.addEventListener('DOMContentLoaded', async () => {
@@ -457,7 +474,7 @@
       if (tabName === 'transactions') loadTransactions(1);
       if (tabName === 'mismatches') loadMismatches();
       if (tabName === 'audit') loadAuditLogs(1);
-      if (tabName === 'users') loadUsers(1);
+      if (tabName === 'users') { currentUsersPage = 1; loadUsers(1); }
     }
 
     function renderStats(data) {
@@ -584,28 +601,70 @@
       return hours + ' giờ ' + minutes + ' phút';
     }
 
+    /**
+     * Render danh sách gói đã đăng ký của user thành badge.
+     * @param {string[]} packages - danh sách tên gói (đã map từ catalog ở backend)
+     * @returns {string} HTML
+     */
+    function renderPackageBadges(packages) {
+      if (!Array.isArray(packages) || packages.length === 0) {
+        return '<span class="text-xs text-slate-500 italic">Chưa đăng ký</span>';
+      }
+      return packages.map(pkg => `
+        <span class="inline-block px-2 py-0.5 mr-1 mb-1 rounded text-xs font-medium bg-cyan-950 text-cyan-300 border border-cyan-800">${escapeHtml(pkg)}</span>
+      `).join('');
+    }
+
     async function loadUsers(page = 1) {
       const tbody = document.getElementById('usersTableBody');
-      tbody.innerHTML = '<tr><td colspan="8" class="p-6 text-center text-slate-500">Đang tải...</td></tr>';
+      const pagEl = document.getElementById('usersPagination');
+      currentUsersPage = page;
+      tbody.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-slate-500">Đang tải...</td></tr>';
+      if (pagEl) pagEl.innerHTML = '';
       try {
-        const res = await window.CyberAPI.admin.getUsers({ page, limit: 15 });
+        const searchInput = document.getElementById('usersSearchInput');
+        const sortSelect = document.getElementById('usersSortSelect');
+        const search = searchInput ? searchInput.value.trim() : '';
+        const sort = sortSelect ? sortSelect.value : 'newest';
+        const res = await window.CyberAPI.admin.getUsers({ page, limit: USERS_PAGE_SIZE, search, sort });
         if (res.success && res.data && res.data.users) {
+          if (res.data.users.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-slate-500">Không có thành viên nào.</td></tr>';
+            if (pagEl) {
+              pagEl.innerHTML = '<span>Không có thành viên nào</span>';
+            }
+            return;
+          }
           tbody.innerHTML = res.data.users.map(u => `
             <tr class="hover:bg-slate-900/50 transition-colors">
               <td class="p-3.5 text-slate-400">#${escapeHtml(u.id)}</td>
               <td class="p-3.5 font-bold text-white">${escapeHtml(u.username)}</td>
               <td class="p-3.5 text-slate-300">${escapeHtml(u.email)}</td>
               <td class="p-3.5"><span class="px-2 py-0.5 rounded text-xs ${u.role === 'admin' ? 'bg-purple-900 text-purple-200 border border-purple-700' : 'bg-slate-800 text-slate-400'}">${escapeHtml(u.role)}</span></td>
-              <td class="p-3.5 text-cyan-400 font-semibold">Cấp ${escapeHtml(u.level || 1)}</td>
-              <td class="p-3.5 font-bold text-amber-400">${Number(u.points || 0)}</td>
+              <td class="p-3.5">${renderPackageBadges(u.packages)}</td>
               <td class="p-3.5 text-xs text-emerald-400 whitespace-nowrap">${escapeHtml(formatDuration(u.onlineSeconds))}${u.isOnlineNow ? ' <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 align-middle" title="Đang online"></span>' : ''}</td>
               <td class="p-3.5 text-xs text-slate-400">${escapeHtml(new Date(u.createdAt).toLocaleDateString('vi-VN'))}</td>
             </tr>
           `).join('');
+
+          const pag = res.data.pagination;
+          if (pagEl && pag) {
+            const totalPages = pag.totalPages || 1;
+            const from = (pag.page - 1) * pag.limit + 1;
+            const to = Math.min(pag.page * pag.limit, pag.total);
+            pagEl.innerHTML = `
+              <span>Trang ${pag.page} / ${totalPages} — Hiển thị ${from}-${to} trong tổng ${pag.total} thành viên</span>
+              <div class="flex gap-2 items-center">
+                <button type="button" ${pag.page <= 1 ? 'disabled class="opacity-50"' : `onclick="loadUsers(${pag.page - 1})"`} class="px-3 py-1 bg-slate-800 hover:bg-slate-700 rounded text-slate-300">Trước</button>
+                <button type="button" ${pag.page >= totalPages ? 'disabled class="opacity-50"' : `onclick="loadUsers(${pag.page + 1})"`} class="px-3 py-1 bg-slate-800 hover:bg-slate-700 rounded text-slate-300">Sau</button>
+              </div>
+            `;
+          }
         }
       } catch (err) {
         console.error('Lỗi khi tải người dùng:', err);
-        tbody.innerHTML = '<tr><td colspan="8" class="p-6 text-center text-rose-400">Lỗi tải danh sách người dùng.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-rose-400">Lỗi tải danh sách người dùng.</td></tr>';
+        if (pagEl) pagEl.innerHTML = '';
       }
     }
 
