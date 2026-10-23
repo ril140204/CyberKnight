@@ -45,17 +45,20 @@ function toInt(v) {
   return Number.isFinite(n) ? n : 0;
 }
 
-// Mã lỗi InnoDB: 1213 = deadlock, 1205 = lock wait timeout
+// SQLSTATE của PostgreSQL:
+//   40P01 = deadlock_detected
+//   55P03 / 57014 = lock_not_available / query_canceled (lock wait timeout)
 // Cả hai đều xảy ra khi 2 heartbeat của CÙNG một user tranh nhau tạo dòng
-const ER_LOCK_DEADLOCK = 1213;
-const ER_LOCK_WAIT_TIMEOUT = 1205;
+const PG_DEADLOCK = '40P01';
+const PG_LOCK_UNAVAILABLE = '55P03';
+const PG_QUERY_CANCELED = '57014';
 const MAX_TX_RETRIES = 3;
 
 /**
  * Chạy một khối transaction, tự thử lại nếu gặp deadlock / lock timeout.
  * Việc serialize thật sự vẫn do khoá X trên dòng user_activity đảm bảo.
  *
- * @param {(conn: import('mysql2/promise').PoolConnection) => Promise<*>} fn
+ * @param {(conn: import('pg').PoolClient) => Promise<*>} fn
  * @returns {Promise<*>}
  */
 async function withTransactionRetry(fn) {
@@ -70,7 +73,11 @@ async function withTransactionRetry(fn) {
         return result;
       } catch (err) {
         try { await conn.rollback(); } catch (_) { /* im lặng */ }
-        const isRetryable = err && (err.errno === ER_LOCK_DEADLOCK || err.errno === ER_LOCK_WAIT_TIMEOUT);
+        const isRetryable = err && (
+          err.code === PG_DEADLOCK ||
+          err.code === PG_LOCK_UNAVAILABLE ||
+          err.code === PG_QUERY_CANCELED
+        );
         if (!isRetryable || attempt === MAX_TX_RETRIES) throw err;
         // Nghỉ ngắn rồi thử lại (backoff tuyến tính)
         await new Promise(r => setTimeout(r, 20 * attempt));
@@ -104,14 +111,15 @@ async function heartbeat(req, res) {
 
   try {
     const result = await withTransactionRetry(async (conn) => {
-      // 1. Bảo đảm dòng dữ liệu tồn tại (INSERT IGNORE chống lỗi trùng khóa khi
-      //    2 request đồng thời tới lần đầu tiên của cùng một user).
-      //    Lưu ý: INSERT IGNORE trên PRIMARY KEY có thể tạo gap-lock; nếu bị
-      //    deadlock (errno 1213) hoặc lock timeout (1205) thì withTransactionRetry
-      //    tự thử lại — lần chạy lại sẽ đi vào nhánh "dòng đã tồn tại" dưới đây.
+      // 1. Bảo đảm dòng dữ liệu tồn tại (ON CONFLICT DO NOTHING chống lỗi trùng
+      //    khóa khi 2 request đồng thời tới lần đầu tiên của cùng một user).
+      //    ON CONFLICT DO NOTHING trên PRIMARY KEY có thể chờ khóa; nếu bị
+      //    deadlock hoặc serialization failure thì withTransactionRetry tự thử
+      //    lại — lần chạy lại sẽ đi vào nhánh "dòng đã tồn tại" dưới đây.
       await conn.query(
-        `INSERT IGNORE INTO user_activity (user_id, total_seconds, last_heartbeat_at, first_seen_at)
-         VALUES (?, 0, NULL, NULL)`,
+        `INSERT INTO user_activity (user_id, total_seconds, last_heartbeat_at, first_seen_at)
+         VALUES (?, 0, NULL, NULL)
+         ON CONFLICT (user_id) DO NOTHING`,
         [userId]
       );
 
@@ -120,7 +128,7 @@ async function heartbeat(req, res) {
         `SELECT total_seconds,
                 last_heartbeat_at,
                 first_seen_at,
-                TIMESTAMPDIFF(SECOND, last_heartbeat_at, NOW()) AS delta_seconds
+                EXTRACT(EPOCH FROM (NOW() - last_heartbeat_at))::BIGINT AS delta_seconds
          FROM user_activity
          WHERE user_id = ?
          FOR UPDATE`,
@@ -174,8 +182,9 @@ async function heartbeat(req, res) {
         if (addedSeconds > 0) {
           await conn.query(
             `INSERT INTO user_activity_daily (user_id, day, seconds)
-             VALUES (?, CURDATE(), ?)
-             ON DUPLICATE KEY UPDATE seconds = seconds + VALUES(seconds)`,
+             VALUES (?, CURRENT_DATE, ?)
+             ON CONFLICT (user_id, day)
+             DO UPDATE SET seconds = user_activity_daily.seconds + EXCLUDED.seconds`,
             [userId, addedSeconds]
           );
         }

@@ -1,5 +1,5 @@
 -- ============================================
--- SIGMABLOOM - Migration 008: User Activity (Online Time)
+-- SIGMABLOOM — Migration 008: User Activity (Online Time) — PostgreSQL
 -- ============================================
 -- Mục đích: Lưu TỔNG THỜI GIAN ONLINE của từng người dùng.
 --   - user_activity        : tổng số giây online (cộng dồn) + mốc heartbeat gần nhất
@@ -11,39 +11,45 @@
 --   - Dữ liệu chỉ là số giây + mốc thời gian, KHÔNG lưu IP / User-Agent /
 --     nội dung tương tác (bảo mật dữ liệu trẻ em - NĐ 13/2023).
 --
--- Idempotent: CREATE TABLE IF NOT EXISTS (chạy lại nhiều lần vẫn an toàn)
--- Style: match migration 007
+-- PostgreSQL: dùng TIMESTAMPTZ + trigger set_updated_at() (định nghĩa ở
+-- migration 001) thay cho MySQL ON UPDATE CURRENT_TIMESTAMP.
+-- Idempotent: CREATE TABLE IF NOT EXISTS + CREATE OR REPLACE TRIGGER.
 -- ============================================
 
 -- 1. Tổng thời gian online toàn hệ thống
 CREATE TABLE IF NOT EXISTS user_activity (
-  user_id            INT            NOT NULL COMMENT 'FK về users(id)',
-  total_seconds      BIGINT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Tổng số giây online đã cộng dồn',
-  last_heartbeat_at  DATETIME       NULL COMMENT 'Lần heartbeat hợp lệ gần nhất',
-  first_seen_at      DATETIME       NULL COMMENT 'Lần đầu tiên gửi heartbeat',
-  updated_at         DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  user_id            INTEGER      NOT NULL,
+  total_seconds      BIGINT       NOT NULL DEFAULT 0,
+  last_heartbeat_at  TIMESTAMPTZ  NULL,
+  first_seen_at      TIMESTAMPTZ  NULL,
+  updated_at         TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
 
   PRIMARY KEY (user_id),
-  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
 
-  -- Truy vấn admin: sắp xếp theo thời gian online
-  INDEX idx_activity_total  (total_seconds),
-  -- Truy vấn admin: lọc user đang online (last_heartbeat_at gần đây)
-  INDEX idx_activity_heartbeat (last_heartbeat_at)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+-- Truy vấn admin: sắp xếp theo thời gian online / lọc user đang online
+CREATE INDEX IF NOT EXISTS idx_activity_total     ON user_activity (total_seconds);
+CREATE INDEX IF NOT EXISTS idx_activity_heartbeat ON user_activity (last_heartbeat_at);
 
--- 2. Thống kê theo ngày (dự phòng — đã cộng trong cùng transaction với bảng trên)
+-- updated_at tự cập nhật mỗi lần heartbeat ghi vào (thay ON UPDATE của MySQL)
+CREATE OR REPLACE TRIGGER trg_user_activity_updated_at
+BEFORE UPDATE ON user_activity
+FOR EACH ROW
+EXECUTE FUNCTION set_updated_at();
+
+-- 2. Thống kê theo ngày (dự phòng — cộng trong cùng transaction với bảng trên)
 CREATE TABLE IF NOT EXISTS user_activity_daily (
-  user_id   INT     NOT NULL,
-  day       DATE    NOT NULL COMMENT 'Ngày tính theo giờ máy chủ (NOW())',
-  seconds   INT     NOT NULL DEFAULT 0,
+  user_id   INTEGER     NOT NULL,
+  day       DATE        NOT NULL,
+  seconds   INTEGER     NOT NULL DEFAULT 0,
 
   PRIMARY KEY (user_id, day),
-  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
 
-  -- Báo cáo tổng theo ngày
-  INDEX idx_activity_daily_day (day)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+-- Báo cáo tổng theo ngày
+CREATE INDEX IF NOT EXISTS idx_activity_daily_day ON user_activity_daily (day);
 
 -- ============================================
 -- Marker
