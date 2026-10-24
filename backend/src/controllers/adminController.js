@@ -50,12 +50,12 @@ async function getStats(req, res) {
     return res.json({
       success: true,
       data: {
-        totalUsers: totalUsers[0].cnt,
-        totalPaidOrders: totalPaidOrders[0].cnt,
-        totalEntitlements: totalEntitlements[0].cnt,
-        todayNewUsers: todayUsers[0].cnt,
-        totalMismatches: totalMismatches[0].cnt,
-        totalRevenue: Number(totalRevenue[0].total) || 0,
+        totalUsers: Number(totalUsers[0]?.cnt) || 0,
+        totalPaidOrders: Number(totalPaidOrders[0]?.cnt) || 0,
+        totalEntitlements: Number(totalEntitlements[0]?.cnt) || 0,
+        todayNewUsers: Number(todayUsers[0]?.cnt) || 0,
+        totalMismatches: Number(totalMismatches[0]?.cnt) || 0,
+        totalRevenue: Number(totalRevenue[0]?.total) || 0,
       },
     });
   } catch (err) {
@@ -131,7 +131,7 @@ async function listUsers(req, res) {
     dataQuery += ` ORDER BY ${orderBy} LIMIT ? OFFSET ?`;
 
     const [countResult] = await db.query(countQuery, countParams);
-    const total = countResult[0].total;
+    const total = Number(countResult[0]?.total) || 0;
 
     // Đặt limit/offset làm số
     const [rows] = await db.query(dataQuery, [...dataParams, limit, offset]);
@@ -164,7 +164,7 @@ async function listUsers(req, res) {
           page,
           limit,
           total,
-          totalPages: Math.ceil(total / limit),
+          totalPages: Math.ceil(total / limit) || 1,
         },
       },
     });
@@ -220,7 +220,7 @@ async function getUserDetail(req, res) {
               first_seen_at,
               (last_heartbeat_at IS NOT NULL
                AND last_heartbeat_at >= NOW() - make_interval(secs => ?)) AS is_online_now
-       FROM user_activity WHERE user_id = $2`,
+       FROM user_activity WHERE user_id = ?`,
       [ONLINE_WINDOW_SECONDS, userId]
     );
     const act = activityRows[0] || {};
@@ -449,7 +449,7 @@ async function listAdminOrders(req, res) {
     }
 
     const [countResult] = await db.query(countQuery, params);
-    const total = countResult[0].total;
+    const total = Number(countResult[0]?.total) || 0;
 
     dataQuery += ' ORDER BY o.created_at DESC LIMIT ? OFFSET ?';
 
@@ -476,7 +476,7 @@ async function listAdminOrders(req, res) {
           page,
           limit,
           total,
-          totalPages: Math.ceil(total / limit),
+          totalPages: Math.ceil(total / limit) || 1,
         },
       },
     });
@@ -500,12 +500,15 @@ async function listAdminTransactions(req, res) {
   const offset = (page - 1) * limit;
   const providerFilter = (req.query.provider || '').trim();
   const orderIdFilter = parseInt(req.query.order_id) || null;
+  const statusFilter = (req.query.status || '').trim();
+  const search = (req.query.search || '').trim();
 
   try {
     let countQuery = `
       SELECT COUNT(*) AS total
       FROM payment_transactions pt
       LEFT JOIN orders o ON pt.order_id = o.id
+      LEFT JOIN users u ON o.user_id = u.id
     `;
     let dataQuery = `
       SELECT pt.id, pt.provider, pt.provider_tx_id, pt.order_id, pt.amount_in,
@@ -529,6 +532,28 @@ async function listAdminTransactions(req, res) {
       params.push(orderIdFilter);
     }
 
+    // Lọc theo trạng thái khớp (matched / no_order / underpaid / duplicate / error)
+    if (statusFilter) {
+      whereConditions.push('pt.match_status = ?');
+      params.push(statusFilter);
+    }
+
+    // Tìm kiếm: mã GD cổng, nội dung CK, số tài khoản, nhà cung cấp, mã đơn, tên/email người dùng, mã ID
+    if (search) {
+      whereConditions.push(`(
+        pt.provider_tx_id ILIKE ? OR
+        pt.content ILIKE ? OR
+        pt.account_number ILIKE ? OR
+        pt.provider ILIKE ? OR
+        o.order_code ILIKE ? OR
+        u.username ILIKE ? OR
+        u.email ILIKE ? OR
+        CAST(pt.id AS TEXT) ILIKE ?
+      )`);
+      const pattern = `%${search}%`;
+      params.push(pattern, pattern, pattern, pattern, pattern, pattern, pattern, pattern);
+    }
+
     if (whereConditions.length > 0) {
       const whereClause = ' WHERE ' + whereConditions.join(' AND ');
       countQuery += whereClause;
@@ -536,7 +561,7 @@ async function listAdminTransactions(req, res) {
     }
 
     const [countResult] = await db.query(countQuery, params);
-    const total = countResult[0].total;
+    const total = Number(countResult[0]?.total) || 0;
 
     dataQuery += ' ORDER BY pt.created_at DESC LIMIT ? OFFSET ?';
 
@@ -565,7 +590,7 @@ async function listAdminTransactions(req, res) {
           page,
           limit,
           total,
-          totalPages: Math.ceil(total / limit),
+          totalPages: Math.ceil(total / limit) || 1,
         },
       },
     });
@@ -677,21 +702,71 @@ async function grantPackageDirect(req, res) {
 /**
  * GET /api/admin/payments/mismatches
  * Danh sách giao dịch lỗi cần admin reconcile
+ * Query: page, limit, search, status
  */
 async function getMismatches(req, res) {
+  const page = Math.max(1, parseInt(req.query.page) || 1);
+  const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 20));
+  const offset = (page - 1) * limit;
+  const statusFilter = (req.query.status || '').trim();
+  const search = (req.query.search || '').trim();
+
   try {
-    const [rows] = await db.query(
-      `SELECT pt.id, pt.provider, pt.provider_tx_id, pt.order_id, pt.amount_in,
-              pt.content, pt.account_number, pt.transaction_date,
-              pt.match_status, pt.created_at,
-              o.order_code, o.user_id, u.username, u.email
-       FROM payment_transactions pt
-       LEFT JOIN orders o ON pt.order_id = o.id
-       LEFT JOIN users u ON o.user_id = u.id
-       WHERE pt.match_status IN ('no_order', 'underpaid', 'error')
-       ORDER BY pt.created_at DESC
-       LIMIT 200`
-    );
+    // Chỉ các trạng thái lỗi; nếu có status filter thì thu hẹp thêm.
+    const ERROR_STATUSES = ['no_order', 'underpaid', 'error'];
+    const whereConditions = [];
+    const params = [];
+
+    if (statusFilter && ERROR_STATUSES.includes(statusFilter)) {
+      whereConditions.push('pt.match_status = ?');
+      params.push(statusFilter);
+    } else {
+      whereConditions.push(`pt.match_status IN ('no_order', 'underpaid', 'error')`);
+    }
+
+    // Tìm kiếm: mã GD cổng, nội dung CK, số tài khoản, nhà cung cấp, mã đơn, tên/email người dùng, mã ID
+    if (search) {
+      whereConditions.push(`(
+        pt.provider_tx_id ILIKE ? OR
+        pt.content ILIKE ? OR
+        pt.account_number ILIKE ? OR
+        pt.provider ILIKE ? OR
+        o.order_code ILIKE ? OR
+        u.username ILIKE ? OR
+        u.email ILIKE ? OR
+        CAST(pt.id AS TEXT) ILIKE ?
+      )`);
+      const pattern = `%${search}%`;
+      params.push(pattern, pattern, pattern, pattern, pattern, pattern, pattern, pattern);
+    }
+
+    const whereClause = ' WHERE ' + whereConditions.join(' AND ');
+
+    const countQuery = `
+      SELECT COUNT(*) AS total
+      FROM payment_transactions pt
+      LEFT JOIN orders o ON pt.order_id = o.id
+      LEFT JOIN users u ON o.user_id = u.id
+    ${whereClause}
+    `;
+
+    const dataQuery = `
+      SELECT pt.id, pt.provider, pt.provider_tx_id, pt.order_id, pt.amount_in,
+             pt.content, pt.account_number, pt.transaction_date,
+             pt.match_status, pt.created_at,
+             o.order_code, o.user_id, u.username, u.email
+      FROM payment_transactions pt
+      LEFT JOIN orders o ON pt.order_id = o.id
+      LEFT JOIN users u ON o.user_id = u.id
+    ${whereClause}
+      ORDER BY pt.created_at DESC
+      LIMIT ? OFFSET ?
+    `;
+
+    const [countResult] = await db.query(countQuery, params);
+    const total = Number(countResult[0]?.total) || 0;
+
+    const [rows] = await db.query(dataQuery, [...params, limit, offset]);
 
     return res.json({
       success: true,
@@ -712,6 +787,12 @@ async function getMismatches(req, res) {
           matchStatus: r.match_status,
           createdAt: r.created_at,
         })),
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages: Math.ceil(total / limit) || 1,
+        },
       },
     });
   } catch (err) {
@@ -897,7 +978,7 @@ async function reconcileTransaction(req, res) {
 /**
  * GET /api/admin/audit-logs
  * Danh sách nhật ký hoạt động của admin
- * Query params: ?page=1&limit=20&admin_id=&target_user_id=&action=
+ * Query params: ?page=1&limit=20&admin_id=&target_user_id=&action=&search=
  */
 async function listAuditLogs(req, res) {
   const page = Math.max(1, Number.parseInt(req.query.page, 10) || 1);
@@ -906,11 +987,14 @@ async function listAuditLogs(req, res) {
   const adminIdFilter = Number.parseInt(req.query.admin_id, 10) || null;
   const targetUserIdFilter = Number.parseInt(req.query.target_user_id, 10) || null;
   const actionFilter = (req.query.action || '').trim();
+  const search = (req.query.search || '').trim();
 
   try {
     let countQuery = `
       SELECT COUNT(*) AS total
       FROM admin_audit_log a
+      LEFT JOIN users u_admin ON a.admin_id = u_admin.id
+      LEFT JOIN users u_target ON a.target_user_id = u_target.id
     `;
     let dataQuery = `
       SELECT a.id, a.admin_id, a.action, a.target_user_id, a.package_id, a.reason, a.created_at,
@@ -934,8 +1018,28 @@ async function listAuditLogs(req, res) {
     }
 
     if (actionFilter) {
-      whereConditions.push('a.action = ?');
-      params.push(actionFilter);
+      if (actionFilter === 'reconcile') {
+        whereConditions.push("a.action IN ('reconcile', 'reconcile_transaction')");
+      } else {
+        whereConditions.push('a.action = ?');
+        params.push(actionFilter);
+      }
+    }
+
+    // Tìm kiếm: tên/email admin, tên/email người nhận, gói, lý do, hành động, ID
+    if (search) {
+      whereConditions.push(`(
+        u_admin.username ILIKE ? OR
+        u_admin.email ILIKE ? OR
+        u_target.username ILIKE ? OR
+        u_target.email ILIKE ? OR
+        a.package_id ILIKE ? OR
+        a.reason ILIKE ? OR
+        a.action ILIKE ? OR
+        CAST(a.id AS TEXT) ILIKE ?
+      )`);
+      const pattern = `%${search}%`;
+      params.push(pattern, pattern, pattern, pattern, pattern, pattern, pattern, pattern);
     }
 
     if (whereConditions.length > 0) {
@@ -945,7 +1049,7 @@ async function listAuditLogs(req, res) {
     }
 
     const [countResult] = await db.query(countQuery, params);
-    const total = countResult[0].total;
+    const total = Number(countResult[0]?.total) || 0;
 
     dataQuery += ' ORDER BY a.created_at DESC LIMIT ? OFFSET ?';
 
@@ -971,7 +1075,7 @@ async function listAuditLogs(req, res) {
           page,
           limit,
           total,
-          totalPages: Math.ceil(total / limit),
+          totalPages: Math.ceil(total / limit) || 1,
         },
       },
     });

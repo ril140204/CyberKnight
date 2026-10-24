@@ -187,7 +187,7 @@ async function run() {
     console.log('\n── 4. Kiểm tra phòng vệ tài khoản bị khóa (is_active = FALSE) ──');
     const [disabledUserInsert] = await db.query(
       `INSERT INTO users (first_name, last_name, username, email, password, role, is_active, birth_year)
-       VALUES ('Disabled', 'Admin', ?, ?, 'hash123', 'admin', 0, 2000)`,
+       VALUES ('Disabled', 'Admin', ?, ?, 'hash123', 'admin', FALSE, 2000)`,
       [`disabled_admin_${ts}`, `disabled_admin_${ts}@sigmabloom.vn`]
     );
     const disabledAdminId = disabledUserInsert.insertId;
@@ -359,6 +359,14 @@ async function run() {
     });
     assert(txsRes.status === 200 && txsRes.json?.success === true, 'GET /api/admin/transactions trả về danh sách giao dịch');
     assert(Array.isArray(txsRes.json?.data?.transactions), 'Kết quả transactions là mảng hợp lệ');
+    assert(txsRes.json?.data?.pagination?.limit === 10, 'Phân trang transactions tôn trọng tham số limit');
+
+    const defaultTxRes = await request({
+      method: 'GET',
+      path: '/api/admin/transactions',
+      headers: { Authorization: `Bearer ${adminToken}` },
+    });
+    assert(defaultTxRes.json?.data?.pagination?.limit === 20, 'Phân trang transactions mặc định 20 dòng/trang');
 
     // ── 11. Đối soát & Khớp giao dịch (Reconciliation) ──
     console.log('\n── 11. Đối soát & Khớp giao dịch (POST /api/admin/payments/reconcile) ──');
@@ -391,6 +399,16 @@ async function run() {
     });
     const foundMismatch = mismatchesBefore.json?.data?.transactions?.some(t => t.id === testTxId);
     assert(foundMismatch, `Giao dịch lỗi #${testTxId} xuất hiện trong GET /api/admin/payments/mismatches`);
+    assert(mismatchesBefore.json?.data?.pagination?.limit === 20, 'Phân trang mismatches mặc định 20 dòng/trang');
+
+    // Kiểm tra tìm kiếm mismatches theo mã giao dịch
+    const searchMismatchRes = await request({
+      method: 'GET',
+      path: `/api/admin/payments/mismatches?search=${testProviderTxId}`,
+      headers: { Authorization: `Bearer ${adminToken}` },
+    });
+    const foundSearchMismatch = searchMismatchRes.json?.data?.transactions?.some(t => t.id === testTxId);
+    assert(foundSearchMismatch, `Tìm kiếm mismatch theo search=${testProviderTxId} thành công`);
 
     // Thực hiện đối soát POST /api/admin/payments/reconcile
     const reconcileRes = await request({

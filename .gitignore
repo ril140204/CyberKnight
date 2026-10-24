@@ -24,6 +24,12 @@ _cursor/
 *.swo
 .vscode/
 
+# Temporary test/shot scripts
+_*.js
+_*.py
+_shots/
+backend/_*.js
+
 # Archives & Repomix outputs
 *.zip
 *.tar.gz
