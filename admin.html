@@ -135,20 +135,24 @@
 
     <!-- TAB 1: ĐƠN HÀNG -->
     <section id="tabContent-orders" class="space-y-4">
-      <div class="flex flex-col sm:flex-row justify-between gap-3">
-        <div class="flex items-center gap-2">
-          <input type="text" id="orderSearchInput" aria-label="Tìm kiếm theo mã đơn hoặc email" placeholder="Tìm theo mã đơn, email..." class="px-4 py-2 rounded-xl bg-slate-900 border border-slate-700 text-sm focus:outline-none focus:border-cyan-400 w-64">
-          <select id="orderStatusFilter" aria-label="Lọc theo trạng thái đơn hàng" onchange="loadOrders(1)" class="px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-sm focus:outline-none focus:border-cyan-400 text-slate-300">
-            <option value="">Tất cả trạng thái</option>
-            <option value="pending">Chờ thanh toán (pending)</option>
-            <option value="paid">Đã thanh toán (paid)</option>
-            <option value="expired">Hết hạn (expired)</option>
-            <option value="underpaid">Chuyển thiếu (underpaid)</option>
-            <option value="cancelled">Đã hủy (cancelled)</option>
-          </select>
-          <button type="button" onclick="loadOrders(1)" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-sm font-semibold transition-colors">Lọc</button>
-        </div>
+      <div class="flex justify-between items-center">
+        <h3 class="text-base font-bold text-white">Quản Lý Đơn Hàng Hệ Thống</h3>
         <button type="button" onclick="loadOrders(currentOrderPage)" class="text-sm text-cyan-400 hover:underline"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-refresh-cw"></use></svg> Làm mới</button>
+      </div>
+      <div class="flex flex-wrap gap-2 items-center">
+        <input type="text" id="orderSearchInput" aria-label="Tìm kiếm theo mã đơn, email hoặc người dùng" placeholder="Tìm theo mã đơn, email, người dùng..."
+               onkeydown="if (event.key === 'Enter') { currentOrderPage = 1; loadOrders(1); }"
+               class="flex-1 min-w-[220px] bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-400">
+        <select id="orderStatusFilter" aria-label="Lọc theo trạng thái đơn hàng" onchange="currentOrderPage = 1; loadOrders(1)"
+                class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-300 focus:outline-none focus:border-cyan-400">
+          <option value="">Tất cả trạng thái</option>
+          <option value="pending">Chờ thanh toán (pending)</option>
+          <option value="paid">Đã thanh toán (paid)</option>
+          <option value="expired">Hết hạn (expired)</option>
+          <option value="underpaid">Chuyển thiếu (underpaid)</option>
+          <option value="cancelled">Đã hủy (cancelled)</option>
+        </select>
+        <button type="button" onclick="currentOrderPage = 1; loadOrders(1)" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-sm font-semibold transition-colors">Tìm kiếm</button>
       </div>
 
       <div class="glass-card rounded-2xl overflow-hidden border border-slate-800">
@@ -177,7 +181,23 @@
     <section id="tabContent-transactions" class="hidden space-y-4">
       <div class="flex justify-between items-center">
         <h3 class="text-base font-bold text-white">Lịch Sử Webhook / Giao Dịch Đã Nhận</h3>
-        <button type="button" onclick="loadTransactions(1)" class="text-sm text-cyan-400 hover:underline"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-refresh-cw"></use></svg> Làm mới</button>
+        <button type="button" onclick="loadTransactions(currentTxPage)" class="text-sm text-cyan-400 hover:underline"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-refresh-cw"></use></svg> Làm mới</button>
+      </div>
+      <div class="flex flex-wrap gap-2 items-center">
+        <input type="text" id="txSearchInput" placeholder="Tìm theo mã GD, nội dung CK, số tài khoản, mã đơn..."
+               onkeydown="if (event.key === 'Enter') { currentTxPage = 1; loadTransactions(1); }"
+               class="flex-1 min-w-[220px] bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-400" />
+        <select id="txStatusFilter" onchange="currentTxPage = 1; loadTransactions(1);"
+                class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-300 focus:outline-none focus:border-cyan-400">
+          <option value="">Tất cả trạng thái</option>
+          <option value="matched">Đã khớp (matched)</option>
+          <option value="no_order">Không có mã đơn (no_order)</option>
+          <option value="underpaid">Chuyển thiếu (underpaid)</option>
+          <option value="duplicate">Trùng (duplicate)</option>
+          <option value="error">Lỗi (error)</option>
+        </select>
+        <button type="button" onclick="currentTxPage = 1; loadTransactions(1);"
+                class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-sm font-semibold transition-colors">Tìm kiếm</button>
       </div>
       <div class="glass-card rounded-2xl overflow-hidden border border-slate-800">
         <div class="overflow-x-auto">
@@ -199,6 +219,7 @@
           </table>
         </div>
       </div>
+      <div id="txPagination" class="flex justify-between items-center text-xs text-slate-400 px-2"></div>
     </section>
 
     <!-- TAB 3: ĐỐI SOÁT GIAO DỊCH LỖI (MISMATCHES) -->
@@ -210,7 +231,21 @@
           </h3>
           <p class="text-xs text-slate-400 mt-0.5">Các giao dịch chuyển thiếu tiền (underpaid), không có mã đơn (no_order) hoặc gặp lỗi khớp.</p>
         </div>
-        <button type="button" onclick="loadMismatches()" class="text-sm text-cyan-400 hover:underline"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-refresh-cw"></use></svg> Làm mới</button>
+        <button type="button" onclick="loadMismatches(currentMismatchPage)" class="text-sm text-cyan-400 hover:underline"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-refresh-cw"></use></svg> Làm mới</button>
+      </div>
+      <div class="flex flex-wrap gap-2 items-center">
+        <input type="text" id="mismatchSearchInput" placeholder="Tìm theo mã GD, nội dung CK, số tài khoản, mã đơn..."
+               onkeydown="if (event.key === 'Enter') { currentMismatchPage = 1; loadMismatches(1); }"
+               class="flex-1 min-w-[220px] bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-400" />
+        <select id="mismatchStatusFilter" onchange="currentMismatchPage = 1; loadMismatches(1);"
+                class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-300 focus:outline-none focus:border-cyan-400">
+          <option value="">Tất cả lỗi</option>
+          <option value="no_order">Không có mã đơn (no_order)</option>
+          <option value="underpaid">Chuyển thiếu (underpaid)</option>
+          <option value="error">Lỗi đối soát (error)</option>
+        </select>
+        <button type="button" onclick="currentMismatchPage = 1; loadMismatches(1);"
+                class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-sm font-semibold transition-colors">Tìm kiếm</button>
       </div>
       <div class="glass-card rounded-2xl overflow-hidden border border-slate-800">
         <div class="overflow-x-auto">
@@ -232,6 +267,7 @@
           </table>
         </div>
       </div>
+      <div id="mismatchesPagination" class="flex justify-between items-center text-xs text-slate-400 px-2"></div>
     </section>
 
     <!-- TAB 4: CẤP QUYỀN THỦ CÔNG -->
@@ -274,7 +310,21 @@
           </h3>
           <p class="text-xs text-slate-400 mt-0.5">Lưu vết toàn bộ thao tác cấp gói, thu hồi quyền và đối soát giao dịch.</p>
         </div>
-        <button type="button" onclick="loadAuditLogs(1)" class="text-sm text-cyan-400 hover:underline"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-refresh-cw"></use></svg> Làm mới</button>
+        <button type="button" onclick="loadAuditLogs(currentAuditPage)" class="text-sm text-cyan-400 hover:underline"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-refresh-cw"></use></svg> Làm mới</button>
+      </div>
+      <div class="flex flex-wrap gap-2 items-center">
+        <input type="text" id="auditSearchInput" placeholder="Tìm theo admin, học sinh, gói, lý do..."
+               onkeydown="if (event.key === 'Enter') { currentAuditPage = 1; loadAuditLogs(1); }"
+               class="flex-1 min-w-[220px] bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-400" />
+        <select id="auditActionFilter" onchange="currentAuditPage = 1; loadAuditLogs(1);"
+                class="bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-300 focus:outline-none focus:border-cyan-400">
+          <option value="">Tất cả hành động</option>
+          <option value="grant_package">Cấp gói (grant_package)</option>
+          <option value="revoke_package">Thu hồi gói (revoke_package)</option>
+          <option value="reconcile_transaction">Đối soát giao dịch (reconcile_transaction)</option>
+        </select>
+        <button type="button" onclick="currentAuditPage = 1; loadAuditLogs(1);"
+                class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-sm font-semibold transition-colors">Tìm kiếm</button>
       </div>
       <div class="glass-card rounded-2xl overflow-hidden border border-slate-800">
         <div class="overflow-x-auto">
@@ -383,9 +433,64 @@
   <script src="/assets/api.js"></script>
   <script>
     let currentOrderPage = 1;
-    // Số thành viên hiển thị mỗi trang trong tab Danh Sách Thành Viên
-    const USERS_PAGE_SIZE = 20;
+    // Số dòng hiển thị mỗi trang — áp dụng cho TẤT CẢ các bảng trong trang quản trị
+    const PAGE_SIZE = 20;
+    // Trạng thái phân trang của từng bảng
     let currentUsersPage = 1;
+    let currentTxPage = 1;
+    let currentMismatchPage = 1;
+    let currentAuditPage = 1;
+
+    /**
+     * Render thanh phân trang dùng chung cho mọi bảng.
+     * @param {string} containerId - id của div chứa thanh phân trang
+     * @param {Object} pag - đối tượng pagination từ API { page, limit, total, totalPages }
+     * @param {string} loadFnName - tên hàm load (vd 'loadTransactions') để gọi khi chuyển trang
+     * @param {string} unit - đơn vị ngữ nghĩa (vd 'thành viên', 'giao dịch') để hiển thị
+     * @param {string} emptyText - thông báo khi không có dữ liệu
+     */
+    function renderPagination(containerId, pag, loadFnName, unit, emptyText) {
+      const el = document.getElementById(containerId);
+      if (!el) return;
+      if (!pag) { el.innerHTML = ''; return; }
+
+      const total = pag.total || 0;
+      const totalPages = pag.totalPages || 1;
+      const page = pag.page || 1;
+      const limit = pag.limit || PAGE_SIZE;
+
+      if (total === 0) {
+        el.innerHTML = `<span>${escapeHtml(emptyText || 'Không có dữ liệu')}</span>`;
+        return;
+      }
+
+      const from = (page - 1) * limit + 1;
+      const to = Math.min(page * limit, total);
+
+      // Dải số trang hiển thị: tối đa 5 nút quanh trang hiện tại
+      const maxButtons = 5;
+      let start = Math.max(1, page - Math.floor(maxButtons / 2));
+      let end = Math.min(totalPages, start + maxButtons - 1);
+      if (end - start + 1 < maxButtons) start = Math.max(1, end - maxButtons + 1);
+
+      let pageButtons = '';
+      for (let p = start; p <= end; p++) {
+        const isActive = p === page;
+        pageButtons += `<button type="button" onclick="${loadFnName}(${p})"
+          class="px-2.5 py-1 rounded text-xs font-semibold transition-colors ${isActive
+            ? 'bg-cyan-500 text-gray-900'
+            : 'bg-slate-800 hover:bg-slate-700 text-slate-300'}">${p}</button>`;
+      }
+
+      el.innerHTML = `
+        <span>Trang ${page} / ${totalPages} — Hiển thị ${from}-${to} trong tổng ${total} ${escapeHtml(unit || 'bản ghi')}</span>
+        <div class="flex gap-1.5 items-center flex-wrap">
+          <button type="button" ${page <= 1 ? 'disabled class="opacity-50 cursor-not-allowed px-2.5 py-1 bg-slate-800 rounded text-xs text-slate-300"' : `onclick="${loadFnName}(${page - 1})" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded text-xs text-slate-300"`}>Trước</button>
+          ${pageButtons}
+          <button type="button" ${page >= totalPages ? 'disabled class="opacity-50 cursor-not-allowed px-2.5 py-1 bg-slate-800 rounded text-xs text-slate-300"' : `onclick="${loadFnName}(${page + 1})" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded text-xs text-slate-300"`}>Sau</button>
+        </div>
+      `;
+    }
 
     // Khởi tạo trang
     document.addEventListener('DOMContentLoaded', async () => {
@@ -471,9 +576,10 @@
         }
       });
 
-      if (tabName === 'transactions') loadTransactions(1);
-      if (tabName === 'mismatches') loadMismatches();
-      if (tabName === 'audit') loadAuditLogs(1);
+      if (tabName === 'orders') { currentOrderPage = 1; loadOrders(1); }
+      if (tabName === 'transactions') { currentTxPage = 1; loadTransactions(1); }
+      if (tabName === 'mismatches') { currentMismatchPage = 1; loadMismatches(1); }
+      if (tabName === 'audit') { currentAuditPage = 1; loadAuditLogs(1); }
       if (tabName === 'users') { currentUsersPage = 1; loadUsers(1); }
     }
 
@@ -502,13 +608,16 @@
       const status = document.getElementById('orderStatusFilter').value;
       const search = document.getElementById('orderSearchInput').value.trim();
       const tbody = document.getElementById('ordersTableBody');
+      const pagEl = document.getElementById('ordersPagination');
       tbody.innerHTML = '<tr><td colspan="6" class="p-6 text-center text-slate-500">Đang tải...</td></tr>';
+      if (pagEl) pagEl.innerHTML = '';
 
       try {
-        const res = await window.CyberAPI.admin.getOrders({ page, limit: 15, status, search });
+        const res = await window.CyberAPI.admin.getOrders({ page, limit: PAGE_SIZE, status, search });
         if (res.success && res.data && res.data.orders) {
           if (res.data.orders.length === 0) {
             tbody.innerHTML = '<tr><td colspan="6" class="p-6 text-center text-slate-500">Không tìm thấy đơn hàng nào.</td></tr>';
+            renderPagination('ordersPagination', res.data.pagination, 'loadOrders', 'đơn hàng', 'Không tìm thấy đơn hàng nào');
             return;
           }
           tbody.innerHTML = res.data.orders.map(o => {
@@ -533,21 +642,32 @@
               </tr>
             `;
           }).join('');
+
+          renderPagination('ordersPagination', res.data.pagination, 'loadOrders', 'đơn hàng', 'Không tìm thấy đơn hàng nào');
         }
       } catch (err) {
         console.error('Lỗi khi tải đơn hàng:', err);
         tbody.innerHTML = '<tr><td colspan="6" class="p-6 text-center text-rose-400">Lỗi khi tải dữ liệu đơn hàng.</td></tr>';
+        if (pagEl) pagEl.innerHTML = '';
       }
     }
 
     async function loadTransactions(page = 1) {
+      currentTxPage = page;
       const tbody = document.getElementById('txTableBody');
+      const pagEl = document.getElementById('txPagination');
+      const searchInput = document.getElementById('txSearchInput');
+      const statusSelect = document.getElementById('txStatusFilter');
+      const search = searchInput ? searchInput.value.trim() : '';
+      const status = statusSelect ? statusSelect.value : '';
       tbody.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-slate-500">Đang tải...</td></tr>';
+      if (pagEl) pagEl.innerHTML = '';
       try {
-        const res = await window.CyberAPI.admin.getTransactions({ page, limit: 15 });
+        const res = await window.CyberAPI.admin.getTransactions({ page, limit: PAGE_SIZE, search, status });
         if (res.success && res.data && res.data.transactions) {
           if (res.data.transactions.length === 0) {
             tbody.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-slate-500">Chưa có giao dịch webhook nào.</td></tr>';
+            renderPagination('txPagination', res.data.pagination, 'loadTransactions', 'giao dịch', 'Chưa có giao dịch nào');
             return;
           }
           tbody.innerHTML = res.data.transactions.map(t => {
@@ -568,10 +688,13 @@
               </tr>
             `;
           }).join('');
+
+          renderPagination('txPagination', res.data.pagination, 'loadTransactions', 'giao dịch', 'Chưa có giao dịch nào');
         }
       } catch (err) {
         console.error('Lỗi khi tải giao dịch:', err);
         tbody.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-rose-400">Lỗi khi tải giao dịch.</td></tr>';
+        if (pagEl) pagEl.innerHTML = '';
       }
     }
 
@@ -626,13 +749,11 @@
         const sortSelect = document.getElementById('usersSortSelect');
         const search = searchInput ? searchInput.value.trim() : '';
         const sort = sortSelect ? sortSelect.value : 'newest';
-        const res = await window.CyberAPI.admin.getUsers({ page, limit: USERS_PAGE_SIZE, search, sort });
+        const res = await window.CyberAPI.admin.getUsers({ page, limit: PAGE_SIZE, search, sort });
         if (res.success && res.data && res.data.users) {
           if (res.data.users.length === 0) {
             tbody.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-slate-500">Không có thành viên nào.</td></tr>';
-            if (pagEl) {
-              pagEl.innerHTML = '<span>Không có thành viên nào</span>';
-            }
+            renderPagination('usersPagination', res.data.pagination, 'loadUsers', 'thành viên', 'Không có thành viên nào');
             return;
           }
           tbody.innerHTML = res.data.users.map(u => `
@@ -647,19 +768,7 @@
             </tr>
           `).join('');
 
-          const pag = res.data.pagination;
-          if (pagEl && pag) {
-            const totalPages = pag.totalPages || 1;
-            const from = (pag.page - 1) * pag.limit + 1;
-            const to = Math.min(pag.page * pag.limit, pag.total);
-            pagEl.innerHTML = `
-              <span>Trang ${pag.page} / ${totalPages} — Hiển thị ${from}-${to} trong tổng ${pag.total} thành viên</span>
-              <div class="flex gap-2 items-center">
-                <button type="button" ${pag.page <= 1 ? 'disabled class="opacity-50"' : `onclick="loadUsers(${pag.page - 1})"`} class="px-3 py-1 bg-slate-800 hover:bg-slate-700 rounded text-slate-300">Trước</button>
-                <button type="button" ${pag.page >= totalPages ? 'disabled class="opacity-50"' : `onclick="loadUsers(${pag.page + 1})"`} class="px-3 py-1 bg-slate-800 hover:bg-slate-700 rounded text-slate-300">Sau</button>
-              </div>
-            `;
-          }
+          renderPagination('usersPagination', res.data.pagination, 'loadUsers', 'thành viên', 'Không có thành viên nào');
         }
       } catch (err) {
         console.error('Lỗi khi tải người dùng:', err);
@@ -717,66 +826,108 @@
       }
     }
 
-    async function loadMismatches() {
+    function getMismatchStatusBadge(status) {
+      if (status === 'no_order') {
+        return '<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-950 text-amber-400 border border-amber-800">Không có mã đơn</span>';
+      }
+      if (status === 'underpaid') {
+        return '<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-950 text-rose-400 border border-rose-800">Thiếu tiền</span>';
+      }
+      if (status === 'error') {
+        return '<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-950 text-rose-400 border border-rose-800">Lỗi đối soát</span>';
+      }
+      return '<span class="px-2 py-0.5 rounded text-xs bg-slate-800 text-slate-300">' + escapeHtml(status) + '</span>';
+    }
+
+    function renderMismatchRow(t) {
+      const safeContent = escapeHtml(t.content || '');
+      const safeTxId = Number(t.id);
+      const safeAmount = Number(t.amountIn || 0);
+      const statusBadge = getMismatchStatusBadge(t.matchStatus);
+
+      return `
+        <tr class="hover:bg-slate-900/50 transition-colors">
+          <td class="p-3.5 text-xs text-slate-400 font-mono">#${safeTxId} <span class="uppercase text-cyan-400 font-bold">(${escapeHtml(t.provider)})</span></td>
+          <td class="p-3.5 font-mono text-xs text-slate-300">${escapeHtml(t.providerTxId)}</td>
+          <td class="p-3.5 font-bold text-emerald-400">+${safeAmount.toLocaleString('vi-VN')} đ</td>
+          <td class="p-3.5 text-xs text-slate-200 max-w-xs truncate" title="${safeContent}">${safeContent || '-'}</td>
+          <td class="p-3.5 text-xs text-slate-400">${escapeHtml(new Date(t.createdAt).toLocaleString('vi-VN'))}</td>
+          <td class="p-3.5">${statusBadge}</td>
+          <td class="p-3.5 text-center">
+            <button type="button" data-action="reconcile" data-tx-id="${safeTxId}" data-amount="${safeAmount}" data-content="${safeContent}" class="px-3 py-1 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-semibold rounded-lg text-xs shadow transition-all">
+              <svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-link"></use></svg> Khớp Đơn
+            </button>
+          </td>
+        </tr>
+      `;
+    }
+
+    function bindReconcileListener(tbody) {
+      if (!tbody || tbody.__hasReconcileListener) return;
+      tbody.__hasReconcileListener = true;
+      tbody.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-action="reconcile"]');
+        if (!btn) return;
+        openReconcileModal(
+          btn.dataset.txId,
+          btn.dataset.amount,
+          btn.dataset.content
+        );
+      });
+    }
+
+    function updateMismatchesBadge(count) {
+      const badge = document.getElementById('mismatchesCountBadge');
+      if (!badge) return;
+      const num = Number(count) || 0;
+      badge.innerText = num;
+      badge.classList.toggle('hidden', num <= 0);
+    }
+
+    async function loadMismatches(page = 1) {
+      currentMismatchPage = page;
       const tbody = document.getElementById('mismatchesTableBody');
+      const pagEl = document.getElementById('mismatchesPagination');
+      const searchInput = document.getElementById('mismatchSearchInput');
+      const statusSelect = document.getElementById('mismatchStatusFilter');
+      const search = searchInput ? searchInput.value.trim() : '';
+      const status = statusSelect ? statusSelect.value : '';
+
       tbody.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-slate-500">Đang tải danh sách giao dịch lỗi...</td></tr>';
+      if (pagEl) pagEl.innerHTML = '';
+
       try {
-        const res = await window.CyberAPI.admin.getMismatches();
-        if (res.success && res.data && res.data.transactions) {
-          const list = res.data.transactions;
-          const badge = document.getElementById('mismatchesCountBadge');
-          if (badge) {
-            badge.innerText = list.length;
-            if (list.length > 0) badge.classList.remove('hidden');
-            else badge.classList.add('hidden');
-          }
-          if (list.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-emerald-400"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-party-popper"></use></svg> Tuyệt vời! Hiện không có giao dịch nào bị lỗi hay chuyển thiếu tiền.</td></tr>';
-            return;
-          }
-          tbody.innerHTML = list.map(t => {
-            let statusBadge = '<span class="px-2 py-0.5 rounded text-xs bg-slate-800 text-slate-300">' + escapeHtml(t.matchStatus) + '</span>';
-            if (t.matchStatus === 'no_order') statusBadge = '<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-950 text-amber-400 border border-amber-800">Không có mã đơn</span>';
-            else if (t.matchStatus === 'underpaid') statusBadge = '<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-950 text-rose-400 border border-rose-800">Thiếu tiền</span>';
-            else if (t.matchStatus === 'error') statusBadge = '<span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-950 text-rose-400 border border-rose-800">Lỗi đối soát</span>';
-
-            const safeContent = escapeHtml(t.content || '');
-            const safeTxId = Number(t.id);
-            const safeAmount = Number(t.amountIn || 0);
-
-            return `
-              <tr class="hover:bg-slate-900/50 transition-colors">
-                <td class="p-3.5 text-xs text-slate-400 font-mono">#${safeTxId} <span class="uppercase text-cyan-400 font-bold">(${escapeHtml(t.provider)})</span></td>
-                <td class="p-3.5 font-mono text-xs text-slate-300">${escapeHtml(t.providerTxId)}</td>
-                <td class="p-3.5 font-bold text-emerald-400">+${safeAmount.toLocaleString('vi-VN')} đ</td>
-                <td class="p-3.5 text-xs text-slate-200 max-w-xs truncate" title="${safeContent}">${safeContent || '-'}</td>
-                <td class="p-3.5 text-xs text-slate-400">${escapeHtml(new Date(t.createdAt).toLocaleString('vi-VN'))}</td>
-                <td class="p-3.5">${statusBadge}</td>
-                <td class="p-3.5 text-center">
-                  <button type="button" data-action="reconcile" data-tx-id="${safeTxId}" data-amount="${safeAmount}" data-content="${safeContent}" class="px-3 py-1 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-semibold rounded-lg text-xs shadow transition-all">
-                    <svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-link"></use></svg> Khớp Đơn
-                  </button>
-                </td>
-              </tr>
-            `;
-          }).join('');
-
-          if (!tbody.__hasReconcileListener) {
-            tbody.__hasReconcileListener = true;
-            tbody.addEventListener('click', (e) => {
-              const btn = e.target.closest('[data-action="reconcile"]');
-              if (btn) {
-                const txId = btn.getAttribute('data-tx-id');
-                const amount = btn.getAttribute('data-amount');
-                const content = btn.getAttribute('data-content');
-                openReconcileModal(txId, amount, content);
-              }
-            });
-          }
+        const res = await window.CyberAPI.admin.getMismatches({ page, limit: PAGE_SIZE, search, status });
+        const data = res?.data;
+        if (!res?.success || !data?.transactions) {
+          throw new Error(res?.message || 'Không thể lấy dữ liệu giao dịch lỗi.');
         }
+
+        const list = data.transactions;
+        const pag = data.pagination;
+
+        if (!search && !status) {
+          updateMismatchesBadge(pag?.total ?? list.length);
+        }
+
+        if (list.length === 0) {
+          const isFiltering = Boolean(search || status);
+          const emptyMsg = isFiltering
+            ? 'Không tìm thấy giao dịch lỗi nào phù hợp với bộ lọc.'
+            : '<svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-party-popper"></use></svg> Tuyệt vời! Hiện không có giao dịch nào bị lỗi hay chuyển thiếu tiền.';
+          const textColor = isFiltering ? 'text-slate-500' : 'text-emerald-400';
+          tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center ${textColor}">${emptyMsg}</td></tr>`;
+          renderPagination('mismatchesPagination', pag, 'loadMismatches', 'giao dịch lỗi', 'Không có giao dịch lỗi');
+          return;
+        }
+
+        tbody.innerHTML = list.map(renderMismatchRow).join('');
+        bindReconcileListener(tbody);
+        renderPagination('mismatchesPagination', pag, 'loadMismatches', 'giao dịch lỗi', 'Không có giao dịch lỗi');
       } catch (err) {
         console.error('Lỗi khi tải giao dịch lỗi:', err);
         tbody.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-rose-400">Lỗi khi tải danh sách giao dịch cần đối soát.</td></tr>';
+        if (pagEl) pagEl.innerHTML = '';
       }
     }
 
@@ -828,7 +979,7 @@
           alertBox.classList.remove('hidden');
           setTimeout(() => {
             closeReconcileModal();
-            loadMismatches();
+            loadMismatches(currentMismatchPage);
             loadOrders(currentOrderPage);
             window.CyberAPI.admin.getStats().then(s => s && s.success && renderStats(s.data));
           }, 1200);
@@ -848,13 +999,21 @@
     }
 
     async function loadAuditLogs(page = 1) {
+      currentAuditPage = page;
       const tbody = document.getElementById('auditTableBody');
+      const pagEl = document.getElementById('auditPagination');
+      const searchInput = document.getElementById('auditSearchInput');
+      const actionSelect = document.getElementById('auditActionFilter');
+      const search = searchInput ? searchInput.value.trim() : '';
+      const action = actionSelect ? actionSelect.value : '';
       tbody.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-slate-500">Đang tải nhật ký...</td></tr>';
+      if (pagEl) pagEl.innerHTML = '';
       try {
-        const res = await window.CyberAPI.admin.getAuditLogs({ page, limit: 15 });
+        const res = await window.CyberAPI.admin.getAuditLogs({ page, limit: PAGE_SIZE, search, action });
         if (res.success && res.data && res.data.logs) {
           if (res.data.logs.length === 0) {
             tbody.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-slate-500">Chưa có nhật ký hoạt động nào.</td></tr>';
+            renderPagination('auditPagination', res.data.pagination, 'loadAuditLogs', 'thao tác', 'Chưa có nhật ký hoạt động nào');
             return;
           }
           tbody.innerHTML = res.data.logs.map(log => {
@@ -882,17 +1041,7 @@
             `;
           }).join('');
 
-          const pag = res.data.pagination;
-          const pagEl = document.getElementById('auditPagination');
-          if (pagEl && pag) {
-            pagEl.innerHTML = `
-              <span>Trang ${pag.page} / ${pag.totalPages || 1} (Tổng: ${pag.total} thao tác)</span>
-              <div class="flex gap-2">
-                <button type="button" ${pag.page <= 1 ? 'disabled class="opacity-50"' : `onclick="loadAuditLogs(${pag.page - 1})"`} class="px-3 py-1 bg-slate-800 hover:bg-slate-700 rounded text-slate-300">Trước</button>
-                <button type="button" ${pag.page >= pag.totalPages ? 'disabled class="opacity-50"' : `onclick="loadAuditLogs(${pag.page + 1})"`} class="px-3 py-1 bg-slate-800 hover:bg-slate-700 rounded text-slate-300">Sau</button>
-              </div>
-            `;
-          }
+          renderPagination('auditPagination', res.data.pagination, 'loadAuditLogs', 'thao tác', 'Chưa có nhật ký hoạt động nào');
         }
       } catch (err) {
         console.error('Lỗi khi tải audit log:', err);

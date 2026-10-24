@@ -215,6 +215,18 @@
     },
   };
 
+  // Helper xây dựng chuỗi query an toàn, bỏ các tham số rỗng/null/undefined
+  function buildQueryString(params = {}) {
+    const clean = {};
+    for (const [k, v] of Object.entries(params)) {
+      if (v !== undefined && v !== null && v !== '') {
+        clean[k] = v;
+      }
+    }
+    const q = new URLSearchParams(clean).toString();
+    return q ? '?' + q : '';
+  }
+
   // ── Admin Services ─────────────────────────────────────────────
   const admin = {
     async getStats() {
@@ -223,20 +235,17 @@
     },
 
     async getUsers(params = {}) {
-      const query = new URLSearchParams(params).toString();
-      const res = await apiFetch(`/api/admin/users?${query}`);
+      const res = await apiFetch(`/api/admin/users${buildQueryString(params)}`);
       return res.json();
     },
 
     async getOrders(params = {}) {
-      const query = new URLSearchParams(params).toString();
-      const res = await apiFetch(`/api/admin/orders?${query}`);
+      const res = await apiFetch(`/api/admin/orders${buildQueryString(params)}`);
       return res.json();
     },
 
     async getTransactions(params = {}) {
-      const query = new URLSearchParams(params).toString();
-      const res = await apiFetch(`/api/admin/transactions?${query}`);
+      const res = await apiFetch(`/api/admin/transactions${buildQueryString(params)}`);
       return res.json();
     },
 
@@ -248,8 +257,8 @@
       return res.json();
     },
 
-    async getMismatches() {
-      const res = await apiFetch('/api/admin/payments/mismatches');
+    async getMismatches(params = {}) {
+      const res = await apiFetch(`/api/admin/payments/mismatches${buildQueryString(params)}`);
       return res.json();
     },
 
@@ -262,8 +271,7 @@
     },
 
     async getAuditLogs(params = {}) {
-      const query = new URLSearchParams(params).toString();
-      const res = await apiFetch(`/api/admin/audit-logs?${query}`);
+      const res = await apiFetch(`/api/admin/audit-logs${buildQueryString(params)}`);
       return res.json();
     },
   };
