@@ -1341,7 +1341,7 @@
                             <span class="flex items-center gap-1.5">
                                 <span><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-gamepad-2"></use></svg></span> CHỌN MÀN CHƠI
                             </span>
-                            <span class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full text-[10px] font-bold">5 Cấp độ</span>
+                            <span class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full text-[10px] font-bold">6 Cấp độ</span>
                         </div>
 
                         <!-- Option Level 0 -->
@@ -1421,6 +1421,37 @@
                                 </div>
                                 <div class="text-sm font-bold text-gray-900 group-hover/item:text-primary transition-colors truncate">Bức Ảnh Có Quá Nhiều Bí Mật</div>
                                 <div class="text-[11px] text-gray-500 line-clamp-1">Tìm & che thông tin riêng tư trước khi chia sẻ</div>
+                            </div>
+                        </button>
+
+                        <!-- Option Level 5 -->
+                        <button type="button" data-dd-level="5" onclick="selectAndPlayLevel('/level5/level5.html')" class="w-full text-left p-3 rounded-xl hover:bg-gradient-to-r hover:from-indigo-50 hover:to-violet-50 transition-all border border-transparent hover:border-indigo-300 flex items-center gap-3.5 group/item">
+                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center text-2xl shadow-md group-hover/item:scale-110 group-hover/item:rotate-3 transition-transform flex-shrink-0">
+                                <svg class="icon text-white" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-sparkles"></use></svg>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center justify-between gap-1">
+                                    <span class="text-xs font-black text-gray-800 uppercase tracking-wide">Level 5</span>
+                                    <span class="level-badge-area-dd"></span>
+                                </div>
+                                <div class="text-sm font-bold text-gray-900 group-hover/item:text-primary transition-colors truncate">Thật Hay Giả? Đống Ảnh AI</div>
+                                <div class="text-[11px] text-gray-500 line-clamp-1">Soi ảnh do AI tạo ra</div>
+                            </div>
+                        </button>
+
+                        <!-- Option Level 6 -->
+                        <button type="button" data-dd-level="6" onclick="selectAndPlayLevel('/level6/level6.html')" class="w-full text-left p-3 rounded-xl hover:bg-gradient-to-r hover:from-emerald-50 hover:to-cyan-50 transition-all border border-transparent hover:border-emerald-300 flex items-center gap-3.5 group/item">
+                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center text-2xl shadow-md group-hover/item:scale-110 group-hover/item:rotate-3 transition-transform flex-shrink-0">
+                                <svg class="icon text-white" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-shield-check"></use></svg>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center justify-between gap-1">
+                                    <span class="text-xs font-black text-gray-800 uppercase tracking-wide">Level 6</span>
+                                    <span class="text-[9px] bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.5 rounded-md">MỚI NHẤT</span>
+                                    <span class="level-badge-area-dd"></span>
+                                </div>
+                                <div class="text-sm font-bold text-gray-900 group-hover/item:text-primary transition-colors truncate">Chặn Đứng Bắt Nạt Mạng</div>
+                                <div class="text-[11px] text-gray-500 line-clamp-1">Bảo vệ bạn bè khỏi bị bắt nạt</div>
                             </div>
                         </button>
 
@@ -2240,7 +2271,7 @@
                             <span class="text-xs text-gray-500 font-semibold whitespace-nowrap inline-flex items-center gap-1"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-clock"></use></svg> 5–7 phút</span>
                         </div>
                         <div class="flex items-center gap-3 mb-3">
-                            <div class="w-12 h-12 shrink-0 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center text-2xl text-white shadow-md"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-scan-face"></use></svg></div>
+                            <div class="w-12 h-12 shrink-0 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center text-2xl text-white shadow-md"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-sparkles"></use></svg></div>
                             <div>
                                 <h4 class="text-lg font-black text-gray-900">Thật Hay Giả? Đống Ảnh AI</h4>
                                 <p class="text-xs text-gray-500 font-semibold uppercase tracking-wider">Phát hiện ảnh do AI tạo</p>
@@ -2263,6 +2294,44 @@
                     </div>
                     <button type="button" onclick="selectAndPlayLevel('/level5/level5.html')" class="level-play-btn w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-600 hover:to-violet-600 text-white font-black text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 group-hover:translate-y-[-2px]">
                         <span>CHƠI LEVEL 5</span>
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    </button>
+                </div>
+
+                <!-- Level 6 -->
+                <div class="level-card level-card-6 level-card group bg-white rounded-2xl border-2 border-emerald-200 p-5 hover:border-emerald-400 hover:shadow-xl transition-all cursor-pointer">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center gap-2">
+                                <span class="px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800 text-xs font-black tracking-wider whitespace-nowrap">LEVEL 6 • MỚI NHẤT</span>
+                                <span class="level-badge-area"></span>
+                            </div>
+                            <span class="text-xs text-gray-500 font-semibold whitespace-nowrap inline-flex items-center gap-1"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-clock"></use></svg> 6–8 phút</span>
+                        </div>
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-12 h-12 shrink-0 rounded-xl bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center text-2xl text-white shadow-md"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-shield-check"></use></svg></div>
+                            <div>
+                                <h4 class="text-lg font-black text-gray-900">Chặn Đứng Bắt Nạt Mạng</h4>
+                                <p class="text-xs text-gray-500 font-semibold uppercase tracking-wider">Bảo vệ bạn bè trước lời chê bai</p>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-4 leading-relaxed">
+                            Có người đang nói xấu bạn trên mạng? Học cách <strong>không hùa theo</strong>, <strong>chặn và báo cáo</strong> tin xấu, và kể với người lớn tin cậy.
+                        </p>
+                        <div class="space-y-2 text-sm text-gray-700 mb-4">
+                            <div class="flex items-center gap-2">
+                                <svg class="icon text-emerald-500 text-base" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-check"></use></svg> 3 video tình huống (bạn bè bị chê / cách ứng xử / bảo vệ bạn bè)
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <svg class="icon text-emerald-500 text-base" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-check"></use></svg> Câu hỏi chọn phản ứng đúng — chọn lại không giới hạn
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <svg class="icon text-emerald-500 text-base" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-check"></use></svg> Mini-game dọn tin nhắn xấu — bấm hoặc kéo vào thùng Chặn
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" onclick="selectAndPlayLevel('/level6/level6.html')" class="level-play-btn w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-700 hover:to-cyan-600 text-white font-black text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 group-hover:translate-y-[-2px]">
+                        <span>CHƠI LEVEL 6</span>
                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                     </button>
                 </div>

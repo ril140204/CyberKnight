@@ -1,0 +1,260 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CyberKnight — Level 6: Chặn Đứng Bắt Nạt Mạng</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+
+    <!-- Canvas Confetti CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <!-- Level 6 Stylesheet -->
+    <link rel="stylesheet" href="level6.css">
+</head>
+<body>
+
+    <div id="app-container">
+
+        <!-- ===================================================================
+             TOP BAR: THANH ĐIỀU KHIỂN HỆ THỐNG GÓC TRÊN BÊN PHẢI
+             =================================================================== -->
+        <div class="level6-top-bar" id="level6-top-bar">
+            <button id="btn-exit-level" class="btn-level6-exit" type="button" title="Thoát trò chơi (ESC)" aria-label="Thoát trò chơi">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+                <span>THOÁT</span>
+            </button>
+        </div>
+
+        <!-- Nút Bỏ Qua video - góc dưới bên phải (chỉ hiện ở các stage video) -->
+        <button id="btn-skip-video" class="btn-level6-skip hidden" type="button" title="Bỏ qua video" aria-label="Bỏ qua video">
+            <span>BỎ QUA ⏩</span>
+        </button>
+
+        <!-- ===================================================================
+             START OVERLAY
+             =================================================================== -->
+        <div id="start-overlay">
+            <div class="floating-sparkle star" style="left:10%;animation-duration:13s;animation-delay:0s;"></div>
+            <div class="floating-sparkle circle" style="left:30%;animation-duration:16s;animation-delay:1s;"></div>
+            <div class="floating-sparkle diamond" style="left:50%;animation-duration:11s;animation-delay:3s;"></div>
+            <div class="floating-sparkle star" style="left:70%;animation-duration:14s;animation-delay:2s;"></div>
+            <div class="floating-sparkle circle" style="left:88%;animation-duration:15s;animation-delay:4s;"></div>
+
+            <img src="../image/z8014995224177_069f99816bf77dda5fed3feb153a6c0e-removebg-preview.png" alt="CyberKnight Logo" class="overlay-brand-logo">
+
+            <div class="cyber-badge">LEVEL 6 • CHẶN ĐỨNG BẮT NẠT MẠNG</div>
+            <h1 class="cyber-title">CHẶN ĐỨNG BẮT NẠT MẠNG</h1>
+            <p class="cyber-subtitle">
+                Có ai đó đang nói xấu bạn trên mạng. Mình cùng học cách
+                bảo vệ bạn bè và bảo vệ chính mình nhé!
+            </p>
+            <button id="btn-start-level" class="btn-cyber-primary" aria-label="Bắt đầu level 6">
+                <span>▶ BẮT ĐẦU LEVEL 6</span>
+            </button>
+        </div>
+
+        <!-- ===================================================================
+             VIDEO STAGES: scene1 · scene2 · scene3 · complete · badge
+             Mỗi cảnh có 1 thẻ <video> riêng (playsinline, preload=auto, CÓ TIẾNG)
+             =================================================================== -->
+        <div id="stage-scene1" class="stage">
+            <div class="video-ambient-backdrop"></div>
+            <div class="video-container">
+                <video id="video-scene1" class="video-player" playsinline preload="auto"></video>
+                <div class="video-loading-spinner hidden"></div>
+                <div class="video-loading-slow hidden">Mạng hơi chậm, chờ chút nhé</div>
+            </div>
+        </div>
+
+        <div id="stage-scene2" class="stage">
+            <div class="video-ambient-backdrop"></div>
+            <div class="video-container">
+                <video id="video-scene2" class="video-player" playsinline preload="auto"></video>
+                <div class="video-loading-spinner hidden"></div>
+                <div class="video-loading-slow hidden">Mạng hơi chậm, chờ chút nhé</div>
+            </div>
+        </div>
+
+        <div id="stage-scene3" class="stage">
+            <div class="video-ambient-backdrop"></div>
+            <div class="video-container">
+                <video id="video-scene3" class="video-player" playsinline preload="auto"></video>
+                <div class="video-loading-spinner hidden"></div>
+                <div class="video-loading-slow hidden">Mạng hơi chậm, chờ chút nhé</div>
+            </div>
+        </div>
+
+        <div id="stage-complete" class="stage">
+            <div class="video-ambient-backdrop"></div>
+            <div class="video-container">
+                <video id="video-complete" class="video-player" playsinline preload="auto"></video>
+                <div class="video-loading-spinner hidden"></div>
+                <div class="video-loading-slow hidden">Mạng hơi chậm, chờ chút nhé</div>
+            </div>
+        </div>
+
+        <div id="stage-badge" class="stage">
+            <div class="video-ambient-backdrop"></div>
+            <div class="video-container">
+                <video id="video-badge" class="video-player" playsinline preload="auto"></video>
+                <div class="video-loading-spinner hidden"></div>
+                <div class="video-loading-slow hidden">Mạng hơi chậm, chờ chút nhé</div>
+            </div>
+        </div>
+
+        <!-- ===================================================================
+             QUESTION STAGE (stage-q1) — "Phản ứng thế nào khi bị bắt nạt?"
+             =================================================================== -->
+        <div id="stage-q1" class="stage">
+            <div class="cyber-grid"></div>
+
+            <div class="floating-sparkle star" style="left:4%;animation-duration:12s;animation-delay:0s;"></div>
+            <div class="floating-sparkle circle" style="left:15%;animation-duration:15s;animation-delay:2s;"></div>
+            <div class="floating-sparkle diamond" style="left:28%;animation-duration:18s;animation-delay:4s;"></div>
+            <div class="floating-sparkle star" style="left:40%;animation-duration:14s;animation-delay:1s;"></div>
+            <div class="floating-sparkle circle" style="left:55%;animation-duration:16s;animation-delay:3s;"></div>
+            <div class="floating-sparkle diamond" style="left:68%;animation-duration:11s;animation-delay:5s;"></div>
+            <div class="floating-sparkle star" style="left:80%;animation-duration:17s;animation-delay:2.5s;"></div>
+
+            <div class="deco-blob deco-blob-1"></div>
+            <div class="deco-blob deco-blob-2"></div>
+            <div class="deco-blob deco-blob-3"></div>
+
+            <img src="../image/z8014995224177_069f99816bf77dda5fed3feb153a6c0e-removebg-preview.png" alt="CyberKnight" class="character-logo-left">
+            <img src="../image/z8014995365895_a3eb178f5f7a17a45925b55e43e202be-removebg-preview.png" alt="SigmaBloom" class="brand-logo-right">
+
+            <div id="bl-container" class="bl-container">
+
+                <div class="bl-mission-badge">🛡️ HỘP BẢO VỆ BẠN BÈ</div>
+                <h2 class="bl-mission-title">
+                    Có bạn đang bị chê bai trên mạng. Theo cậu, chúng ta nên phản ứng thế nào?
+                </h2>
+
+                <div class="ph-bip bl-bip" id="bl-bip">
+                    <span class="ph-bip-icon">💬</span>
+                    <span id="bl-bip-text">Bíp đây! Mình nghe bạn kể rồi. Cùng suy nghĩ xem cách nào giúp người bị bắt nạt tốt nhất nhé!</span>
+                </div>
+
+                <div class="bl-answer-row" role="group" aria-label="Chọn cách phản ứng khi bạn bè bị bắt nạt">
+                    <button id="btn-answer-a" class="bl-answer-btn" type="button" data-choice="a"
+                            aria-label="Phương án A: Gửi icon cười cợt hùa theo">
+                        😄 Gửi icon cười cợt hùa theo
+                    </button>
+                    <button id="btn-answer-b" class="bl-answer-btn" type="button" data-choice="b"
+                            aria-label="Phương án B: Thoát ứng dụng và mặc kệ">
+                        🙈 Thoát ứng dụng và mặc kệ
+                    </button>
+                    <button id="btn-answer-c" class="bl-answer-btn" type="button" data-choice="c"
+                            aria-label="Phương án C: Lên tiếng bảo vệ bạn hoặc bấm báo cáo">
+                        🛡️ Lên tiếng bảo vệ bạn hoặc Bấm Báo cáo
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ===================================================================
+             MINI-GAME STAGE (stage-cleanup) — "Dọn dẹp tin nhắn xấu xí"
+             =================================================================== -->
+        <div id="stage-cleanup" class="stage">
+            <div class="cyber-grid"></div>
+
+            <div class="deco-blob deco-blob-1"></div>
+            <div class="deco-blob deco-blob-2"></div>
+
+            <img src="../image/z8014995224177_069f99816bf77dda5fed3feb153a6c0e-removebg-preview.png" alt="CyberKnight" class="character-logo-left">
+            <img src="../image/z8014995365895_a3eb178f5f7a17a45925b55e43e202be-removebg-preview.png" alt="SigmaBloom" class="brand-logo-right">
+
+            <div id="bl-cleanup-container" class="bl-cleanup-container">
+
+                <!-- Tiêu đề + Quái Bắt Nạt nằm CÙNG DÒNG → không đè lên nút THOÁT -->
+                <div class="bl-cleanup-header">
+                    <h2 class="bl-mission-title">
+                        Những tin nhắn này rất xấu. Chạm hoặc kéo bong bóng xấu vào thùng Chặn để dọn sạch nhé!
+                    </h2>
+
+                    <!-- Quái Bắt Nạt (dựng bằng CSS/emoji, không cần asset riêng) -->
+                    <div id="bl-bully" class="bl-bully" aria-hidden="true">
+                        <div class="bl-bully-face" id="bl-bully-face">👹</div>
+                        <div class="bl-bully-label">Quái Bắt Nạt</div>
+                    </div>
+                </div>
+
+                <div class="bl-mission-badge">🧹 DỌN DẸP TIN NHẮN XẤU XÍ</div>
+
+                <div class="ph-bip bl-bip" id="bl-bip-cleanup">
+                    <span class="ph-bip-icon">💬</span>
+                    <span id="bl-bip-text-cleanup">Bíp đây! Bấm vào bong bóng xấu, hoặc kéo nó vào thùng Chặn ở bên cạnh nhé!</span>
+                </div>
+
+                <!-- Thanh tiến độ -->
+                <div class="bl-progress-wrap">
+                    <div class="bl-progress-track">
+                        <div class="bl-progress-fill" id="bl-progress-fill"></div>
+                    </div>
+                    <div class="bl-progress-text" id="bl-progress-text">0/3</div>
+                </div>
+
+                <!-- Khu vực bay bong bóng + thùng Chặn (flex, KHÔNG chồng lên nhau) -->
+                <div class="bl-play-area">
+                    <!-- Khu vực bay của 3 bong bóng chat -->
+                    <div id="bl-bubble-field" class="bl-bubble-field">
+                        <!-- Bong bóng được tạo động bằng JS -->
+                    </div>
+
+                    <!-- Thùng Chặn — nằm cạnh khung bong bóng, không đè lên bong bóng -->
+                    <div id="bl-trash" class="bl-trash" role="button" tabindex="0"
+                         aria-label="Thùng Chặn — kéo tin nhắn xấu vào đây để chặn">
+                        <div class="bl-trash-icon">🚫</div>
+                        <div class="bl-trash-label">CHẶN</div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ===================================================================
+             SUMMARY STAGE
+             =================================================================== -->
+        <div id="stage-summary" class="stage">
+            <div class="floating-sparkle star" style="left:5%;animation-duration:14s;animation-delay:0.5s;"></div>
+            <div class="floating-sparkle circle" style="left:18%;animation-duration:16s;animation-delay:1.5s;"></div>
+            <div class="floating-sparkle diamond" style="left:35%;animation-duration:12s;animation-delay:3s;"></div>
+            <div class="floating-sparkle star" style="left:52%;animation-duration:15s;animation-delay:2s;"></div>
+            <div class="floating-sparkle circle" style="left:68%;animation-duration:13s;animation-delay:4s;"></div>
+            <div class="floating-sparkle diamond" style="left:82%;animation-duration:17s;animation-delay:1s;"></div>
+            <div class="floating-sparkle star" style="left:93%;animation-duration:14s;animation-delay:3.5s;"></div>
+
+            <div class="deco-blob deco-blob-1"></div>
+            <div class="deco-blob deco-blob-2"></div>
+            <div class="deco-blob deco-blob-3"></div>
+
+            <div class="deco-shield deco-shield-1">🛡️</div>
+            <div class="deco-shield deco-shield-3">⭐</div>
+            <div class="deco-shield deco-shield-4">💎</div>
+
+            <div id="summary-card-container" class="summary-card">
+                <!-- Nội dung được populate động -->
+            </div>
+        </div>
+
+        <!-- ===================================================================
+             FREEZE FRAME OVERLAY + PARTICLE CANVAS
+             =================================================================== -->
+        <canvas id="freeze-canvas"></canvas>
+        <canvas id="particle-canvas"></canvas>
+
+    </div>
+
+    <!-- Script điều khiển Level 6 -->
+    <script src="level6.js?v=1"></script>
+</body>
+</html>
