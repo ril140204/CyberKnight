@@ -6,12 +6,15 @@
 
 ## 🌟 Tính Năng Nổi Bật
 
-- **Hành Trình Màn Chơi (Level 0 – 4):**
+- **Hành Trình Màn Chơi (Level 0 – 7):**
   - **Level 0 (Miễn phí):** *Hộp Quà Bí Ẩn* — Nhận diện mã độc và đường link quà tặng khả nghi.
   - **Level 1 (Gói Trả Phí):** *Lớp Trưởng Gửi Link Nhận Quà* — Mini-game Lưới Lọc An Toàn và 3 nhánh kết cục độc lập.
   - **Level 2 (Gói Trả Phí):** *Kết Bạn Online* — Ghép cửa căn cứ, phân loại đối tượng lạ trên không gian mạng.
   - **Level 3 (Gói Trả Phí):** *Bốn Chìa Khóa Bí Mật* — Quản lý 4 quyền truy cập nhạy cảm (Camera, Micro, Vị trí, Thư viện ảnh).
   - **Level 4 (Gói Trả Phí):** *Bức Ảnh Có Quá Nhiều Bí Mật* — Công thức Nhìn – Che – Hỏi trước khi chia sẻ ảnh mạng xã hội.
+  - **Level 5 (Gói Trả Phí):** *Thật Hay Giả? Đống Ảnh AI* — Nhận biết ảnh do AI tạo ra với Bút Thử AI phóng to chi tiết.
+  - **Level 6 (Gói Trả Phí):** *Chặn Đứng Bắt Nạt Mạng* — Không hùa theo, chặn & báo cáo tin nhắn xấu, bảo vệ bạn bè.
+  - **Level 7 (Gói Trả Phí):** *Biệt Đội Chống Bẫy Lừa* — Dùng Búa An Toàn đập tan 4 cạm bẫy lừa đảo và Bọt An Toàn báo cho bố mẹ.
 
 - **Thanh Toán Tự Động VietQR & SePay:**
   - Sinh mã đơn hàng ngẫu nhiên 10 ký tự chuẩn **Crockford Base32** (`CK` + 8 ký tự an toàn, loại bỏ triệt để ký tự dễ nhầm lẫn `0, O, 1, I, L`).
@@ -57,6 +60,9 @@ EXEWEB/
 ├── level2/                     # Màn chơi Level 2 (Protected)
 ├── level3/                     # Màn chơi Level 3 (Protected)
 ├── level4/                     # Màn chơi Level 4 (Protected)
+├── level5/                     # Màn chơi Level 5 (Protected)
+├── level6/                     # Màn chơi Level 6 (Protected)
+├── level7/                     # Màn chơi Level 7 (Protected)
 ├── video/                      # Video đã encode: level<N>/<name>.mp4 (720p) + level<N>/hls/<name>/ (HLS 360/480/720p)
 ├── video-src/                  # Video GỐC (gitignored) — nguồn cho scripts/encode-videos.sh
 ├── scripts/encode-videos.sh    # ffmpeg: video-src/ → video/ (MP4 faststart + HLS ABR)

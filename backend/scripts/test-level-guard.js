@@ -9,9 +9,11 @@
  * (c) User with pack_1_4 → launch → 200 → GET /level1/level1.html (with cookie) → 200, body = level1.html
  *     GET /level1/level1.js, /level1/level1.css → 200 with correct content-types
  * (d) Same cookie → /level5/... → 403 (level 5 cần gói pack_5_10)
- * (d2) /level7/level7.html → 404 (level chưa phát hành)
+ * (d2) /level8/level8.html → 404 (level chưa phát hành)
  * (d3) Level 6: no pack → launch 403 LEVEL_LOCKED · pack_1_4 cookie → 403
      pack_5_10 → launch 200 · serve html/js/css · video /video/level 6/ OK
+ * (d4) Level 7: no pack → launch 403 LEVEL_LOCKED · pack_1_4 cookie → 403
+     pack_5_10 → launch 200 · serve html/js/css · video /video/level 7/ OK
  * (e) Tampered cookie signature → 403
  * (f) /level0/level0.html → 200, no login required
  * (g) /level1/..%2f..%2fbackend/.env → NOT leak .env (403/404, no .env content)
@@ -184,7 +186,15 @@ async function grantPackToUser(userEmail, packageId = 'pack_1_4') {
   }
 }
 
-const grantPack14ToUser = (userEmail) => grantPackToUser(userEmail, 'pack_1_4');
+async function grantPack14ToUser(userEmail) {
+  try {
+    const [rows] = await db.query('SELECT id FROM users WHERE email = ?', [userEmail]);
+    if (rows.length > 0) {
+      await db.query('DELETE FROM user_entitlements WHERE user_id = ? AND package_id != ?', [rows[0].id, 'pack_1_4']);
+    }
+  } catch (_) {}
+  return grantPackToUser(userEmail, 'pack_1_4');
+}
 
 // ── Test Helpers ────────────────────────────────────────────────
 
@@ -448,17 +458,17 @@ async function runTests() {
     );
   }
 
-  // ── Test (d2): Level chưa phát hành (7) → 404 ────────────────
-  console.log('\n── TEST (d2): GET /level7/level7.html (chưa phát hành) ──');
+  // ── Test (d2): Level chưa phát hành (8) → 404 ────────────────
+  console.log('\n── TEST (d2): GET /level8/level8.html (chưa phát hành) ──');
   {
     const res = await request({
       method: 'GET',
-      path: '/level7/level7.html',
+      path: '/level8/level8.html',
     });
 
     assert(
       res.status === 404,
-      `(d2) GET /level7/level7.html status = ${res.status} (expect 404 — level7 not in catalog)`
+      `(d2) GET /level8/level8.html status = ${res.status} (expect 404 — level8 not in catalog)`
     );
   }
 
@@ -553,6 +563,100 @@ async function runTests() {
     assert(
       vid6.status === 200,
       `(d3-d) GET /video/level%206/scene1.mp4 status = ${vid6.status} (expect 200)`
+    );
+  }
+
+  // ── Test (d4): Level 7 — chưa mua gói → 403 LEVEL_LOCKED ────
+  console.log('\n── TEST (d4): Level 7 launch rules (pack_5_10) ──');
+  {
+    // (d4-a) noPack user launch level 7 → 403
+    const launchRes = await request({
+      method: 'POST',
+      path: '/api/levels/7/launch',
+      headers: { Authorization: 'Bearer ' + noPackToken },
+    });
+    assert(
+      launchRes.status === 403,
+      `(d4-a) POST /api/levels/7/launch (no pack) status = ${launchRes.status} (expect 403)`
+    );
+    assert(
+      launchRes.json && launchRes.json.error === 'LEVEL_LOCKED',
+      `(d4-a) error = LEVEL_LOCKED (got: ${launchRes.json && launchRes.json.error})`
+    );
+
+    // (d4-b) pack_1_4 cookie KHÔNG mở được level7 → 403
+    await grantPack14ToUser(TEST_USERS.withPack.email);
+    const launch1 = await request({
+      method: 'POST',
+      path: '/api/levels/1/launch',
+      headers: { Authorization: 'Bearer ' + pack14Token },
+    });
+    const cookie14 = parseSetCookie(launch1.headers['set-cookie']).levelAccess;
+    const res7 = await request({
+      method: 'GET',
+      path: '/level7/level7.html',
+      headers: { Cookie: `levelAccess=${cookie14}` },
+    });
+    assert(
+      res7.status === 403,
+      `(d4-b) GET /level7/level7.html with pack_1_4 cookie = ${res7.status} (expect 403)`
+    );
+
+    // (d4-c) Launch level 7 với pack_5_10 → 200 → serve đủ html/js/css
+    const launch7 = await request({
+      method: 'POST',
+      path: '/api/levels/7/launch',
+      headers: { Authorization: 'Bearer ' + pack510Token },
+    });
+    assert(
+      launch7.status === 200,
+      `(d4-c) POST /api/levels/7/launch (pack_5_10) status = ${launch7.status} (expect 200)`
+    );
+    assert(
+      launch7.json && launch7.json.url === '/level7/level7.html',
+      `(d4-c) Launch url = /level7/level7.html`
+    );
+
+    const cookie7 = parseSetCookie(launch7.headers['set-cookie']).levelAccess;
+    const html7 = await request({
+      method: 'GET',
+      path: '/level7/level7.html',
+      headers: { Cookie: `levelAccess=${cookie7}` },
+    });
+    assert(
+      html7.status === 200,
+      `(d4-c) GET /level7/level7.html status = ${html7.status} (expect 200)`
+    );
+    assert(
+      html7.body && html7.body.includes('level7.js'),
+      `(d4-c) Body references level7.js`
+    );
+
+    const js7 = await request({
+      method: 'GET',
+      path: '/level7/level7.js',
+      headers: { Cookie: `levelAccess=${cookie7}` },
+    });
+    assert(
+      js7.status === 200 && js7.headers['content-type'] && js7.headers['content-type'].includes('javascript'),
+      `(d4-c) GET /level7/level7.js status = ${js7.status}, type = ${js7.headers && js7.headers['content-type']}`
+    );
+
+    const css7 = await request({
+      method: 'GET',
+      path: '/level7/level7.css',
+      headers: { Cookie: `levelAccess=${cookie7}` },
+    });
+    assert(
+      css7.status === 200 && css7.headers['content-type'] && css7.headers['content-type'].includes('css'),
+      `(d4-c) GET /level7/level7.css status = ${css7.status}, type = ${css7.headers && css7.headers['content-type']}`
+    );
+
+    // (d4-d) Video của level 7 phải truy cập được qua /video/level 7/
+    const vid7 = await request({ method: 'GET', path: '/video/level%207/intro.mp4' });
+    assert(
+      vid7.status === 200,
+      `(d4-d) GET /video/level%207/intro.mp4 status = ${vid7.status} (expect 200)`
     );
   }
 

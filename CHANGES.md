@@ -5,7 +5,20 @@ Mục tiêu: Hoàn thiện kiến trúc an ninh, thanh toán tự động VietQR
 
 ---
 
-## [2026-10-19] — Chuyển DB sang Supabase PostgreSQL & tối ưu video streaming (HLS)
+## [2026-10-25] — Phát hành Level 7: "Biệt Đội Chống Bẫy Lừa" & Tích Hợp Hệ Thống
+- **Nội dung & Gameplay:**
+  - Phát hành **Level 7: "Biệt Đội Chống Bẫy Lừa"** giáo dục an toàn mạng cho trẻ em (6–12 tuổi) về cạm bẫy lừa đảo mạng (quà miễn phí, link độc hại, đếm ngược dọa dẫm, xin mật khẩu/mã OTP).
+  - Trò chơi tương tác "Phá Bọt Cạm Bẫy" trên khung màn hình điện thoại giả lập với 4 làn rơi riêng biệt, Búa An Toàn 🔨 gõ đập tại vị trí chạm (`pointerdown` trực tiếp, chịu rung ngón tay ≤ 8px).
+  - Bọt ✖ An Toàn thứ 5 xuất hiện sau khi phá tan 4 cạm bẫy: đóng cửa sổ và báo cho bố mẹ / người lớn tin cậy.
+- **Kiến trúc & Tối ưu:**
+  - Đồng bộ kiến trúc State Machine `SCENE_FLOW` với Level 5, `ResourceSource` dò video đa tầng tự động hỗ trợ thư mục có khoảng trắng (`video/level 7/`).
+  - Chuyển cảnh mượt mà bằng Freeze-Frame Crossfade Canvas (`#freeze-canvas`).
+  - Bộ tổng hợp âm thanh `AudioSynth` WebAudio thuần không phụ thuộc tài nguyên bên ngoài.
+  - Tối ưu màn tổng kết (Summary) compact tự co giãn, không cuộn trên cả desktop 1280×720 và điện thoại 390×760, 740×360; hỗ trợ `prefers-reduced-motion`.
+- **Tích hợp Catalog & Bảo mật:**
+  - Cập nhật `backend/src/config/catalog.js`: đưa Level 7 vào `LEVELS` thuộc gói `pack_5_10`.
+  - Cập nhật `index.html`: thêm mục Level 7 vào dropdown menu và Level Card trong Level Select Modal.
+  - Cập nhật `backend/scripts/test-level-guard.js`: bổ sung kiểm thử bảo vệ màn chơi cho Level 7 và chuyển level chưa phát hành thành Level 8.
 
 ### 1. Database: MySQL → PostgreSQL (Supabase), schema `local`
 - **`backend/src/config/db.js`** viết lại trên driver `pg` nhưng **giữ nguyên API mysql2** (`[rows] = await db.query('... ?')`, `result.insertId`, `result.affectedRows`, `getConnection()/beginTransaction/commit/rollback/release`, `db.end()`): tự chuyển `?` → `$n` (bỏ qua `?` trong chuỗi), tự gắn schema `DB_SCHEMA` (mặc định `local`) vào mọi bảng ứng dụng (vì transaction pooler của Supabase không giữ `search_path`), tự thêm `RETURNING id` cho INSERT, `BIGINT`/`NUMERIC` → Number, `isDuplicateError()` thay `ER_DUP_ENTRY`.

@@ -92,8 +92,8 @@ async function setup() {
   const hash = await bcrypt.hash(originalPassword, 12);
 
   const [result] = await db.query(
-    `INSERT INTO users (first_name, last_name, username, email, password, level, role, is_active)
-     VALUES (?, ?, ?, ?, ?, 'Rookie', 'user', 1)`,
+      `INSERT INTO users (first_name, last_name, username, email, password, level, role, is_active)
+     VALUES (?, ?, ?, ?, ?, 'Rookie', 'user', TRUE)`,
     ['Test', 'ChangePwd', testUsername, `${testUsername}@test.local`, hash]
   );
   testUserId = result.insertId;

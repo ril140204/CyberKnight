@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CyberKnight — Level 7: Biệt Đội Chống Bẫy Lừa</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+
+    <!-- Canvas Confetti CDN (CSP allowed) -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <!-- Level 7 Stylesheet -->
+    <link rel="stylesheet" href="level7.css">
+</head>
+<body>
+
+    <div id="app-container">
+
+        <!-- ===================================================================
+             TOP BAR: THANH ĐIỀU KHIỂN HỆ THỐNG GÓC TRÊN BÊN PHẢI
+             =================================================================== -->
+        <div class="level7-top-bar" id="level7-top-bar">
+            <button id="btn-exit-level" class="btn-level7-exit" type="button" title="Thoát trò chơi (ESC)" aria-label="Thoát trò chơi">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+                <span>THOÁT</span>
+            </button>
+        </div>
+
+        <!-- Nút Bỏ Qua video - góc dưới bên phải (chỉ hiện ở các stage video) -->
+        <button id="btn-skip-video" class="btn-level7-skip hidden" type="button" title="Bỏ qua video" aria-label="Bỏ qua video">
+            <span>BỎ QUA ⏩</span>
+        </button>
+
+        <!-- ===================================================================
+             START OVERLAY
+             =================================================================== -->
+        <div id="start-overlay">
+            <div class="floating-sparkle star" style="left:10%;animation-duration:13s;animation-delay:0s;"></div>
+            <div class="floating-sparkle circle" style="left:30%;animation-duration:16s;animation-delay:1s;"></div>
+            <div class="floating-sparkle diamond" style="left:50%;animation-duration:11s;animation-delay:3s;"></div>
+            <div class="floating-sparkle star" style="left:70%;animation-duration:14s;animation-delay:2s;"></div>
+            <div class="floating-sparkle circle" style="left:88%;animation-duration:15s;animation-delay:4s;"></div>
+
+            <img src="../image/z8014995224177_069f99816bf77dda5fed3feb153a6c0e-removebg-preview.png" alt="CyberKnight Logo" class="overlay-brand-logo">
+
+            <div class="cyber-badge">LEVEL 7 • BIỆT ĐỘI CHỐNG BẪY LỪA</div>
+            <h1 class="cyber-title">BIỆT ĐỘI CHỐNG BẪY LỪA</h1>
+            <p class="cyber-subtitle">
+                Cùng Sóc Đỏ và CyberKnight dùng Búa An Toàn đập tan các cạm bẫy lừa đảo trên mạng nhé!
+            </p>
+            <button id="btn-start-level" class="btn-cyber-primary" aria-label="Bắt đầu level 7">
+                <span>▶ BẮT ĐẦU LEVEL 7</span>
+            </button>
+        </div>
+
+        <!-- ===================================================================
+             VIDEO STAGES: intro · good · bad
+             Mỗi cảnh có 1 thẻ <video> riêng (playsinline, preload=auto, CÓ TIẾNG)
+             =================================================================== -->
+        <div id="stage-intro" class="stage">
+            <div class="video-ambient-backdrop"></div>
+            <div class="video-container">
+                <video id="video-intro" class="video-player" playsinline preload="auto"></video>
+                <div class="video-loading-spinner hidden"></div>
+                <div class="video-loading-slow hidden">Mạng hơi chậm, chờ chút nhé</div>
+            </div>
+        </div>
+
+        <div id="stage-good" class="stage">
+            <div class="video-ambient-backdrop"></div>
+            <div class="video-container">
+                <video id="video-good" class="video-player" playsinline preload="auto"></video>
+                <div class="video-loading-spinner hidden"></div>
+                <div class="video-loading-slow hidden">Mạng hơi chậm, chờ chút nhé</div>
+            </div>
+        </div>
+
+        <div id="stage-bad" class="stage">
+            <div class="video-ambient-backdrop"></div>
+            <div class="video-container">
+                <video id="video-bad" class="video-player" playsinline preload="auto"></video>
+                <div class="video-loading-spinner hidden"></div>
+                <div class="video-loading-slow hidden">Mạng hơi chậm, chờ chút nhé</div>
+            </div>
+        </div>
+
+        <!-- ===================================================================
+             GAME STAGE: stage-game — "Phá Bọt Cạm Bẫy"
+             =================================================================== -->
+        <div id="stage-game" class="stage">
+            <div class="cyber-grid"></div>
+            <div class="floating-sparkle star" style="left:4%;animation-duration:12s;animation-delay:0s;"></div>
+            <div class="floating-sparkle circle" style="left:15%;animation-duration:15s;animation-delay:2s;"></div>
+            <div class="floating-sparkle diamond" style="left:28%;animation-duration:18s;animation-delay:4s;"></div>
+            <div class="floating-sparkle star" style="left:40%;animation-duration:14s;animation-delay:1s;"></div>
+            <div class="floating-sparkle circle" style="left:55%;animation-duration:16s;animation-delay:3s;"></div>
+            <div class="floating-sparkle diamond" style="left:68%;animation-duration:11s;animation-delay:5s;"></div>
+            <div class="floating-sparkle star" style="left:80%;animation-duration:17s;animation-delay:2.5s;"></div>
+
+            <div class="deco-blob deco-blob-1"></div>
+            <div class="deco-blob deco-blob-2"></div>
+            <div class="deco-blob deco-blob-3"></div>
+
+            <img src="../image/z8014995224177_069f99816bf77dda5fed3feb153a6c0e-removebg-preview.png" alt="CyberKnight" class="character-logo-left">
+            <img src="../image/z8014995365895_a3eb178f5f7a17a45925b55e43e202be-removebg-preview.png" alt="SigmaBloom" class="brand-logo-right">
+
+            <div id="trap-game-container" class="tr-container">
+
+                <div class="tr-mission-badge">🔨 BIỆT ĐỘI CHỐNG BẪY LỪA</div>
+                <h2 class="tr-mission-title">
+                    Cạm bẫy đang rơi xuống! Dùng Búa An Toàn đập vỡ chúng nhé!
+                </h2>
+
+                <!-- Thanh tiến độ đập bọt -->
+                <div class="tr-progress-bar-container" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="4" aria-label="Tiến độ phá bọt cạm bẫy">
+                    <div class="tr-progress-label">
+                        <span class="tr-progress-text">Tiến độ phá bẫy:</span>
+                        <span id="tr-progress-count" class="tr-progress-count">0/4</span>
+                    </div>
+                    <div class="tr-progress-track">
+                        <div id="tr-progress-fill" class="tr-progress-fill" style="width: 0%;"></div>
+                    </div>
+                </div>
+
+                <!-- Khung màn hình điện thoại giả lập -->
+                <div id="tr-phone-frame" class="tr-phone-frame" role="region" aria-label="Màn hình điện thoại có cạm bẫy đang rơi">
+                    <!-- Thanh tiêu đề popup cảnh báo -->
+                    <div class="tr-phone-header">
+                        <span class="tr-phone-camera"></span>
+                        <div class="tr-phone-alert-badge">
+                            <span class="tr-alert-icon">⚠️</span>
+                            <span class="tr-alert-text">CẢNH BÁO BẪY LỪA ĐẢO</span>
+                        </div>
+                    </div>
+
+                    <!-- 4 làn bọt rơi -->
+                    <div id="tr-bubble-arena" class="tr-bubble-arena">
+                        <div class="tr-lane" data-lane="0"></div>
+                        <div class="tr-lane" data-lane="1"></div>
+                        <div class="tr-lane" data-lane="2"></div>
+                        <div class="tr-lane" data-lane="3"></div>
+                    </div>
+
+                    <!-- Đáy màn hình (ranh giới nguy hiểm) -->
+                    <div class="tr-phone-danger-line" aria-hidden="true">
+                        <span>ĐÁY MÀN HÌNH (DÍNH BẪY NẾU CHẠM ĐÁY)</span>
+                    </div>
+
+                    <!-- Hiệu ứng búa an toàn -->
+                    <div id="tr-hammer-cursor" class="tr-hammer-cursor" aria-hidden="true">🔨</div>
+                </div>
+
+                <!-- Bíp robot hướng dẫn -->
+                <div class="ph-bip tr-bip" id="tr-bip">
+                    <span class="ph-bip-icon">🤖</span>
+                    <span id="tr-bip-text">Bíp đây! Cạm bẫy đang rơi xuống, con hãy dùng Búa An Toàn đập vỡ chúng nhé!</span>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ===================================================================
+             WRONG RESULT OVERLAY (hiện sau khi xem xong video bad)
+             =================================================================== -->
+        <div id="result-overlay" class="tr-result-overlay hidden">
+            <div class="tr-result-card" id="tr-result-card"></div>
+        </div>
+
+        <!-- ===================================================================
+             SUMMARY STAGE
+             =================================================================== -->
+        <div id="stage-summary" class="stage">
+            <div class="floating-sparkle star" style="left:5%;animation-duration:14s;animation-delay:0.5s;"></div>
+            <div class="floating-sparkle circle" style="left:18%;animation-duration:16s;animation-delay:1.5s;"></div>
+            <div class="floating-sparkle diamond" style="left:35%;animation-duration:12s;animation-delay:3s;"></div>
+            <div class="floating-sparkle star" style="left:52%;animation-duration:15s;animation-delay:2s;"></div>
+            <div class="floating-sparkle circle" style="left:68%;animation-duration:13s;animation-delay:4s;"></div>
+            <div class="floating-sparkle diamond" style="left:82%;animation-duration:17s;animation-delay:1s;"></div>
+            <div class="floating-sparkle star" style="left:93%;animation-duration:14s;animation-delay:3.5s;"></div>
+
+            <div class="deco-blob deco-blob-1"></div>
+            <div class="deco-blob deco-blob-2"></div>
+            <div class="deco-blob deco-blob-3"></div>
+
+            <div class="deco-shield deco-shield-1">🛡️</div>
+            <div class="deco-shield deco-shield-3">⭐</div>
+            <div class="deco-shield deco-shield-4">💎</div>
+
+            <div id="summary-card-container" class="summary-card">
+                <!-- Nội dung được populate động -->
+            </div>
+        </div>
+
+        <!-- Canvas chụp ảnh đóng băng chuyển cảnh (Freeze-frame crossfade) -->
+        <canvas id="freeze-canvas" aria-hidden="true"></canvas>
+
+    </div>
+
+    <!-- Level 7 Script -->
+    <script src="level7.js"></script>
+</body>
+</html>
