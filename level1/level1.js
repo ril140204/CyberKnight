@@ -1033,15 +1033,9 @@
                 badgeName = 'Người Mới Học';
 
                 lessonsHtml = `
-                    <div class="lesson-item">
-                        ⚠️ <b>Ôi không!</b> Việc bấm vào link lạ và điền địa chỉ nhà đã khiến thông tin cá nhân của con bị gửi thẳng đến kẻ lừa đảo!
-                    </div>
-                    <div class="lesson-item">
-                        🏠 <b>Bài học:</b> Kẻ xấu có thể dùng địa chỉ nhà để mạo danh shipper giao hàng, tống tiền hoặc gây nguy hiểm cho gia đình.
-                    </div>
-                    <div class="lesson-item">
-                        💪 <b>Không sao cả!</b> Thất bại là cơ hội để học hỏi. Lần sau hãy luôn hỏi ý kiến bố mẹ hoặc cô giáo trước nhé!
-                    </div>
+                    <div class="lesson-item">⚠️ <b>Bẫy lừa:</b> Không bấm link lạ nhận quà bất ngờ.</div>
+                    <div class="lesson-item">🔒 <b>Bí mật:</b> Tuyệt đối không điền địa chỉ nhà.</div>
+                    <div class="lesson-item">👨‍👩‍👧 <b>Nhờ giúp:</b> Báo ngay bố mẹ khi nghi ngờ.</div>
                 `;
             } else if (branch === 'B') {
                 // Nhánh B (Trung gian)
@@ -1054,15 +1048,9 @@
                 badgeName = 'Người Hỏi Thông Minh';
 
                 lessonsHtml = `
-                    <div class="lesson-item">
-                        💬 <b>Phản xạ tốt:</b> Con đã có ý thức không bấm ngay mà hỏi lại lớp trưởng để kiểm tra nguồn gốc.
-                    </div>
-                    <div class="lesson-item">
-                        ⚠️ <b>Lưu ý quan trọng:</b> Kẻ xấu có thể đã chiếm đoạt tài khoản (hack nick) của lớp trưởng để nhắn tin lừa đảo hàng loạt!
-                    </div>
-                    <div class="lesson-item">
-                        🛡️ <b>Cách xử lý an toàn:</b> Gọi điện thoại trực tiếp hoặc gặp mặt xác nhận, đồng thời báo cho thầy cô giáo.
-                    </div>
+                    <div class="lesson-item">💬 <b>Phản xạ tốt:</b> Luôn nghi ngờ trước link lạ.</div>
+                    <div class="lesson-item">⚠️ <b>Cảnh giác:</b> Tài khoản bạn có thể bị hack.</div>
+                    <div class="lesson-item">📞 <b>Xác minh:</b> Gọi điện thoại hoặc báo người lớn.</div>
                 `;
             } else {
                 // Nhánh C (Tốt)
@@ -1082,15 +1070,9 @@
                 badgeName = 'LINK GUARDIAN';
 
                 lessonsHtml = `
-                    <div class="lesson-item">
-                        🎉 <b>Xuất sắc!</b> Con đã phát hiện các dấu hiệu lừa đảo và chọn phương án an toàn nhất: Nhờ người lớn hỗ trợ!
-                    </div>
-                    <div class="lesson-item">
-                        🛑 <b>Nguyên tắc Hiệp Sĩ:</b> Không bao giờ click vào link lạ dù người gửi là bạn bè hay người quen.
-                    </div>
-                    <div class="lesson-item">
-                        🏠 <b>Bảo vệ tổ ấm:</b> Con đã bảo vệ an toàn cho cả gia đình khi không cung cấp địa chỉ nhà! 💪
-                    </div>
+                    <div class="lesson-item">🛑 <b>Tuyệt đối:</b> Không bao giờ bấm link lạ.</div>
+                    <div class="lesson-item">🔒 <b>Bảo vệ:</b> Giữ kín địa chỉ và số điện thoại.</div>
+                    <div class="lesson-item">👨‍👩‍👧 <b>Thông thái:</b> Luôn nhờ người lớn hỗ trợ.</div>
                 `;
             }
 
@@ -1101,7 +1083,7 @@
             this.card.style.visibility = 'visible';
             this.card.style.zIndex = '50';
             this.card.innerHTML = `
-                <img src="../image/z8014995224177_069f99816bf77dda5fed3feb153a6c0e-removebg-preview.webp" alt="CyberKnight" style="width: 130px; margin-top: -6px; filter: drop-shadow(0 6px 16px rgba(0, 102, 255, 0.18)); animation: icon-bounce 2s ease-in-out infinite;">
+                <img src="../image/z8014995224177_069f99816bf77dda5fed3feb153a6c0e-removebg-preview.webp" alt="CyberKnight" style="width: 100px; margin-top: -6px; filter: drop-shadow(0 6px 16px rgba(0, 102, 255, 0.18)); animation: icon-bounce 2s ease-in-out infinite;">
                 <div class="summary-icon-badge">${badgeIcon}</div>
                 <h2 class="summary-title">${titleText}</h2>
                 <div class="summary-reward-box">
@@ -1109,47 +1091,8 @@
                     <span class="summary-reward-badge">🛡️ ${badgeName}</span>
                 </div>
 
-                <div class="lessons-container">
+                <div class="lessons-container" style="margin: 6px 0;">
                     ${lessonsHtml}
-                </div>
-
-                <!-- LỜI KHUYÊN DÀNH CHO TRẺ (2 CỘT NÊN / KHÔNG NÊN) - rõ ràng, dễ nhớ -->
-                <div class="advice-box" aria-label="Lời khuyên an toàn dành cho em">
-                    <div class="advice-box-title">📋 LỜI KHUYÊN DÀNH CHO EM</div>
-                    <div class="advice-grid">
-                        <div class="advice-do">
-                            <div class="advice-header-do">✅ NÊN LÀM</div>
-                            <div class="advice-item">Hỏi bố mẹ hoặc cô giáo trước khi bấm vào bất kỳ link nào</div>
-                            <div class="advice-item">Gọi điện hoặc gặp trực tiếp để xác nhận khi thấy nghi ngờ</div>
-                            <div class="advice-item">Báo ngay cho người lớn khi nhận được tin nhắn lạ</div>
-                        </div>
-                        <div class="advice-dont">
-                            <div class="advice-header-dont">❌ KHÔNG NÊN</div>
-                            <div class="advice-item">Không bấm vào link lạ, dù người gửi là bạn bè hay người quen</div>
-                            <div class="advice-item">Không cung cấp địa chỉ nhà, số điện thoại trên mạng</div>
-                            <div class="advice-item">Không tự mình xử lý khi thấy dấu hiệu lừa đảo</div>
-                        </div>
-                    </div>
-                    <div class="advice-motto">💡 Ghi nhớ: <b>"Nghi ngờ → Hỏi người lớn → An toàn!"</b></div>
-                </div>
-
-                <!-- LUÔN HIỂN THỊ ĐỦ 3 KỸ NĂNG ĐÃ HỌC (BẤT KỂ NHÁNH NÀO) -->
-                <div class="skills-mastered-box">
-                    <div class="skills-title">🛡️ 3 KỸ NĂNG AN TOÀN TRỰC TUYẾN ĐÃ HỌC:</div>
-                    <div class="skills-list">
-                        <div class="skill-row">
-                            <span>🔗</span>
-                            <span>Nhận biết đường link đáng ngờ & tên miền bị lệch</span>
-                        </div>
-                        <div class="skill-row">
-                            <span>🏠</span>
-                            <span>Bảo vệ thông tin về nơi ở và số điện thoại cá nhân</span>
-                        </div>
-                        <div class="skill-row">
-                            <span>🛑</span>
-                            <span>Không click theo lời người khác (dù là người quen)</span>
-                        </div>
-                    </div>
                 </div>
 
                 <div class="summary-actions">
@@ -1316,38 +1259,35 @@
             const dataMap = {
                 'A': {
                     icon: '😮',
-                    title: 'ÔI KHÔNG! ĐÃ BẤM VÀO LINK LẠ',
-                    message: 'Bằng cách bấm vào link và điền địa chỉ nhà, con đã vô tình gửi thông tin cá nhân cho kẻ lừa đảo. Hãy xem hậu quả và bài học:',
-                    ctaText: 'XEM HẬU QUẢ & CÁCH PHÒNG TRÁNH ▶',
+                    title: 'CẦN CẨN THẬN HƠN!',
+                    message: 'Bấm link lạ làm lộ thông tin cá nhân nguy hiểm:',
+                    ctaText: 'XEM BÀI HỌC CHI TIẾT ▶',
                     lessons: [
-                        { icon: '⚠️', text: '<b>Mất an toàn:</b> Kẻ xấu biết chính xác địa chỉ nhà con, có thể mạo danh shipper giao hàng để theo dõi.' },
-                        { icon: '🏠', text: '<b>Nguy hiểm cho cả gia đình:</b> Thông tin có thể bị bán cho người lạ hoặc dùng để tống tiền, đe dọa.' },
-                        { icon: '🔓', text: '<b>Tài khoản bị xâm nhập:</b> Mật khẩu, email, số điện thoại có thể bị đánh cắp và lạm dụng.' },
-                        { icon: '💪', text: '<b>Không sao cả!</b> Đây là bài học quý giá. Lần sau hãy LUÔN hỏi bố mẹ/cô giáo trước khi bấm bất kỳ link nào nhé!' }
+                        { icon: '⚠️', text: 'Kẻ xấu giả danh để lấy địa chỉ nhà.' },
+                        { icon: '🔒', text: 'Tuyệt đối không gửi địa chỉ cá nhân.' },
+                        { icon: '👨‍👩‍👧', text: 'Luôn hỏi bố mẹ trước khi bấm link lạ.' }
                     ]
                 },
                 'B': {
                     icon: '🤔',
-                    title: 'PHẢN XẠ TỐT — NHƯNG CHƯA ĐỦ AN TOÀN',
-                    message: 'Con đã có ý thức không bấm ngay. Tuy nhiên, chỉ hỏi lớp trưởng qua tin nhắn vẫn có rủi ro. Hãy xem chi tiết:',
-                    ctaText: 'XEM CÁCH XÁC MINH AN TOÀN HƠN ▶',
+                    title: 'GẦN ĐÚNG RỒI!',
+                    message: 'Hỏi lại bạn là tốt, nhưng cần xác minh thêm:',
+                    ctaText: 'XEM BÀI HỌC CHI TIẾT ▶',
                     lessons: [
-                        { icon: '💬', text: '<b>Phản xạ tốt:</b> Con đã biết không bấm ngay vào link mà muốn kiểm tra nguồn gốc.' },
-                        { icon: '⚠️', text: '<b>Rủi ro tiềm ẩn:</b> Kẻ xấu có thể đã hack (chiếm đoạt) tài khoản của lớp trưởng để nhắn lừa đảo hàng loạt.' },
-                        { icon: '📞', text: '<b>Cách xác minh an toàn hơn:</b> Gọi điện thoại trực tiếp HOẶC gặp mặt lớp trưởng để xác nhận link.' },
-                        { icon: '👨‍🏫', text: '<b>Báo cho người lớn:</b> Thông báo cho thầy cô giáo hoặc phụ huynh để cùng xử lý và cảnh báo bạn bè khác.' }
+                        { icon: '💬', text: 'Biết nghi ngờ là phản xạ rất tốt.' },
+                        { icon: '⚠️', text: 'Tài khoản của bạn có thể bị kẻ xấu hack.' },
+                        { icon: '📞', text: 'Gọi điện xác minh hoặc báo người lớn ngay.' }
                     ]
                 },
                 'C': {
                     icon: '🛡️',
-                    title: 'XUẤT SẮC! ĐÃ BẢO VỆ AN TOÀN',
-                    message: 'Bằng cách không bấm link và nhờ người lớn hỗ trợ, con đã bảo vệ an toàn cho cả gia đình. Đây là hành động của một Hiệp Sĩ Mạng:',
-                    ctaText: 'XEM BÀI HỌC ĐÃ HỌC ĐƯỢC ▶',
+                    title: 'LEVEL 1 COMPLETED!',
+                    message: 'Con đã xử lý tình huống vô cùng xuất sắc:',
+                    ctaText: 'XEM BÀI HỌC CHI TIẾT ▶',
                     lessons: [
-                        { icon: '🎉', text: '<b>Xuất sắc!</b> Con đã phát hiện dấu hiệu lừa đảo và chọn phương án an toàn nhất.' },
-                        { icon: '🛑', text: '<b>Nguyên tắc Hiệp Sĩ:</b> Không bao giờ click vào link lạ dù người gửi là bạn bè hay người quen.' },
-                        { icon: '🏠', text: '<b>Bảo vệ tổ ấm:</b> Con đã bảo vệ an toàn cho cả gia đình khi không cung cấp địa chỉ nhà!' },
-                        { icon: '🌟', text: '<b>Lời khen:</b> Con là tấm gương sáng về an toàn trực tuyến cho bạn bè và em nhỏ!' }
+                        { icon: '🎉', text: 'Xuất sắc nhận biết cạm bẫy lừa đảo.' },
+                        { icon: '🛑', text: 'Tuyệt đối không bao giờ bấm vào link lạ.' },
+                        { icon: '🏠', text: 'Bảo vệ an toàn cho tổ ấm gia đình.' }
                     ]
                 }
             };

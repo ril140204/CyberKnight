@@ -1455,76 +1455,29 @@
                 <span class="summary-reward-badge">🏅 ${CONFIG.BADGE_NAME}</span>
             </div>
 
-            <div class="summary-message">
-                Một bức ảnh có thể tiết lộ nhiều hơn mình nghĩ.<br>
-                Nhìn kỹ – Che lại – Hỏi bố mẹ rồi mới chia sẻ nhé!
-            </div>
-
             <hr class="summary-divider">
 
-            <!-- NHÌN – CHE – HỎI -->
-            <div class="summary-section-title">NHỚ NHANH: NHÌN – CHE – HỎI</div>
+            <!-- NHÌN – CHE – HỎI TINH GỌN -->
+            <div class="summary-section-title">📸 NHỚ NHANH: NHÌN – CHE – HỎI</div>
             <div class="ps-formula-row">
                 <div class="ps-formula-card">
                     <div class="ps-formula-icon">👀</div>
                     <div class="ps-formula-label">NHÌN</div>
-                    <div class="ps-formula-text">Nhìn thật kỹ cả bức ảnh.</div>
-                    <div class="ps-formula-sub">Xem cả phía sau, balo, thẻ tên, hộp hàng.</div>
+                    <div class="ps-formula-text">Soi kỹ trường lớp, thẻ tên, hộp hàng.</div>
                 </div>
                 <div class="ps-formula-card">
                     <div class="ps-formula-icon">🖍️</div>
                     <div class="ps-formula-label">CHE</div>
-                    <div class="ps-formula-text">Cắt hoặc che tên trường, tên lớp, địa chỉ, số điện thoại.</div>
-                    <div class="ps-formula-sub">Che mặt thôi là chưa đủ.</div>
+                    <div class="ps-formula-text">Che kín số điện thoại và địa chỉ.</div>
                 </div>
                 <div class="ps-formula-card">
                     <div class="ps-formula-icon">👨‍👩‍👧</div>
                     <div class="ps-formula-label">HỎI</div>
-                    <div class="ps-formula-text">Hỏi bố mẹ trước khi chia sẻ.</div>
-                    <div class="ps-formula-sub">Không gửi ảnh cho người lạ.</div>
+                    <div class="ps-formula-text">Hỏi xin phép bố mẹ trước khi đăng.</div>
                 </div>
             </div>
 
-            <hr class="summary-divider">
-
-            <!-- 4 thông tin dễ bị lộ -->
-            <div class="summary-section-title">4 THÔNG TIN DỄ BỊ LỘ TRONG ẢNH</div>
-            <div class="ps-leak-list">
-                <div class="ps-leak-row">
-                    <span class="ps-leak-icon">🏫</span>
-                    <span class="ps-leak-text">Tên trường</span>
-                    <span class="ps-leak-tag">Balo, cặp sách</span>
-                </div>
-                <div class="ps-leak-row">
-                    <span class="ps-leak-icon">📛</span>
-                    <span class="ps-leak-text">Tên và lớp</span>
-                    <span class="ps-leak-tag">Thẻ tên</span>
-                </div>
-                <div class="ps-leak-row">
-                    <span class="ps-leak-icon">🏠</span>
-                    <span class="ps-leak-text">Địa chỉ</span>
-                    <span class="ps-leak-tag">Hộp hàng, thư</span>
-                </div>
-                <div class="ps-leak-row">
-                    <span class="ps-leak-icon">📞</span>
-                    <span class="ps-leak-text">Số điện thoại</span>
-                    <span class="ps-leak-tag">Giấy dán, hộp hàng</span>
-                </div>
-            </div>
-
-            <hr class="summary-divider">
-
-            <!-- HÀNH TRÌNH CỦA CON -->
-            <div class="summary-section-title">HÀNH TRÌNH CỦA CON</div>
-            <div class="choices-recap">
-                ${recapItems.join('')}
-            </div>
-
-            <hr class="summary-divider">
-
-            <!-- Tip + disclaimer -->
-            <div class="ps-tip-line">💡 Lỡ đăng ảnh có bí mật rồi? Hãy báo bố mẹ để xoá hoặc chỉnh lại ảnh ngay.</div>
-            <div class="ps-disclaimer">Mọi tên trường, địa chỉ, số điện thoại trong trò chơi đều là hư cấu.</div>
+            <div class="ps-tip-line" style="margin-top: 8px;">💡 Giữ kín thông tin cá nhân luôn an toàn!</div>
 
             <!-- Actions -->
             <div class="summary-actions">

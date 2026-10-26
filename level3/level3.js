@@ -1175,49 +1175,32 @@
 
             <hr style="width:100%;border:none;border-top:1.5px solid var(--ck-blue-200);margin:4px 0;">
 
-            <!-- D2: NHỚ NHANH — 3 cards -->
-            <div class="summary-section-title">NHỚ NHANH: HỎI – CHỌN – TỪ CHỐI</div>
+            <!-- D2: BỐN CHÌA KHÓA AN TOÀN — 3 cards tinh gọn -->
+            <div class="summary-section-title">🔑 BỐN CHÌA KHÓA AN TOÀN</div>
             <div class="ka-formula-row">
                 <div class="ka-formula-card">
-                    <div class="ka-formula-icon">❓</div>
-                    <div class="ka-formula-label">HỎI</div>
-                    <div class="ka-formula-text">"Ứng dụng này cần quyền để làm gì?"</div>
-                    <div class="ka-formula-sub">Không chắc thì hỏi bố mẹ hoặc cô giáo.</div>
+                    <div class="ka-formula-icon">📷</div>
+                    <div class="ka-formula-label">CAMERA & MIC</div>
+                    <div class="ka-formula-text">Chỉ bật khi thật cần thiết.</div>
                 </div>
                 <div class="ka-formula-card">
-                    <div class="ka-formula-icon">🔑</div>
-                    <div class="ka-formula-label">CHỌN</div>
-                    <div class="ka-formula-text">Chỉ cho quyền thật sự cần.</div>
-                    <div class="ka-formula-sub">Nếu cần, chọn "Chỉ khi đang dùng", đừng chọn "Luôn cho phép".</div>
+                    <div class="ka-formula-icon">📍</div>
+                    <div class="ka-formula-label">VỊ TRÍ & ẢNH</div>
+                    <div class="ka-formula-text">Giữ kín, không chia sẻ bừa.</div>
                 </div>
                 <div class="ka-formula-card">
                     <div class="ka-formula-icon">🚫</div>
                     <div class="ka-formula-label">TỪ CHỐI</div>
-                    <div class="ka-formula-text">Quyền không liên quan, hoặc xong việc rồi mà còn xin thêm.</div>
-                    <div class="ka-formula-sub">Hãy bấm "Không cho phép".</div>
+                    <div class="ka-formula-text">Khóa quyền lạ, hỏi người lớn.</div>
                 </div>
             </div>
 
-            <hr style="width:100%;border:none;border-top:1.5px solid var(--ck-blue-200);margin:4px 0;">
+            <div class="keygame-recap-line" style="margin-top: 8px;">🎮 Đúng ${keygameScore}/5 thử thách quyền!</div>
 
-            <!-- D3: HÀNH TRÌNH CỦA CON -->
-            <div class="summary-section-title">HÀNH TRÌNH CỦA CON</div>
+            <!-- D3: Disclaimer -->
+            <div class="ka-disclaimer" style="margin-top: 4px;">Trò chơi giả lập — không xin quyền thật của con.</div>
 
-            <div class="choices-recap">
-                ${recapItems.join('')}
-            </div>
-
-            <div class="keygame-recap-line">🎮 ${keygameLabel}</div>
-
-            <hr style="width:100%;border:none;border-top:1.5px solid var(--ck-blue-200);margin:4px 0;">
-
-            <!-- D4: Tip line -->
-            <div class="ka-tip-line">💡 Lỡ cho rồi? Nhờ bố/mẹ vào Cài đặt để rút quyền lại.</div>
-
-            <!-- D5: Disclaimer -->
-            <div class="ka-disclaimer">Trò chơi này chỉ giả lập — web không hề xin quyền thật của con.</div>
-
-            <!-- D6: Actions -->
+            <!-- D4: Actions -->
             <div class="summary-actions">
                 <button id="btn-summary-replay" class="btn-summary-replay">🔄 Chơi lại</button>
                 <button id="btn-summary-continue" class="btn-summary-continue">Tiếp tục hành trình ▶</button>

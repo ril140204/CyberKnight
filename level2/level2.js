@@ -975,15 +975,9 @@
                 badgeName = 'Người Mới Học';
 
                 lessonsHtml = `
-                    <div class="lesson-item">
-                        ⚠️ <b>Nguy hiểm!</b> Con đã mở cửa và tin tưởng người lạ trên mạng mà chưa xác minh danh tính!
-                    </div>
-                    <div class="lesson-item">
-                        🏠 <b>Bài học:</b> Kẻ xấu có thể giả làm bạn mới, lợi dụng quà tặng để tiếp cận và lừa đảo trẻ em.
-                    </div>
-                    <div class="lesson-item">
-                        💪 <b>Không sao cả!</b> Thất bại là cơ hội để học hỏi. Lần sau hãy luôn hỏi ý kiến bố mẹ trước nhé!
-                    </div>
+                    <div class="lesson-item">🚪 <b>Cửa khóa:</b> Không mở cửa cho người lạ trên mạng.</div>
+                    <div class="lesson-item">🎁 <b>Cảnh giác:</b> Không tin quà tặng từ người chưa quen.</div>
+                    <div class="lesson-item">👨‍👩‍👧 <b>Nhờ giúp:</b> Luôn hỏi bố mẹ trước khi kết bạn.</div>
                 `;
             } else {
                 // Nhánh CLOSED (Tốt)
@@ -1003,15 +997,9 @@
                 badgeName = 'HIỆP SĨ KẾT BẠN THÔNG MINH';
 
                 lessonsHtml = `
-                    <div class="lesson-item">
-                        🎉 <b>Xuất sắc!</b> Con đã giữ cửa đóng và không tin ngay vào "người bạn mới" trên mạng!
-                    </div>
-                    <div class="lesson-item">
-                        🛡️ <b>Nguyên tắc Hiệp Sĩ:</b> Không tin người lạ online, dù họ tặng quà hay nói chuyện thân thiện.
-                    </div>
-                    <div class="lesson-item">
-                        🏠 <b>Bảo vệ tổ ấm:</b> Con đã bảo vệ sự an toàn cho gia đình bằng cách không tiết lộ thông tin! 💪
-                    </div>
+                    <div class="lesson-item">🚪 <b>Vững vàng:</b> Luôn đóng cửa bảo vệ căn cứ số.</div>
+                    <div class="lesson-item">🛡️ <b>Cảnh giác:</b> Không tin người lạ dù họ tặng quà.</div>
+                    <div class="lesson-item">🔒 <b>Bí mật:</b> Giữ kín mọi thông tin cá nhân mình.</div>
                 `;
             }
 
@@ -1029,26 +1017,8 @@
                     <span class="summary-reward-badge">🛡️ ${badgeName}</span>
                 </div>
 
-                <div class="lessons-container">
+                <div class="lessons-container" style="margin: 6px 0;">
                     ${lessonsHtml}
-                </div>
-
-                <!-- LỜI KHUYÊN DÀNH CHO TRẺ (RÚT GỌN: 2 cột, 2 items mỗi cột) -->
-                <div class="advice-box" aria-label="Lời khuyên an toàn dành cho em">
-                    <div class="advice-box-title">📋 LỜI KHUYÊN DÀNH CHO EM</div>
-                    <div class="advice-grid">
-                        <div class="advice-do">
-                            <div class="advice-header-do">✅ NÊN LÀM</div>
-                            <div class="advice-item">Hỏi bố mẹ trước khi kết bạn với người lạ</div>
-                            <div class="advice-item">Giữ bí mật thông tin cá nhân</div>
-                        </div>
-                        <div class="advice-dont">
-                            <div class="advice-header-dont">❌ KHÔNG NÊN</div>
-                            <div class="advice-item">Không tin người lạ dù tỏ ra thân thiện</div>
-                            <div class="advice-item">Không tự ý gặp người quen online</div>
-                        </div>
-                    </div>
-                    <div class="advice-motto">💡 <b>"Cẩn thận là vàng — An toàn là vàng!"</b></div>
                 </div>
 
                 <div class="summary-actions">

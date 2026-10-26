@@ -1392,71 +1392,29 @@
                 <span class="summary-reward-badge">🏅 ${CONFIG.BADGE_NAME}</span>
             </div>
 
-            <div class="summary-message">
-                AI vẽ ảnh rất đẹp nhưng hay sai ở những chi tiết nhỏ.<br>
-                Soi kỹ – Kiểm tra – Hỏi người lớn rồi mới tin nhé!
-            </div>
-
             <hr class="summary-divider">
 
-            <!-- NHỚ NHANH: SOI – KIỂM – HỎI -->
-            <div class="summary-section-title">NHỚ NHANH: SOI – KIỂM – HỎI</div>
+            <!-- NHỚ NHANH: SOI – KIỂM – HỎI TINH GỌN -->
+            <div class="summary-section-title">🔍 NHỚ NHANH: SOI – KIỂM – HỎI</div>
             <div class="ps-formula-row">
                 <div class="ps-formula-card">
                     <div class="ps-formula-icon">🔍</div>
                     <div class="ps-formula-label">SOI</div>
-                    <div class="ps-formula-text">Soi kỹ tay, chân, ngón, chữ.</div>
-                    <div class="ps-formula-sub">Dùng Bút Thử AI phóng to từng chi tiết.</div>
+                    <div class="ps-formula-text">Đếm ngón tay, chân và chữ nhòe lạ.</div>
                 </div>
                 <div class="ps-formula-card">
                     <div class="ps-formula-icon">✅</div>
                     <div class="ps-formula-label">KIỂM</div>
-                    <div class="ps-formula-text">Xem nguồn ảnh, có quá hoàn hảo/vô lý không.</div>
-                    <div class="ps-formula-sub">Mèo có cánh, bóng đổ lạ là dấu hiệu.</div>
+                    <div class="ps-formula-text">Tìm chi tiết vô lý hoặc bóng đổ méo.</div>
                 </div>
                 <div class="ps-formula-card">
                     <div class="ps-formula-icon">👨‍👩‍👧</div>
                     <div class="ps-formula-label">HỎI</div>
-                    <div class="ps-formula-text">Không chắc thì hỏi bố mẹ, thầy cô.</div>
-                    <div class="ps-formula-sub">Đừng chia sẻ ngay khi chưa chắc.</div>
+                    <div class="ps-formula-text">Nhờ người lớn kiểm tra trước khi tin.</div>
                 </div>
             </div>
 
-            <hr class="summary-divider">
-
-            <!-- 3 DẤU HIỆU ẢNH DO AI VẼ -->
-            <div class="summary-section-title">3 DẤU HIỆU ẢNH DO AI VẼ</div>
-            <div class="ps-leak-list">
-                <div class="ps-leak-row">
-                    <span class="ps-leak-icon">🐾</span>
-                    <span class="ps-leak-text">Tay, chân, ngón thừa hoặc thiếu</span>
-                    <span class="ps-leak-tag">Đếm ngón</span>
-                </div>
-                <div class="ps-leak-row">
-                    <span class="ps-leak-icon">🔤</span>
-                    <span class="ps-leak-text">Chữ bị nhòe, méo, đọc không ra</span>
-                    <span class="ps-leak-tag">Soi chữ</span>
-                </div>
-                <div class="ps-leak-row">
-                    <span class="ps-leak-icon">🌈</span>
-                    <span class="ps-leak-text">Quá hoàn hảo hoặc vô lý</span>
-                    <span class="ps-leak-tag">Mèo có cánh, bóng đổ lạ</span>
-                </div>
-            </div>
-
-            <hr class="summary-divider">
-
-            <!-- HÀNH TRÌNH CỦA CON -->
-            <div class="summary-section-title">HÀNH TRÌNH CỦA CON</div>
-            <div class="choices-recap">
-                ${recapHtml}
-            </div>
-
-            <hr class="summary-divider">
-
-            <!-- Tip + disclaimer -->
-            <div class="ps-tip-line">💡 Không chắc ảnh thật hay giả? Hãy hỏi người lớn trước khi tin hoặc chia sẻ nhé!</div>
-            <div class="ps-disclaimer">Bức ảnh mèo biết bay trong trò chơi là ảnh do AI tạo ra để học tập.</div>
+            <div class="ps-tip-line" style="margin-top: 8px;">💡 Ảnh AI rất đẹp nhưng hãy luôn cẩn thận!</div>
 
             <!-- Actions -->
             <div class="summary-actions">
