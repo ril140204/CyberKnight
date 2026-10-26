@@ -29,6 +29,9 @@ _*.js
 _*.py
 _shots/
 backend/_*.js
+tmp-*.js
+backend/tmp-*.js
+assets/tmp-*.css
 
 # Archives & Repomix outputs
 *.zip

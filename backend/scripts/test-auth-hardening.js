@@ -82,12 +82,15 @@ function request(options, body) {
 }
 
 // ── Trợ giúp ──────────────────────────────────────────────────
-const suffix = `_authtest_${Date.now()}`;
+// Suffix ngắn (base36) để username/email LUÔN nằm trong giới hạn 30 ký tự
+// của validator. Dùng Date.now() thuần sẽ tạo username dài 31 ký tự
+// ("authuser" + "_authtest_" + 13 chữ số) → register trả 400 → test vỡ.
+const suffix = Date.now().toString(36);
 const testUser = {
   firstName: 'Auth',
   lastName: 'Test',
-  username: `authuser${suffix}`,
-  email: `authuser${suffix}@test.local`,
+  username: `authuser_${suffix}`,
+  email: `authuser_${suffix}@test.local`,
   password: 'StrongP@ss123!',
   confirmPassword: 'StrongP@ss123!',
   birthYear: 2010,
@@ -204,6 +207,17 @@ async function run() {
   // 4c. Lấy user ID
   const [userRows] = await db.query('SELECT id FROM users WHERE email = ?', [testUser.email]);
   const userId = userRows[0]?.id;
+
+  // Nếu không tìm thấy user → user chưa được tạo (đăng ký lỗi ở bước 0).
+  // Dừng ngay với thông báo rõ ràng, tránh lỗi DB khó hiểu (NULL user_id).
+  if (!userId) {
+    console.error(
+      `\n💥 Không tìm thấy user "${testUser.email}" trong DB — đăng ký ở bước 0 đã thất bại.`
+    );
+    console.error(`   Phản hồi đăng ký: HTTP ${regRes.status} ${regRes.body?.slice(0, 300)}`);
+    console.error('   Không thể chạy tiếp phần reset mật khẩu.\n');
+    process.exit(1);
+  }
 
   // 4d. Mô phỏng reset mật khẩu qua DB (tạo token reset → dùng API reset)
   const { hashToken, generateRandomToken } = require('../src/utils/tokens');

@@ -122,7 +122,13 @@ const resetPasswordValidation = [
       return true;
     }),
 
+  // confirmPassword là TUỲ CHỌN ở API:
+  // frontend (reset-password.html) đã tự so khớp 2 mật khẩu trước khi gửi và chỉ
+  // gửi {token, password}. Trước đây field này là BẮT BUỘC → mọi lượt đặt lại
+  // mật khẩu từ link email đều fail 400 với "Mật khẩu nhập lại không khớp".
+  // Nếu client có gửi field này → vẫn validate nghiêm ngặt để chặn lỗi gõ nhầm.
   body('confirmPassword')
+    .optional()
     .custom((value, { req }) => {
       if (value !== req.body.password) {
         throw new Error('Mật khẩu nhập lại không khớp');

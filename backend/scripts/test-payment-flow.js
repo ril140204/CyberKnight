@@ -28,9 +28,17 @@ const envPath = fs.existsSync(path.join(__dirname, '../.env'))
 require('dotenv').config({ path: envPath });
 
 const db = require('../src/config/db');
+const { getPackageById } = require('../src/config/catalog');
 
 const BASE_URL = process.env.TEST_BASE_URL || 'http://localhost:5000';
 const API_KEY = (process.env.SEPAY_API_KEY || process.env.PAYMENT_WEBHOOK_SECRET || 'sigmabloom_level_access_secret_please_change_this_2026_09').trim();
+
+// Giá gói lấy từ catalog (nguồn sự thật duy nhất) — KHÔNG hardcode.
+// Trước đây test hardcode 2000đ (giá test cũ); commit 5269b3c đã đổi giá thật
+// của pack_1_4 thành 49.000đ → test fail dù backend hoạt động đúng.
+const PACKAGE_ID = 'pack_1_4';
+const PACKAGE_PRICE = getPackageById(PACKAGE_ID)?.price;
+const UNDERPAID_AMOUNT = Math.floor(PACKAGE_PRICE / 2); // chuyển thiếu một nửa
 
 let passed = 0;
 let failed = 0;
@@ -121,14 +129,14 @@ async function run() {
     method: 'POST',
     path: '/api/payments/orders',
     headers: { Authorization: `Bearer ${token}` },
-  }, { packageId: 'pack_1_4' });
+  }, { packageId: PACKAGE_ID });
 
   assert(createOrderRes.status === 201, `Tạo đơn thành công (HTTP ${createOrderRes.status})`);
   const orderData = createOrderRes.json?.data?.order;
   const qrData = createOrderRes.json?.data?.qr;
 
   assert(orderData && /^CK[A-HJ-NP-Z2-9]{8}$/.test(orderData.orderCode), `Mã đơn đúng định dạng: ${orderData?.orderCode}`);
-  assert(orderData?.amount === 2000, `Số tiền chính xác 2.000đ (nhận: ${orderData?.amount})`);
+  assert(orderData?.amount === PACKAGE_PRICE, `Số tiền khớp giá gói trong catalog (${PACKAGE_PRICE?.toLocaleString('vi-VN')}đ — nhận: ${orderData?.amount})`);
   assert(qrData?.qrUrl && qrData.qrUrl.includes('img.vietqr.io'), `Tạo link VietQR động chuẩn: ${qrData?.qrUrl?.slice(0, 50)}...`);
 
   const orderCode = orderData.orderCode;
@@ -139,7 +147,7 @@ async function run() {
     method: 'POST',
     path: '/api/payments/webhook/sepay',
     headers: { Authorization: 'Apikey WRONG_KEY_123456' },
-  }, { id: 111111, amountIn: 2000, content: orderCode });
+  }, { id: 111111, amountIn: PACKAGE_PRICE, content: orderCode });
 
   assert(invalidKeyRes.status === 403, `Bị chặn 403 Forbidden khi sai key (nhận: ${invalidKeyRes.status})`);
 
@@ -153,7 +161,7 @@ async function run() {
     id: `OUT_${timestamp}`,
     transferType: 'out',
     amountIn: 0,
-    amountOut: 2000,
+    amountOut: PACKAGE_PRICE,
     content: orderCode,
   });
 
@@ -169,7 +177,7 @@ async function run() {
   }, {
     id: txUnderpaidId,
     transferType: 'in',
-    amountIn: 1000, // Cần 2.000 nhưng chỉ chuyển 1.000
+    amountIn: UNDERPAID_AMOUNT, // Chuyển thiếu: chỉ một nửa số tiền của gói
     content: `Chuyen tien hoc phi ${orderCode}`,
   });
 
@@ -192,7 +200,7 @@ async function run() {
   }, {
     id: txPaidId,
     transferType: 'in',
-    amountIn: 2000,
+    amountIn: PACKAGE_PRICE,
     content: `Nap tien bo sung CyberKnight ${orderCode}`,
   });
 
@@ -209,9 +217,9 @@ async function run() {
   console.log('\n── 7. Kiểm tra user_entitlements sau thanh toán ──');
   const [entitlements] = await db.query(
     'SELECT package_id, expires_at FROM user_entitlements WHERE user_id = ? AND package_id = ?',
-    [loginRes.json.user.id, 'pack_1_4']
+    [loginRes.json.user.id, PACKAGE_ID]
   );
-  assert(entitlements.length > 0, 'User đã được cấp quyền package pack_1_4');
+  assert(entitlements.length > 0, `User đã được cấp quyền package ${PACKAGE_ID}`);
   assert(entitlements[0]?.expires_at === null, 'Thời hạn gói là vĩnh viễn (expires_at = null)');
 
   // ── 8. Webhook gửi trùng lặp (Idempotency) ──
@@ -223,7 +231,7 @@ async function run() {
   }, {
     id: txPaidId,
     transferType: 'in',
-    amountIn: 59000,
+    amountIn: PACKAGE_PRICE,
     content: `Nap tien bo sung CyberKnight ${orderCode}`,
   });
   assert(duplicateRes.status === 200 && duplicateRes.json?.data?.duplicate === true, 'Xử lý idempotent an toàn, không ném lỗi trùng lặp');
