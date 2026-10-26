@@ -29,13 +29,14 @@ const LEVELS = [
   { id: 5, url: '/level5/level5.html', title: 'Thật Hay Giả? Đống Ảnh AI' },
   { id: 6, url: '/level6/level6.html', title: 'Chặn Đứng Bắt Nạt Mạng' },
   { id: 7, url: '/level7/level7.html', title: 'Biệt Đội Chống Bẫy Lừa' },
+  { id: 8, url: '/level8/level8.html', title: 'Trận Chiến An Toàn Số' },
   // ============================================================
-  // Các level 8..10 CHƯA phát hành — để comment hướng dẫn thêm:
+  // Các level 9..10 CHƯA phát hành — để comment hướng dẫn thêm:
   // Khi thêm level mới, chỉ cần thêm object vào mảng LEVELS bên dưới
   // và tạo thư mục levelN/ cùng file levelN.html trong project root.
   //
-  // Ví dụ khi phát hành level 8:
-  //   { id: 8, url: '/level8/level8.html', title: 'Tên Level Mới' },
+  // Ví dụ khi phát hành level 9:
+  //   { id: 9, url: '/level9/level9.html', title: 'Tên Level Mới' },
   // ============================================================
 ];
 

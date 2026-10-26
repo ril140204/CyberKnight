@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CyberKnight — Level 8: Trận Chiến An Toàn Số</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;600;700;800&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Canvas Confetti CDN (CSP allowed) -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <!-- Safe HTML helper (CSP & anti-XSS) -->
+    <script src="../assets/safe.js"></script>
+
+    <!-- Level 8 Stylesheet -->
+    <link rel="stylesheet" href="level8.css">
+</head>
+<body>
+
+    <div id="app-container">
+
+        <!-- ===================================================================
+             TOP BAR: THANH ĐIỀU KHIỂN HỆ THỐNG GÓC TRÊN BÊN PHẢI
+             =================================================================== -->
+        <div class="level8-top-bar" id="level8-top-bar">
+            <button id="btn-exit-level" class="btn-level8-exit" type="button" title="Thoát trò chơi (ESC)" aria-label="Thoát trò chơi">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+                <span>THOÁT</span>
+            </button>
+        </div>
+
+        <!-- Nút Bỏ Qua video - góc dưới bên phải (chỉ hiện ở các stage video) -->
+        <button id="btn-skip-video" class="btn-level8-skip hidden" type="button" title="Bỏ qua video" aria-label="Bỏ qua video">
+            <span>BỎ QUA ⏩</span>
+        </button>
+
+        <!-- ===================================================================
+             START OVERLAY
+             =================================================================== -->
+        <div id="start-overlay">
+            <div class="floating-sparkle star" style="left:8%;animation-duration:12s;animation-delay:0s;"></div>
+            <div class="floating-sparkle circle" style="left:26%;animation-duration:15s;animation-delay:1s;"></div>
+            <div class="floating-sparkle diamond" style="left:52%;animation-duration:11s;animation-delay:3s;"></div>
+            <div class="floating-sparkle star" style="left:76%;animation-duration:14s;animation-delay:2s;"></div>
+            <div class="floating-sparkle circle" style="left:92%;animation-duration:16s;animation-delay:4s;"></div>
+
+            <img src="../image/z8014995224177_069f99816bf77dda5fed3feb153a6c0e-removebg-preview.png" alt="CyberKnight Logo" class="overlay-brand-logo">
+
+            <div class="cyber-badge">LEVEL 8 • MÀN TỔNG HỢP & ĐẤU TRÙM</div>
+            <h1 class="cyber-title">TRẬN CHIẾN AN TOÀN SỐ</h1>
+            <p class="cyber-subtitle">
+                Cùng Sóc Đỏ vượt qua 3 Trạm Thử Thách để thu thập 3 Mảnh Cầu An Toàn, đúc thành Khiên Ánh Sáng phong ấn Vua Độc Hại nhé!
+            </p>
+            <button id="btn-start-level" class="btn-cyber-primary" type="button" aria-label="Bắt đầu level 8">
+                <span>▶ BẮT ĐẦU LEVEL 8</span>
+            </button>
+        </div>
+
+        <!-- ===================================================================
+             VIDEO STAGES: intro & outro
+             Mỗi cảnh có 1 thẻ <video> riêng (playsinline, preload=auto, CÓ TIẾNG)
+             =================================================================== -->
+        <div id="stage-intro" class="stage">
+            <div class="video-ambient-backdrop"></div>
+            <div class="video-container">
+                <video id="video-intro" class="video-player" playsinline preload="auto"></video>
+                <div class="video-loading-spinner hidden"></div>
+                <div class="video-loading-slow hidden">Mạng hơi chậm, chờ chút nhé</div>
+            </div>
+        </div>
+
+        <div id="stage-outro" class="stage">
+            <div class="video-ambient-backdrop"></div>
+            <div class="video-container">
+                <video id="video-outro" class="video-player" playsinline preload="auto"></video>
+                <div class="video-loading-spinner hidden"></div>
+                <div class="video-loading-slow hidden">Mạng hơi chậm, chờ chút nhé</div>
+            </div>
+        </div>
+
+        <!-- ===================================================================
+             STAGE MAP: BẢN ĐỒ THÀNH PHỐ SỐ
+             =================================================================== -->
+        <div id="stage-map" class="stage">
+            <div class="cyber-grid"></div>
+            <div class="bt-map-container">
+                <div class="bt-map-header">
+                    <div class="bt-map-title-box">
+                        <span class="bt-badge-station">BẢN ĐỒ THÀNH PHỐ SỐ</span>
+                        <h2 class="bt-map-heading">HÀNH TRÌNH THU THẬP MẢNH CẦU</h2>
+                    </div>
+                    <div class="bt-sphere-tracker" id="map-sphere-tracker">
+                        <span class="bt-tracker-label">Mảnh Cầu:</span>
+                        <div class="bt-tracker-slots">
+                            <div class="bt-sphere-slot" id="sphere-slot-1" title="Mảnh Cầu 1 (Công Viên QR)">
+                                <span class="bt-sphere-icon">🔮</span>
+                            </div>
+                            <div class="bt-sphere-slot" id="sphere-slot-2" title="Mảnh Cầu 2 (Bờ Biển Tin Giả)">
+                                <span class="bt-sphere-icon">🔮</span>
+                            </div>
+                            <div class="bt-sphere-slot" id="sphere-slot-3" title="Mảnh Cầu 3 (Chợ Ứng Dụng)">
+                                <span class="bt-sphere-icon">🔮</span>
+                            </div>
+                        </div>
+                        <span class="bt-sphere-counter" id="map-sphere-text">0/3</span>
+                    </div>
+                </div>
+
+                <!-- Bip dẫn dắt trên bản đồ -->
+                <div class="bt-bip-bar">
+                    <div class="bt-bip-avatar">🤖</div>
+                    <div class="bt-bip-bubble" id="map-bip-msg">
+                        Chào Hiệp Sĩ! Vua Độc Hại đã giấu 3 Mảnh Cầu ở 3 trạm. Con hãy bấm vào <b>Trạm 1</b> để bắt đầu nhé!
+                    </div>
+                </div>
+
+                <!-- Bản đồ Cyber City SVG tương tác -->
+                <div class="bt-city-board" id="city-board">
+                    <svg class="bt-city-svg" viewBox="0 0 960 520" preserveAspectRatio="xMidYMid meet" aria-label="Bản đồ Thành Phố Số">
+                        <defs>
+                            <linearGradient id="cyberSky" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stop-color="#0a1026" />
+                                <stop offset="100%" stop-color="#141c3d" />
+                            </linearGradient>
+                            <linearGradient id="cyberRoad" x1="0" y1="0" x2="1" y2="0">
+                                <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.25" />
+                                <stop offset="50%" stop-color="#06b6d4" stop-opacity="0.5" />
+                                <stop offset="100%" stop-color="#3b82f6" stop-opacity="0.25" />
+                            </linearGradient>
+                            <filter id="neonGlow" x="-20%" y="-20%" width="140%" height="140%">
+                                <feGaussianBlur stdDeviation="6" result="blur" />
+                                <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                            </filter>
+                        </defs>
+
+                        <!-- Background & Grid -->
+                        <rect width="960" height="520" fill="url(#cyberSky)" rx="24" />
+
+                        <!-- Cyber Roads connecting stations -->
+                        <path d="M 180 380 Q 280 280 480 390 T 780 370" fill="none" stroke="url(#cyberRoad)" stroke-width="8" stroke-dasharray="10 6" class="bt-road-dash" />
+                        <path d="M 480 390 L 480 180" fill="none" stroke="url(#cyberRoad)" stroke-width="8" stroke-dasharray="10 6" class="bt-road-dash" />
+
+                        <!-- Cyber Skyline background silhouettes -->
+                        <rect x="60" y="220" width="70" height="180" fill="#182247" opacity="0.6" rx="4" />
+                        <rect x="140" y="190" width="60" height="210" fill="#1e2c59" opacity="0.5" rx="4" />
+                        <rect x="280" y="150" width="85" height="250" fill="#152044" opacity="0.6" rx="4" />
+                        <rect x="580" y="170" width="75" height="230" fill="#1a254f" opacity="0.6" rx="4" />
+                        <rect x="670" y="210" width="80" height="190" fill="#19244c" opacity="0.5" rx="4" />
+                        <rect x="800" y="180" width="70" height="220" fill="#162249" opacity="0.6" rx="4" />
+                    </svg>
+
+                    <!-- Interactive Station Nodes positioned on the board -->
+                    <div class="bt-station-node bt-node-1" id="node-station-1" role="button" tabindex="0" aria-label="Trạm 1: Công Viên QR">
+                        <div class="bt-node-pulse"></div>
+                        <div class="bt-node-badge">1</div>
+                        <div class="bt-node-icon">🏞️</div>
+                        <div class="bt-node-info">
+                            <span class="bt-node-name">Công Viên QR</span>
+                            <span class="bt-node-status" id="node-1-status">SẴN SÀNG</span>
+                        </div>
+                    </div>
+
+                    <div class="bt-station-node bt-node-2 bt-locked" id="node-station-2" role="button" tabindex="0" aria-label="Trạm 2: Bờ Biển Tin Giả (Đang khóa)">
+                        <div class="bt-node-pulse"></div>
+                        <div class="bt-node-badge">2</div>
+                        <div class="bt-node-icon">🌊</div>
+                        <div class="bt-node-info">
+                            <span class="bt-node-name">Bờ Biển Tin Giả</span>
+                            <span class="bt-node-status" id="node-2-status">🔒 KHÓA</span>
+                        </div>
+                    </div>
+
+                    <div class="bt-station-node bt-node-3 bt-locked" id="node-station-3" role="button" tabindex="0" aria-label="Trạm 3: Chợ Ứng Dụng (Đang khóa)">
+                        <div class="bt-node-pulse"></div>
+                        <div class="bt-node-badge">3</div>
+                        <div class="bt-node-icon">📱</div>
+                        <div class="bt-node-info">
+                            <span class="bt-node-name">Chợ Ứng Dụng</span>
+                            <span class="bt-node-status" id="node-3-status">🔒 KHÓA</span>
+                        </div>
+                    </div>
+
+                    <div class="bt-station-node bt-node-boss bt-locked" id="node-station-boss" role="button" tabindex="0" aria-label="Tháp Vua Độc Hại (Thu thập đủ 3 Mảnh Cầu để mở khóa)">
+                        <div class="bt-node-pulse bt-boss-pulse"></div>
+                        <div class="bt-node-badge">👑</div>
+                        <div class="bt-node-icon">🏰</div>
+                        <div class="bt-node-info">
+                            <span class="bt-node-name">Tháp Vua Độc Hại</span>
+                            <span class="bt-node-status" id="node-boss-status">🔒 CẦN 3 MẢNH CẦU</span>
+                        </div>
+                    </div>
+
+                    <!-- Flying sphere for celebration animations -->
+                    <div class="bt-flying-sphere hidden" id="flying-sphere">🔮</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================================================================
+             STAGE ST1: TRẠM 1 – MÃ QR BẪY (CÔNG VIÊN)
+             =================================================================== -->
+        <div id="stage-st1" class="stage">
+            <div class="cyber-grid"></div>
+            <div class="bt-card-wrap">
+                <div class="bt-stage-badge">TRẠM 1 • CÔNG VIÊN QR</div>
+                <h3 class="bt-stage-title">BẢNG TIN CÔNG VIÊN CÓ MÃ QR LẠ</h3>
+                <p class="bt-stage-desc">
+                    Mã QR lạ dán ở nơi công cộng có thể dẫn đến trang lừa đảo. Con hãy kiểm tra kỹ nhé!
+                </p>
+
+                <div class="bt-st1-content">
+                    <!-- Khung mô phỏng bảng tin công viên có mã QR -->
+                    <div class="bt-st1-park-board" id="st1-board">
+                        <div class="bt-board-pin">📌</div>
+                        <div class="bt-board-header">QUÀ TẶNG MIỄN PHÍ CÔNG VIÊN</div>
+                        <div class="bt-qr-box" id="st1-qr-box">
+                            <!-- SVG QR giả lập (không chứa dữ liệu thật) -->
+                            <svg class="bt-qr-svg" viewBox="0 0 100 100" width="130" height="130" aria-label="Mã QR giả lập">
+                                <rect width="100" height="100" fill="#ffffff" rx="6" />
+                                <!-- QR Corner 1 -->
+                                <rect x="8" y="8" width="24" height="24" fill="#0f172a" rx="3" />
+                                <rect x="13" y="13" width="14" height="14" fill="#ffffff" />
+                                <rect x="17" y="17" width="6" height="6" fill="#0f172a" />
+                                <!-- QR Corner 2 -->
+                                <rect x="68" y="8" width="24" height="24" fill="#0f172a" rx="3" />
+                                <rect x="73" y="13" width="14" height="14" fill="#ffffff" />
+                                <rect x="77" y="17" width="6" height="6" fill="#0f172a" />
+                                <!-- QR Corner 3 -->
+                                <rect x="8" y="68" width="24" height="24" fill="#0f172a" rx="3" />
+                                <rect x="13" y="73" width="14" height="14" fill="#ffffff" />
+                                <rect x="17" y="77" width="6" height="6" fill="#0f172a" />
+                                <!-- Fictional QR data patterns -->
+                                <rect x="38" y="12" width="6" height="6" fill="#0f172a" />
+                                <rect x="48" y="12" width="10" height="6" fill="#0f172a" />
+                                <rect x="38" y="24" width="8" height="6" fill="#0f172a" />
+                                <rect x="52" y="24" width="8" height="8" fill="#0f172a" />
+                                <rect x="12" y="40" width="12" height="6" fill="#0f172a" />
+                                <rect x="30" y="38" width="8" height="8" fill="#0f172a" />
+                                <rect x="44" y="38" width="14" height="6" fill="#0f172a" />
+                                <rect x="64" y="38" width="8" height="14" fill="#0f172a" />
+                                <rect x="78" y="40" width="12" height="8" fill="#0f172a" />
+                                <rect x="18" y="52" width="8" height="8" fill="#0f172a" />
+                                <rect x="34" y="52" width="12" height="8" fill="#0f172a" />
+                                <rect x="52" y="50" width="8" height="14" fill="#0f172a" />
+                                <rect x="68" y="58" width="16" height="6" fill="#0f172a" />
+                                <rect x="38" y="68" width="8" height="8" fill="#0f172a" />
+                                <rect x="52" y="72" width="10" height="8" fill="#0f172a" />
+                                <rect x="68" y="72" width="8" height="12" fill="#0f172a" />
+                                <rect x="82" y="78" width="8" height="8" fill="#0f172a" />
+                                <rect x="40" y="82" width="16" height="6" fill="#0f172a" />
+                            </svg>
+                            <!-- Simulated laser scanning beam -->
+                            <div class="bt-scan-beam hidden" id="st1-scan-beam"></div>
+                        </div>
+                        <button class="bt-scan-btn" id="btn-st1-scan" type="button" aria-label="Quét mã QR">
+                            📷 QUÉT MÃ
+                        </button>
+                    </div>
+
+                    <!-- Màn hình điện thoại giả lập hiện link lạ -->
+                    <div class="bt-st1-phone-popup hidden" id="st1-phone-popup">
+                        <div class="bt-phone-notch"></div>
+                        <div class="bt-phone-status">10:25 • Sóc Đỏ Phone</div>
+                        <div class="bt-phone-content">
+                            <div class="bt-alert-icon">⚠️</div>
+                            <div class="bt-phone-alert-title">PHÁT HIỆN LIÊN KẾT TỪ MÃ QR:</div>
+                            <div class="bt-fake-url" id="st1-fake-url">http://qua-tang-mien-phi.xyz</div>
+                            <p class="bt-phone-warning">Đường link này không rõ nguồn gốc và có đuôi tên miền rất lạ!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bip phản hồi tại chỗ -->
+                <div class="bt-station-bip" id="st1-bip-box">
+                    <span class="bt-station-bip-icon">🤖</span>
+                    <span class="bt-station-bip-text" id="st1-bip-text">Con hãy bấm "📷 QUÉT MÃ" để xem mã QR này dẫn tới đâu nhé!</span>
+                </div>
+
+                <!-- 3 nút trả lời trung tính (khi điện thoại xuất hiện) -->
+                <div class="bt-answer-grid hidden" id="st1-answers">
+                    <button class="bt-answer-btn" id="btn-st1-open" type="button" data-choice="open" aria-label="Mở link">
+                        <span class="bt-btn-icon">🌐</span>
+                        <span class="bt-btn-text">MỞ LINK</span>
+                    </button>
+                    <button class="bt-answer-btn" id="btn-st1-send" type="button" data-choice="send" aria-label="Gửi link cho bạn">
+                        <span class="bt-btn-icon">📤</span>
+                        <span class="bt-btn-text">GỬI LINK CHO BẠN</span>
+                    </button>
+                    <button class="bt-answer-btn" id="btn-st1-delete" type="button" data-choice="delete" aria-label="Tắt và xóa mã QR">
+                        <span class="bt-btn-icon">🚫</span>
+                        <span class="bt-btn-text">TẮT VÀ XÓA MÃ QR</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================================================================
+             STAGE ST2: TRẠM 2 – TIN GIẢ & BÚT THỬ AI (BỜ BIỂN)
+             =================================================================== -->
+        <div id="stage-st2" class="stage">
+            <div class="cyber-grid"></div>
+            <div class="bt-card-wrap">
+                <div class="bt-stage-badge">TRẠM 2 • BỜ BIỂN TIN GIẢ</div>
+                <h3 class="bt-stage-title">BÀI ĐĂNG CÓ QUÁI VẬT BỜ BIỂN</h3>
+                <p class="bt-stage-desc">
+                    Bật <b>Bút Thử AI</b> và chạm vào ảnh để soi kỹ chi tiết quái vật xem là ảnh thật hay do AI vẽ nhé!
+                </p>
+
+                <!-- Công cụ Bút Thử AI + Gợi ý -->
+                <div class="bt-tool-row">
+                    <button class="bt-magnify-btn" id="btn-magnifier-st2" type="button" aria-pressed="false" aria-label="Bật tắt Bút Thử AI phóng to 2.5x">
+                        <span class="bt-tool-icon">🔍</span>
+                        <span>Bút Thử AI</span>
+                        <span class="bt-tool-badge">2.5×</span>
+                    </button>
+                    <button class="bt-hint-btn" id="btn-hint-st2" type="button" aria-label="Xem gợi ý từ Bíp">
+                        <span>💡 Gợi ý</span>
+                    </button>
+                </div>
+
+                <div class="bt-st2-post-frame">
+                    <div class="bt-post-header">
+                        <div class="bt-post-avatar">🌊</div>
+                        <div class="bt-post-user">
+                            <span class="bt-user-name">Người Đi Biển Bí Ẩn</span>
+                            <span class="bt-post-time">Vừa xong • Tin nóng sốt dẻo 🔥</span>
+                        </div>
+                    </div>
+                    <div class="bt-post-caption">
+                        "Cứu với bà con ơi! Vừa chụp được quái vật khổng lồ ở bờ biển thành phố chiều nay! Xem xong chia sẻ ngay kẻo muộn!"
+                    </div>
+
+                    <!-- Khung ảnh Polaroid có kính lúp zoom -->
+                    <div class="bt-zoom-frame" id="st2-zoom-frame" role="group" aria-label="Ảnh quái vật bờ biển cần kiểm tra">
+                        <img id="st2-ai-image" class="bt-zoom-img" alt="Ảnh quái vật bờ biển do AI tạo ra" src="../video/level 8/quai_vat_ai.jpg">
+                        <div class="bt-zoom-hint-tag">🔍 Chạm ảnh để phóng to</div>
+                    </div>
+                </div>
+
+                <!-- Bip phản hồi tại chỗ -->
+                <div class="bt-station-bip" id="st2-bip-box">
+                    <span class="bt-station-bip-icon">🤖</span>
+                    <span class="bt-station-bip-text" id="st2-bip-text">Hãy bật Bút Thử AI và soi kỹ số ngón tay, ngón chân của quái vật nhé con!</span>
+                </div>
+
+                <!-- 3 nút trả lời trung tính -->
+                <div class="bt-answer-grid" id="st2-answers">
+                    <button class="bt-answer-btn" id="btn-st2-like" type="button" data-choice="like" aria-label="Thả tim">
+                        <span class="bt-btn-icon">❤️</span>
+                        <span class="bt-btn-text">THẢ TIM</span>
+                    </button>
+                    <button class="bt-answer-btn" id="btn-st2-share" type="button" data-choice="share" aria-label="Chia sẻ cho bạn bè">
+                        <span class="bt-btn-icon">🔁</span>
+                        <span class="bt-btn-text">CHIA SẺ CHO BẠN BÈ</span>
+                    </button>
+                    <button class="bt-answer-btn" id="btn-st2-report" type="button" data-choice="report" aria-label="Báo cáo tin giả">
+                        <span class="bt-btn-icon">📢</span>
+                        <span class="bt-btn-text">BÁO CÁO TIN GIẢ</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================================================================
+             STAGE ST3: TRẠM 3 – LỌC APP ĐỘC HẠI (CHỢ ỨNG DỤNG)
+             =================================================================== -->
+        <div id="stage-st3" class="stage">
+            <div class="cyber-grid"></div>
+            <div class="bt-card-wrap bt-st3-wrap">
+                <div class="bt-stage-badge">TRẠM 3 • CHỢ ỨNG DỤNG</div>
+                <h3 class="bt-stage-title">CHỌN VÀ CHUYỂN CÁC APP NHÁI VÀO THÙNG RÁC</h3>
+                <p class="bt-stage-desc">
+                    Chỉ giữ lại ứng dụng an toàn! Con hãy <b>chạm vào app nhái rồi chạm thùng rác</b> (hoặc kéo thả) để dọn dẹp nhé!
+                </p>
+
+                <div class="bt-st3-layout">
+                    <!-- Danh sách 4 thẻ app -->
+                    <div class="bt-app-grid" id="st3-app-grid">
+                        <!-- App 1: Xịn -->
+                        <div class="bt-app-card" id="app-card-safe" data-app="safe" role="button" tabindex="0" aria-label="Ứng dụng Trường Học Số (An toàn)">
+                            <div class="bt-app-icon-box bt-app-safe-icon">📚</div>
+                            <div class="bt-app-details">
+                                <div class="bt-app-title">Trường Học Số <span class="bt-badge-verified">✔ Cửa hàng chính thức</span></div>
+                                <div class="bt-app-meta">⭐ 4.9 · 1.000.000 lượt tải</div>
+                                <div class="bt-app-perm">🔒 Quyền: Bộ nhớ học tập</div>
+                            </div>
+                        </div>
+
+                        <!-- App 2: Nhái 1 (file ngoài apk) -->
+                        <div class="bt-app-card" id="app-card-fake1" data-app="fake1" role="button" tabindex="0" aria-label="Ứng dụng Kim Cương Miễn Phí (Nhái)">
+                            <div class="bt-app-icon-box bt-app-fake-icon">💎</div>
+                            <div class="bt-app-details">
+                                <div class="bt-app-title">Kim Cương Miễn Phí <span class="bt-badge-warning">⚠️ File ngoài (.apk)</span></div>
+                                <div class="bt-app-meta">⭐ 1.2 · 5 lượt tải</div>
+                                <div class="bt-app-perm">⚠️ Không rõ nguồn gốc</div>
+                            </div>
+                        </div>
+
+                        <!-- App 3: Nhái 2 (đòi quyền SMS & Danh bạ) -->
+                        <div class="bt-app-card" id="app-card-fake2" data-app="fake2" role="button" tabindex="0" aria-label="Ứng dụng Quà Tặng Vô Hạn (Nhái)">
+                            <div class="bt-app-icon-box bt-app-fake-icon">🎁</div>
+                            <div class="bt-app-details">
+                                <div class="bt-app-title">Quà Tặng Vô Hạn <span class="bt-badge-warning">⚠️ Đòi quyền lạ</span></div>
+                                <div class="bt-app-meta">⭐ 2.0 · Đánh giá ảo</div>
+                                <div class="bt-app-perm">⚠️ Đòi quyền đọc tin nhắn SMS & Danh bạ</div>
+                            </div>
+                        </div>
+
+                        <!-- App 4: Nhái 3 (quảng cáo độc hại) -->
+                        <div class="bt-app-card" id="app-card-fake3" data-app="fake3" role="button" tabindex="0" aria-label="Ứng dụng Hack Xu Siêu Tốc (Nhái)">
+                            <div class="bt-app-icon-box bt-app-fake-icon">⚡</div>
+                            <div class="bt-app-details">
+                                <div class="bt-app-title">Hack Xu Siêu Tốc <span class="bt-badge-warning">⚠️ Chứa mã độc</span></div>
+                                <div class="bt-app-meta">⭐ 1.0 · 2 đánh giá</div>
+                                <div class="bt-app-perm">⚠️ Chứa quảng cáo độc hại và pop-up</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Khu vực thùng rác dọn dẹp -->
+                    <div class="bt-trash-area" id="st3-trash-area" role="button" tabindex="0" aria-label="Thùng rác dọn dẹp ứng dụng độc hại">
+                        <div class="bt-trash-icon" id="st3-trash-icon">🗑️</div>
+                        <div class="bt-trash-label">THÙNG RÁC DỌN DẸP</div>
+                        <div class="bt-trash-counter" id="st3-trash-counter">Đã dọn: 0/3 app nhái</div>
+                        <div class="bt-trash-hint">Chạm app rồi chạm thùng rác</div>
+                    </div>
+                </div>
+
+                <!-- Bip phản hồi tại chỗ -->
+                <div class="bt-station-bip" id="st3-bip-box">
+                    <span class="bt-station-bip-icon">🤖</span>
+                    <span class="bt-station-bip-text" id="st3-bip-text">Hãy quan sát kỹ dấu tích xanh và quyền truy cập để tìm ra 3 app nhái nhé con!</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================================================================
+             STAGE BOSS: TRẬN ĐẤU TRÙM (VUA ĐỘC HẠI)
+             =================================================================== -->
+        <div id="stage-boss" class="stage">
+            <div class="cyber-grid"></div>
+            <div class="bt-boss-container">
+                <div class="bt-boss-header">
+                    <span class="bt-stage-badge bt-boss-badge">TRẬN ĐẤU TRÙM CUỐI</span>
+                    <h2 class="bt-boss-heading">PHONG ẤN VUA ĐỘC HẠI</h2>
+                </div>
+
+                <!-- Boss Avatar & Thanh năng lượng -->
+                <div class="bt-boss-arena">
+                    <div class="bt-boss-figure-wrap" id="boss-figure-wrap">
+                        <div class="bt-boss-aura"></div>
+                        <div class="bt-boss-monster" id="boss-monster">👿</div>
+                        <div class="bt-boss-name">VUA ĐỘC HẠI</div>
+                        <div class="bt-boss-hp-bar">
+                            <div class="bt-boss-hp-fill" id="boss-hp-fill" style="width: 100%;"></div>
+                        </div>
+                        <div class="bt-boss-hp-text" id="boss-hp-text">Năng Lượng: 100%</div>
+                    </div>
+
+                    <!-- Hiệu ứng chùm sáng bắn từ Khiên lên Boss -->
+                    <div class="bt-beam-track" id="boss-beam-track"></div>
+
+                    <!-- Lọ thủy tinh phong ấn ở dưới -->
+                    <div class="bt-glass-jar" id="boss-glass-jar" title="Lọ Thủy Tinh Phong Ấn">
+                        <div class="bt-jar-lid" id="boss-jar-lid">🔒 NẮP PHONG ẤN</div>
+                        <div class="bt-jar-body">
+                            <span class="bt-jar-sparkles">✨</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lời thoại Bip / Hướng dẫn bấm -->
+                <div class="bt-boss-bip-bar">
+                    <div class="bt-bip-avatar">🤖</div>
+                    <div class="bt-bip-bubble" id="boss-bip-bubble">
+                        3 Mảnh Cầu đã hợp nhất thành Khiên Ánh Sáng! <b>Con hãy bấm liên tục vào Khiên</b> (hoặc phím Space/Enter) để phóng chùm sáng phong ấn hắn nhé!
+                    </div>
+                </div>
+
+                <!-- Khiên Ánh Sáng (Nút bấm liên tục) -->
+                <div class="bt-shield-control">
+                    <button class="bt-shield-btn" id="btn-boss-shield" type="button" aria-label="Bấm liên tục vào Khiên Ánh Sáng để tấn công Vua Độc Hại">
+                        <div class="bt-shield-icon">🛡️</div>
+                        <div class="bt-shield-text">BẤM VÀO KHIÊN!</div>
+                        <div class="bt-shield-progress" id="boss-click-counter">0 / 20</div>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================================================================
+             STAGE SUMMARY: MÀN TỔNG KẾT
+             1 tiêu đề + đúng 4 ý (mỗi ý <= 8 từ, 1 emoji) + Bằng Khen gọn
+             =================================================================== -->
+        <div id="stage-summary" class="stage">
+            <div class="cyber-grid"></div>
+            <div class="bt-summary-container" id="summary-card-container">
+                <!-- Nội dung được render an toàn trong level8.js -->
+            </div>
+        </div>
+
+        <!-- Canvas dùng cho hiệu ứng Freeze-Frame Crossfade chuyển cảnh -->
+        <canvas id="freeze-canvas"></canvas>
+
+    </div>
+
+    <!-- Level 8 Controller -->
+    <script src="level8.js"></script>
+</body>
+</html>

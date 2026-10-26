@@ -1,0 +1,1629 @@
+/**
+ * CYBERKNIGHT — LEVEL 8: "TRẬN CHIẾN AN TOÀN SỐ"
+ * Stylesheet: Tokens, Layout, Responsive Grid, Animations, Magnifier, Boss Battle & Summary.
+ * Class prefix: bt- (battle)
+ */
+
+/* =============================================================================
+   1. DESIGN TOKENS & RESET
+   ============================================================================= */
+:root {
+    --ck-bg-dark: #070d1e;
+    --ck-bg-surface: #0f172a;
+    --ck-bg-card: rgba(15, 23, 42, 0.88);
+    --ck-border-card: rgba(59, 130, 246, 0.28);
+
+    --ck-blue-500: #3b82f6;
+    --ck-blue-600: #2563eb;
+    --ck-cyan-400: #22d3ee;
+    --ck-emerald-500: #10b981;
+    --ck-amber-400: #fbbf24;
+    --ck-amber-500: #f59e0b;
+    --ck-rose-500: #f43f5e;
+    --ck-purple-500: #a855f7;
+
+    --z-stage: 10;
+    --z-stage-active: 20;
+    --z-freeze: 50;
+    --z-overlay: 60;
+    --z-topbar: 9999;
+
+    --font-heading: 'Space Grotesk', 'Poppins', sans-serif;
+    --font-body: 'Inter', sans-serif;
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: var(--ck-bg-dark);
+    color: #ffffff;
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.5;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+#app-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: radial-gradient(circle at 50% 20%, #151e3f 0%, #070d1e 100%);
+}
+
+/* =============================================================================
+   2. TOPBAR & SKIP BUTTON (GIỐNG LEVEL 5 & 7)
+   ============================================================================= */
+.level8-top-bar {
+    position: fixed;
+    top: 14px;
+    right: 14px;
+    z-index: var(--z-topbar);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-level8-exit {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 40px;
+    padding: 0 14px;
+    border-radius: 9999px;
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #f1f5f9;
+    font-family: var(--font-heading);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    transition: all 0.2s ease;
+}
+
+.btn-level8-exit:hover {
+    background: rgba(239, 68, 68, 0.25);
+    border-color: rgba(239, 68, 68, 0.6);
+    color: #ffffff;
+    transform: translateY(-1px);
+}
+
+.btn-level8-skip {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: var(--z-topbar);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 48px;
+    padding: 0 20px;
+    border-radius: 9999px;
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    color: #ffffff;
+    font-family: var(--font-heading);
+    font-size: 15px;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(245, 158, 11, 0.4);
+    transition: all 0.2s ease;
+}
+
+.btn-level8-skip:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.6);
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* =============================================================================
+   3. STAGES & TRANSITIONS
+   ============================================================================= */
+.stage {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    visibility: hidden;
+    z-index: var(--z-stage);
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.stage.active {
+    opacity: 1;
+    visibility: visible;
+    z-index: var(--z-stage-active);
+}
+
+#freeze-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: var(--z-freeze);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+/* Background Cyber Grid */
+.cyber-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(59, 130, 246, 0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(59, 130, 246, 0.07) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+}
+
+/* Sparkles */
+.floating-sparkle {
+    position: absolute;
+    pointer-events: none;
+    background: radial-gradient(circle, #38bdf8 0%, transparent 70%);
+    border-radius: 50%;
+    opacity: 0.6;
+    animation: sparkleFloat linear infinite;
+}
+.floating-sparkle.star { width: 8px; height: 8px; }
+.floating-sparkle.circle { width: 12px; height: 12px; }
+.floating-sparkle.diamond { width: 10px; height: 10px; transform: rotate(45deg); }
+
+@keyframes sparkleFloat {
+    0% { transform: translateY(105vh) scale(0.6); opacity: 0; }
+    30% { opacity: 0.8; }
+    80% { opacity: 0.7; }
+    100% { transform: translateY(-10vh) scale(1.1); opacity: 0; }
+}
+
+/* =============================================================================
+   4. START OVERLAY
+   ============================================================================= */
+#start-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: var(--z-overlay);
+    background: radial-gradient(circle at 50% 30%, #151e3f 0%, #070d1e 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    text-align: center;
+}
+
+.overlay-brand-logo {
+    width: 140px;
+    height: auto;
+    margin-bottom: 12px;
+    filter: drop-shadow(0 4px 12px rgba(56, 189, 248, 0.3));
+}
+
+.cyber-badge {
+    display: inline-block;
+    padding: 4px 14px;
+    border-radius: 9999px;
+    background: rgba(59, 130, 246, 0.2);
+    border: 1px solid rgba(59, 130, 246, 0.4);
+    color: var(--ck-cyan-400);
+    font-family: var(--font-heading);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+}
+
+.cyber-title {
+    font-family: var(--font-heading);
+    font-size: clamp(24px, 5vw, 42px);
+    font-weight: 800;
+    background: linear-gradient(135deg, #ffffff 0%, #93c5fd 50%, #38bdf8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 12px;
+    text-shadow: 0 0 24px rgba(59, 130, 246, 0.4);
+}
+
+.cyber-subtitle {
+    max-width: 580px;
+    font-size: clamp(14px, 2.5vw, 17px);
+    color: #cbd5e1;
+    line-height: 1.6;
+    margin-bottom: 28px;
+}
+
+.btn-cyber-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 52px;
+    padding: 0 36px;
+    border-radius: 9999px;
+    background: linear-gradient(135deg, #2563eb 0%, #06b6d4 100%);
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    color: #ffffff;
+    font-family: var(--font-heading);
+    font-size: 17px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    box-shadow: 0 8px 24px rgba(37, 99, 235, 0.45);
+    transition: all 0.2s ease;
+}
+
+.btn-cyber-primary:hover {
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 12px 32px rgba(6, 182, 212, 0.6);
+}
+
+/* =============================================================================
+   5. VIDEO CONTAINERS
+   ============================================================================= */
+.video-container {
+    position: relative;
+    width: 100%;
+    max-width: 1080px;
+    aspect-ratio: 16 / 9;
+    border-radius: 20px;
+    overflow: hidden;
+    background: #000000;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+.video-player {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.video-loading-spinner {
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    width: 48px;
+    height: 48px;
+    border: 4px solid rgba(255, 255, 255, 0.2);
+    border-top-color: var(--ck-cyan-400);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+.video-loading-slow {
+    position: absolute;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(15, 23, 42, 0.85);
+    padding: 6px 16px;
+    border-radius: 9999px;
+    font-size: 13px;
+    color: #94a3b8;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Video Error Panel */
+.video-error-panel {
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.94);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    z-index: 30;
+}
+.video-error-inner {
+    text-align: center;
+    max-width: 480px;
+}
+.video-error-icon { font-size: 48px; margin-bottom: 12px; }
+.video-error-title {
+    font-family: var(--font-heading);
+    font-size: 18px;
+    font-weight: 700;
+    color: #f87171;
+    margin-bottom: 16px;
+}
+.video-error-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+.video-error-btn {
+    padding: 10px 20px;
+    border-radius: 9999px;
+    border: none;
+    font-family: var(--font-heading);
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+}
+.video-error-retry { background: #3b82f6; color: #fff; }
+.video-error-skip { background: #64748b; color: #fff; }
+
+/* =============================================================================
+   6. STAGE MAP: BẢN ĐỒ THÀNH PHỐ SỐ
+   ============================================================================= */
+.bt-map-container {
+    width: 100%;
+    max-width: 1000px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 10px 0;
+}
+
+.bt-map-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.bt-badge-station {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 9999px;
+    background: rgba(59, 130, 246, 0.2);
+    border: 1px solid rgba(59, 130, 246, 0.4);
+    color: var(--ck-cyan-400);
+    font-family: var(--font-heading);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+}
+
+.bt-map-heading {
+    font-family: var(--font-heading);
+    font-size: clamp(16px, 3vw, 24px);
+    font-weight: 800;
+    color: #ffffff;
+}
+
+.bt-sphere-tracker {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid var(--ck-border-card);
+    padding: 6px 14px;
+    border-radius: 9999px;
+}
+
+.bt-tracker-label {
+    font-family: var(--font-heading);
+    font-size: 13px;
+    font-weight: 700;
+    color: #94a3b8;
+}
+
+.bt-tracker-slots {
+    display: flex;
+    gap: 6px;
+}
+
+.bt-sphere-slot {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px dashed rgba(255, 255, 255, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+.bt-sphere-slot.bt-slot-active {
+    background: rgba(168, 85, 247, 0.3);
+    border: 1px solid #c084fc;
+    box-shadow: 0 0 12px rgba(192, 132, 252, 0.6);
+    transform: scale(1.1);
+}
+
+.bt-sphere-slot:not(.bt-slot-active) .bt-sphere-icon {
+    opacity: 0.2;
+    filter: grayscale(1);
+}
+
+.bt-sphere-counter {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    color: #c084fc;
+    font-size: 14px;
+}
+
+/* Bip Bar */
+.bt-bip-bar, .bt-station-bip, .bt-boss-bip-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid var(--ck-border-card);
+    border-radius: 16px;
+    padding: 10px 16px;
+    margin-bottom: 12px;
+}
+
+.bt-bip-avatar, .bt-station-bip-icon {
+    font-size: 26px;
+    flex-shrink: 0;
+}
+
+.bt-bip-bubble, .bt-station-bip-text {
+    font-size: 14px;
+    color: #e2e8f0;
+    line-height: 1.5;
+}
+
+/* Bản đồ City Board */
+.bt-city-board {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 960 / 520;
+    max-height: calc(100vh - 200px);
+    border-radius: 20px;
+    overflow: hidden;
+    border: 2px solid rgba(59, 130, 246, 0.3);
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6);
+}
+
+.bt-city-svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* Station Nodes */
+.bt-station-node {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(15, 23, 42, 0.92);
+    border: 2px solid #38bdf8;
+    border-radius: 9999px;
+    padding: 6px 14px 6px 6px;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6), 0 0 16px rgba(56, 189, 248, 0.4);
+    transition: all 0.25s ease;
+    z-index: 5;
+    outline: none;
+}
+
+.bt-station-node:hover:not(.bt-locked), .bt-station-node:focus-visible:not(.bt-locked) {
+    transform: scale(1.08) translateY(-2px);
+    border-color: #67e8f9;
+    box-shadow: 0 10px 24px rgba(6, 182, 212, 0.6);
+}
+
+.bt-node-pulse {
+    position: absolute;
+    inset: -6px;
+    border-radius: 9999px;
+    border: 2px solid var(--ck-cyan-400);
+    opacity: 0.6;
+    animation: nodePulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    pointer-events: none;
+}
+
+@keyframes nodePulse {
+    0% { transform: scale(0.95); opacity: 0.8; }
+    50% { transform: scale(1.08); opacity: 0.2; }
+    100% { transform: scale(0.95); opacity: 0.8; }
+}
+
+.bt-node-badge {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #2563eb;
+    color: #ffffff;
+    font-family: var(--font-heading);
+    font-size: 13px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bt-node-icon {
+    font-size: 22px;
+}
+
+.bt-node-info {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.bt-node-name {
+    font-family: var(--font-heading);
+    font-size: 13px;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.bt-node-status {
+    font-size: 11px;
+    font-weight: 800;
+    color: #38bdf8;
+    letter-spacing: 0.5px;
+}
+
+/* Node Positions on Map */
+.bt-node-1 { left: 10%; top: 68%; }
+.bt-node-2 { left: 42%; top: 70%; }
+.bt-node-3 { left: 72%; top: 66%; }
+.bt-node-boss { left: 38%; top: 22%; }
+
+/* Locked Node */
+.bt-station-node.bt-locked {
+    filter: grayscale(0.85);
+    opacity: 0.65;
+    border-color: #64748b;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+.bt-station-node.bt-locked .bt-node-pulse { display: none; }
+.bt-station-node.bt-locked .bt-node-badge { background: #475569; }
+.bt-station-node.bt-locked .bt-node-status { color: #94a3b8; }
+
+/* Completed Node */
+.bt-station-node.bt-completed {
+    border-color: #10b981;
+    box-shadow: 0 0 16px rgba(16, 185, 129, 0.4);
+}
+.bt-station-node.bt-completed .bt-node-badge { background: #10b981; }
+.bt-station-node.bt-completed .bt-node-status { color: #34d399; }
+
+/* Boss Node Pulse */
+.bt-boss-pulse {
+    border-color: #f43f5e;
+}
+.bt-node-boss:not(.bt-locked) {
+    border-color: #f43f5e;
+    box-shadow: 0 0 24px rgba(244, 63, 94, 0.6);
+}
+.bt-node-boss:not(.bt-locked) .bt-node-badge {
+    background: #f43f5e;
+}
+
+/* Flying Sphere Animation */
+.bt-flying-sphere {
+    position: absolute;
+    font-size: 32px;
+    z-index: 50;
+    pointer-events: none;
+    transition: all 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* =============================================================================
+   7. STAGE CARDS & COMMON COMPONENTS (ST1, ST2, ST3)
+   ============================================================================= */
+.bt-card-wrap {
+    width: 100%;
+    max-width: 860px;
+    background: var(--ck-bg-card);
+    border: 1px solid var(--ck-border-card);
+    border-radius: 24px;
+    padding: clamp(16px, 3vw, 24px);
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.bt-stage-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 9999px;
+    background: rgba(59, 130, 246, 0.2);
+    border: 1px solid rgba(59, 130, 246, 0.4);
+    color: var(--ck-cyan-400);
+    font-family: var(--font-heading);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+
+.bt-stage-title {
+    font-family: var(--font-heading);
+    font-size: clamp(18px, 3.5vw, 26px);
+    font-weight: 800;
+    color: #ffffff;
+    margin-bottom: 6px;
+}
+
+.bt-stage-desc {
+    font-size: clamp(13px, 2vw, 15px);
+    color: #94a3b8;
+    max-width: 600px;
+    margin-bottom: 16px;
+}
+
+/* 3 Nút đáp án trung tính chuẩn mực */
+.bt-answer-grid {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 14px;
+}
+
+.bt-answer-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 56px;
+    padding: 12px 14px;
+    border-radius: 16px;
+    background: #1e293b;
+    border: 2px solid rgba(255, 255, 255, 0.12);
+    color: #f1f5f9;
+    font-family: var(--font-heading);
+    font-size: clamp(12px, 1.8vw, 14px);
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    outline: none;
+}
+
+.bt-answer-btn:hover:not(:disabled), .bt-answer-btn:focus-visible:not(:disabled) {
+    background: #334155;
+    border-color: #60a5fa;
+    transform: translateY(-2px);
+}
+
+.bt-answer-btn:disabled {
+    cursor: default;
+}
+
+.bt-answer-btn.bt-selected-correct {
+    background: rgba(16, 185, 129, 0.25) !important;
+    border-color: #10b981 !important;
+    color: #34d399 !important;
+    box-shadow: 0 0 16px rgba(16, 185, 129, 0.4);
+}
+
+.bt-answer-btn.bt-selected-wrong {
+    background: rgba(245, 158, 11, 0.25) !important;
+    border-color: #f59e0b !important;
+    color: #fbbf24 !important;
+    box-shadow: 0 0 16px rgba(245, 158, 11, 0.4);
+}
+
+/* =============================================================================
+   8. TRẠM 1: CÔNG VIÊN QR
+   ============================================================================= */
+.bt-st1-content {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+.bt-st1-park-board {
+    position: relative;
+    background: #3e2723;
+    border: 4px solid #795548;
+    border-radius: 16px;
+    padding: 20px 24px 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+.bt-board-pin {
+    position: absolute;
+    top: -12px;
+    font-size: 20px;
+}
+
+.bt-board-header {
+    font-family: var(--font-heading);
+    font-size: 13px;
+    font-weight: 800;
+    color: #ffe082;
+    margin-bottom: 12px;
+    letter-spacing: 0.5px;
+}
+
+.bt-qr-box {
+    position: relative;
+    padding: 10px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.bt-qr-svg {
+    display: block;
+}
+
+.bt-scan-beam {
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    height: 4px;
+    background: linear-gradient(90deg, transparent, #22d3ee, #38bdf8, transparent);
+    box-shadow: 0 0 12px #38bdf8;
+    animation: scanLaser 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes scanLaser {
+    0% { top: 12px; }
+    100% { top: calc(100% - 16px); }
+}
+
+.bt-scan-btn {
+    margin-top: 14px;
+    min-height: 44px;
+    padding: 0 20px;
+    border-radius: 9999px;
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #ffffff;
+    font-family: var(--font-heading);
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.bt-scan-btn:hover {
+    transform: scale(1.05);
+}
+
+/* Phone Popup */
+.bt-st1-phone-popup {
+    width: 280px;
+    background: #0f172a;
+    border: 3px solid #334155;
+    border-radius: 28px;
+    padding: 16px 14px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6);
+    animation: popupIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popupIn {
+    from { transform: scale(0.85); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.bt-phone-notch {
+    width: 60px;
+    height: 8px;
+    background: #334155;
+    border-radius: 9999px;
+    margin: 0 auto 10px;
+}
+
+.bt-phone-status {
+    font-size: 11px;
+    color: #64748b;
+    margin-bottom: 12px;
+}
+
+.bt-phone-content {
+    background: #1e293b;
+    border-radius: 16px;
+    padding: 14px 10px;
+}
+
+.bt-alert-icon { font-size: 32px; margin-bottom: 6px; }
+
+.bt-phone-alert-title {
+    font-family: var(--font-heading);
+    font-size: 11px;
+    font-weight: 800;
+    color: #f59e0b;
+    margin-bottom: 6px;
+}
+
+.bt-fake-url {
+    background: #0f172a;
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    border-radius: 8px;
+    padding: 8px 6px;
+    font-family: monospace;
+    font-size: 12px;
+    color: #f87171;
+    word-break: break-all;
+    margin-bottom: 8px;
+}
+
+.bt-phone-warning {
+    font-size: 11px;
+    color: #94a3b8;
+    line-height: 1.4;
+}
+
+/* =============================================================================
+   9. TRẠM 2: TIN GIẢ & BÚT THỬ AI (MAGNIFIER)
+   ============================================================================= */
+.bt-tool-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.bt-magnify-btn, .bt-hint-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 42px;
+    padding: 0 16px;
+    border-radius: 9999px;
+    background: #1e293b;
+    border: 1px solid var(--ck-border-card);
+    color: #f1f5f9;
+    font-family: var(--font-heading);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.bt-magnify-btn:hover, .bt-hint-btn:hover {
+    background: #334155;
+    transform: translateY(-1px);
+}
+
+.bt-magnify-btn[aria-pressed="true"] {
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+    border-color: #38bdf8;
+    box-shadow: 0 0 12px rgba(56, 189, 248, 0.5);
+}
+
+.bt-tool-badge {
+    padding: 1px 6px;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.2);
+    font-size: 10px;
+}
+
+.bt-st2-post-frame {
+    width: 100%;
+    max-width: 520px;
+    background: #1e293b;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 14px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    margin-bottom: 12px;
+}
+
+.bt-post-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    text-align: left;
+}
+
+.bt-post-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #0284c7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+.bt-user-name {
+    display: block;
+    font-family: var(--font-heading);
+    font-size: 13px;
+    font-weight: 700;
+    color: #f8fafc;
+}
+
+.bt-post-time {
+    display: block;
+    font-size: 11px;
+    color: #94a3b8;
+}
+
+.bt-post-caption {
+    font-size: 13px;
+    color: #e2e8f0;
+    text-align: left;
+    margin-bottom: 10px;
+    line-height: 1.4;
+}
+
+/* Zoom Frame */
+.bt-zoom-frame {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #000000;
+    cursor: default;
+}
+
+.bt-zoom-frame.bt-zoom-active {
+    cursor: zoom-in;
+    box-shadow: 0 0 0 3px #38bdf8;
+}
+
+.bt-zoom-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.25s ease;
+    transform-origin: 50% 50%;
+}
+
+.bt-zoom-img.bt-zoomed {
+    transform: scale(2.5);
+    cursor: zoom-out;
+}
+
+.bt-zoom-hint-tag {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    background: rgba(15, 23, 42, 0.85);
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    color: #94a3b8;
+    pointer-events: none;
+}
+
+/* =============================================================================
+   10. TRẠM 3: LỌC APP ĐỘC HẠI
+   ============================================================================= */
+.bt-st3-layout {
+    width: 100%;
+    display: flex;
+    gap: 16px;
+    align-items: stretch;
+    margin-bottom: 12px;
+}
+
+.bt-app-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.bt-app-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    background: #1e293b;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: left;
+    outline: none;
+}
+
+.bt-app-card:hover, .bt-app-card:focus-visible {
+    border-color: #60a5fa;
+    transform: translateY(-2px);
+}
+
+.bt-app-card.bt-app-selected {
+    border-color: #38bdf8;
+    background: rgba(56, 189, 248, 0.15);
+    box-shadow: 0 0 16px rgba(56, 189, 248, 0.4);
+}
+
+.bt-app-card.bt-app-dragged {
+    opacity: 0.6;
+    transform: scale(0.95);
+}
+
+.bt-app-icon-box {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+}
+.bt-app-safe-icon { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+.bt-app-fake-icon { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+
+.bt-app-title {
+    font-family: var(--font-heading);
+    font-size: 13px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 3px;
+}
+
+.bt-badge-verified {
+    font-size: 10px;
+    color: #34d399;
+    font-weight: 800;
+    margin-left: 4px;
+}
+
+.bt-badge-warning {
+    font-size: 10px;
+    color: #f87171;
+    font-weight: 800;
+    margin-left: 4px;
+}
+
+.bt-app-meta {
+    font-size: 11px;
+    color: #94a3b8;
+    margin-bottom: 3px;
+}
+
+.bt-app-perm {
+    font-size: 10px;
+    color: #cbd5e1;
+    line-height: 1.3;
+}
+
+/* Thùng rác */
+.bt-trash-area {
+    width: 180px;
+    background: rgba(239, 68, 68, 0.12);
+    border: 2px dashed rgba(239, 68, 68, 0.5);
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    outline: none;
+}
+
+.bt-trash-area:hover, .bt-trash-area.bt-trash-hover {
+    background: rgba(239, 68, 68, 0.25);
+    border-color: #f87171;
+    transform: scale(1.03);
+}
+
+.bt-trash-icon {
+    font-size: 44px;
+    margin-bottom: 8px;
+    transition: transform 0.2s ease;
+}
+
+.bt-trash-area:hover .bt-trash-icon {
+    transform: rotate(-10deg) scale(1.1);
+}
+
+.bt-trash-label {
+    font-family: var(--font-heading);
+    font-size: 12px;
+    font-weight: 800;
+    color: #fca5a5;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+    text-align: center;
+}
+
+.bt-trash-counter {
+    font-size: 11px;
+    color: #ef4444;
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.bt-trash-hint {
+    font-size: 10px;
+    color: #94a3b8;
+    text-align: center;
+}
+
+/* =============================================================================
+   11. STAGE BOSS: TRẬN ĐẤU TRÙM (VUA ĐỘC HẠI)
+   ============================================================================= */
+.bt-boss-container {
+    width: 100%;
+    max-width: 760px;
+    background: var(--ck-bg-card);
+    border: 2px solid rgba(244, 63, 94, 0.35);
+    border-radius: 24px;
+    padding: clamp(14px, 2.5vw, 22px);
+    box-shadow: 0 16px 48px rgba(244, 63, 94, 0.25);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.bt-boss-badge {
+    background: rgba(244, 63, 94, 0.2);
+    border-color: rgba(244, 63, 94, 0.4);
+    color: #fda4af;
+}
+
+.bt-boss-heading {
+    font-family: var(--font-heading);
+    font-size: clamp(20px, 4vw, 30px);
+    font-weight: 800;
+    color: #ffffff;
+    margin-bottom: 8px;
+}
+
+.bt-boss-arena {
+    position: relative;
+    width: 100%;
+    max-width: 500px;
+    margin-bottom: 12px;
+}
+
+.bt-boss-figure-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: transform 0.2s ease;
+}
+
+.bt-boss-monster {
+    font-size: clamp(64px, 12vw, 96px);
+    line-height: 1;
+    filter: drop-shadow(0 0 16px rgba(244, 63, 94, 0.8));
+    animation: bossHover 2s ease-in-out infinite alternate;
+}
+
+@keyframes bossHover {
+    from { transform: translateY(-4px) scale(1); }
+    to { transform: translateY(4px) scale(1.04); }
+}
+
+.bt-boss-name {
+    font-family: var(--font-heading);
+    font-size: 16px;
+    font-weight: 800;
+    color: #f43f5e;
+    letter-spacing: 1px;
+    margin-top: 4px;
+}
+
+.bt-boss-hp-bar {
+    width: 240px;
+    height: 14px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(244, 63, 94, 0.5);
+    border-radius: 9999px;
+    overflow: hidden;
+    margin-top: 6px;
+}
+
+.bt-boss-hp-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #f43f5e 0%, #fb7185 100%);
+    transition: width 0.15s ease;
+}
+
+.bt-boss-hp-text {
+    font-size: 11px;
+    font-weight: 700;
+    color: #fda4af;
+    margin-top: 2px;
+}
+
+/* Lọ Thủy Tinh */
+.bt-glass-jar {
+    width: 90px;
+    height: 80px;
+    background: rgba(56, 189, 248, 0.1);
+    border: 3px solid rgba(56, 189, 248, 0.4);
+    border-radius: 12px 12px 20px 20px;
+    margin: 12px auto 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    padding-bottom: 8px;
+    position: relative;
+    box-shadow: 0 0 16px rgba(56, 189, 248, 0.2);
+}
+
+.bt-jar-lid {
+    position: absolute;
+    top: -12px;
+    font-family: var(--font-heading);
+    font-size: 9px;
+    font-weight: 800;
+    background: #0284c7;
+    color: #ffffff;
+    padding: 2px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+}
+
+/* Khiên Ánh Sáng Button */
+.bt-shield-control {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.bt-shield-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    min-width: 200px;
+    min-height: 84px;
+    padding: 12px 28px;
+    border-radius: 24px;
+    background: linear-gradient(135deg, #2563eb 0%, #06b6d4 100%);
+    border: 3px solid #ffffff;
+    color: #ffffff;
+    cursor: pointer;
+    box-shadow: 0 8px 32px rgba(6, 182, 212, 0.5);
+    transition: transform 0.08s ease, box-shadow 0.08s ease;
+    outline: none;
+}
+
+.bt-shield-btn:active {
+    transform: scale(0.94);
+    box-shadow: 0 4px 16px rgba(6, 182, 212, 0.8);
+}
+
+.bt-shield-icon {
+    font-size: 32px;
+    line-height: 1;
+}
+
+.bt-shield-text {
+    font-family: var(--font-heading);
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+}
+
+.bt-shield-progress {
+    font-family: var(--font-heading);
+    font-size: 12px;
+    font-weight: 700;
+    color: #e0f2fe;
+}
+
+/* Beam Flash Track */
+.bt-beam-track {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 4px;
+    height: 100px;
+    transform: translateX(-50%);
+    background: linear-gradient(to top, #38bdf8, transparent);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.bt-beam-active {
+    animation: beamFlash 0.15s ease-out;
+}
+
+@keyframes beamFlash {
+    0% { opacity: 1; transform: translateX(-50%) scaleX(3); }
+    100% { opacity: 0; transform: translateX(-50%) scaleX(1); }
+}
+
+/* =============================================================================
+   12. STAGE SUMMARY: MÀN TỔNG KẾT
+   ============================================================================= */
+.bt-summary-container {
+    width: 100%;
+    max-width: 620px;
+    background: var(--ck-bg-card);
+    border: 2px solid var(--ck-border-card);
+    border-radius: 28px;
+    padding: clamp(16px, 3.5vw, 28px);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin: auto;
+}
+
+.summary-logo {
+    width: 100px;
+    height: auto;
+    margin-bottom: 8px;
+    filter: drop-shadow(0 4px 12px rgba(56, 189, 248, 0.3));
+}
+
+.summary-icon-badge {
+    font-size: 38px;
+    line-height: 1;
+    margin-bottom: 4px;
+}
+
+.summary-title {
+    font-family: var(--font-heading);
+    font-size: clamp(20px, 4vw, 26px);
+    font-weight: 800;
+    color: #ffffff;
+    margin-bottom: 6px;
+}
+
+.summary-stars {
+    font-size: 26px;
+    letter-spacing: 4px;
+    color: #f59e0b;
+    margin-bottom: 10px;
+}
+
+.summary-reward-box {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 9999px;
+    padding: 6px 18px;
+    margin-bottom: 14px;
+}
+
+.summary-reward-xp {
+    font-family: var(--font-heading);
+    font-size: 14px;
+    font-weight: 800;
+    color: #38bdf8;
+}
+
+.summary-reward-badge {
+    font-family: var(--font-heading);
+    font-size: 13px;
+    font-weight: 800;
+    color: #fbbf24;
+}
+
+.summary-divider {
+    width: 100%;
+    border: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin: 8px 0 12px;
+}
+
+/* 4 Ý Nhớ Nhanh Tinh Gọn (Mỗi ý <= 8 từ, 1 emoji) */
+.bt-summary-formula-grid {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.bt-summary-formula-card {
+    background: #1e293b;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-align: left;
+}
+
+.bt-formula-icon {
+    font-size: 24px;
+    flex-shrink: 0;
+}
+
+.bt-formula-text {
+    font-size: 13px;
+    font-weight: 600;
+    color: #f1f5f9;
+    line-height: 1.35;
+}
+
+/* Bằng Khen Danh Dự Gọn Gàng */
+.bt-diploma-card {
+    width: 100%;
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, rgba(217, 119, 6, 0.06) 100%);
+    border: 2px solid rgba(245, 158, 11, 0.35);
+    border-radius: 16px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    text-align: left;
+}
+
+.bt-diploma-seal {
+    font-size: 32px;
+    flex-shrink: 0;
+}
+
+.bt-diploma-title {
+    font-family: var(--font-heading);
+    font-size: 13px;
+    font-weight: 800;
+    color: #fde68a;
+    letter-spacing: 0.5px;
+    margin-bottom: 2px;
+}
+
+.bt-diploma-sub {
+    font-size: 12px;
+    color: #cbd5e1;
+    line-height: 1.3;
+}
+
+/* Actions Buttons (Visible without scrolling) */
+.summary-actions {
+    width: 100%;
+    display: flex;
+    gap: 12px;
+}
+
+.btn-summary-replay, .btn-summary-continue {
+    flex: 1;
+    min-height: 48px;
+    border-radius: 9999px;
+    font-family: var(--font-heading);
+    font-size: clamp(13px, 2.5vw, 15px);
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-summary-replay {
+    background: #1e293b;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #f1f5f9;
+}
+.btn-summary-replay:hover {
+    background: #334155;
+    transform: translateY(-1px);
+}
+
+.btn-summary-continue {
+    background: linear-gradient(135deg, #2563eb 0%, #06b6d4 100%);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: #ffffff;
+    box-shadow: 0 4px 16px rgba(37, 99, 235, 0.4);
+}
+.btn-summary-continue:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(6, 182, 212, 0.6);
+}
+
+/* =============================================================================
+   13. RESPONSIVE BREAKPOINTS (MOBILE & LOW-HEIGHT SCREENS)
+   ============================================================================= */
+@media (max-width: 640px) {
+    .bt-st3-layout {
+        flex-direction: column;
+    }
+    .bt-app-grid {
+        grid-template-columns: 1fr;
+    }
+    .bt-trash-area {
+        width: 100%;
+        min-height: 80px;
+        flex-direction: row;
+        gap: 12px;
+    }
+    .bt-trash-icon {
+        font-size: 32px;
+        margin-bottom: 0;
+    }
+    .bt-answer-grid {
+        grid-template-columns: 1fr;
+    }
+    .bt-summary-formula-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Màn hình thấp (<= 480px) */
+@media (max-height: 480px) {
+    .stage {
+        padding: 8px;
+        justify-content: flex-start;
+    }
+    .level8-top-bar {
+        top: 6px;
+        right: 6px;
+    }
+    .btn-level8-exit {
+        height: 32px;
+        padding: 0 10px;
+        font-size: 11px;
+    }
+    .bt-card-wrap {
+        padding: 12px;
+    }
+    .bt-stage-desc {
+        display: none;
+    }
+    .summary-logo {
+        width: 60px;
+        margin-bottom: 4px;
+    }
+    .summary-stars {
+        margin-bottom: 4px;
+    }
+    .bt-diploma-card {
+        padding: 8px 12px;
+        margin-bottom: 8px;
+    }
+    .bt-summary-container {
+        padding: 12px;
+    }
+    .summary-actions {
+        position: sticky;
+        bottom: 0;
+        background: var(--ck-bg-card);
+        padding-top: 6px;
+    }
+}
+
+/* Reduced Motion Safety */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    .floating-sparkle, .bt-node-pulse, .bt-scan-beam, .bt-beam-track {
+        display: none !important;
+    }
+    .bt-boss-monster {
+        animation: none !important;
+    }
+}

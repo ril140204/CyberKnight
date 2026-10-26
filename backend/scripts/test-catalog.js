@@ -6,7 +6,7 @@
  * - FREE_LEVELS always playable
  * - premium → all LEVELS playable
  * - pack_1_4 → only 1,2,3,4
- * - pack_5_10 → level 5, 6 (level 7-10 chưa phát hành)
+ * - pack_5_10 → level 5, 6, 7, 8 (level 9-10 chưa phát hành)
  * - Unknown level id → false
  * - Unknown package id → null
  * - listPackageLevels('premium') → all current LEVELS ids
@@ -175,10 +175,10 @@ describe('getLevelById()', () => {
 // ============================================================
 
 describe('listPackageLevels()', () => {
-  test('premium trả về toàn bộ LEVELS hiện tại (0..7), KHÔNG bao gồm 8..10 chưa phát hành', () => {
+  test('premium trả về toàn bộ LEVELS hiện tại (0..8), KHÔNG bao gồm 9..10 chưa phát hành', () => {
     const ids = listPackageLevels('premium');
     assert.ok(Array.isArray(ids));
-    assert.deepStrictEqual(ids, [0, 1, 2, 3, 4, 5, 6, 7]);
+    assert.deepStrictEqual(ids, [0, 1, 2, 3, 4, 5, 6, 7, 8]);
   });
 
   test('pack_1_4 trả về [1,2,3,4]', () => {
@@ -186,7 +186,7 @@ describe('listPackageLevels()', () => {
     assert.deepStrictEqual(ids, [1, 2, 3, 4]);
   });
 
-  test('pack_5_10 trả về [5,6,7,8,9,10] (level 5 đã phát hành, 6-10 chưa)', () => {
+  test('pack_5_10 trả về [5,6,7,8,9,10] (level 5-8 đã phát hành, 9-10 chưa)', () => {
     // pack_5_10 định nghĩa levels = [5,6,7,8,9,10]
     // → hàm vẫn trả về đúng pkg.levels, không lọc theo LEVELS
     // (vì premium mới lọc; gói thường trả đúng như định nghĩa)
@@ -244,15 +244,16 @@ describe('userCanPlay(levelId, entitlements)', () => {
     assert.strictEqual(userCanPlay(6, ent), false);
   });
 
-  test('pack_5_10 → được chơi level 5, 6 và 7, KHÔNG được chơi level 8-10 (chưa phát hành)', () => {
-    // pack_5_10 định nghĩa levels = [5,6,7,8,9,10]; level 5, 6 & 7 có trong LEVELS
+  test('pack_5_10 → được chơi level 5, 6, 7 và 8, KHÔNG được chơi level 9-10 (chưa phát hành)', () => {
+    // pack_5_10 định nghĩa levels = [5,6,7,8,9,10]; level 5, 6, 7 & 8 có trong LEVELS
     const ent = makeEntitlements({
       packages: [{ packageId: 'pack_5_10', levels: [5, 6, 7, 8, 9, 10] }],
     });
     assert.strictEqual(userCanPlay(5, ent), true, 'Level 5 đã phát hành → phải playable với pack_5_10');
     assert.strictEqual(userCanPlay(6, ent), true, 'Level 6 đã phát hành → phải playable với pack_5_10');
     assert.strictEqual(userCanPlay(7, ent), true, 'Level 7 đã phát hành → phải playable với pack_5_10');
-    for (let i = 8; i <= 10; i++) {
+    assert.strictEqual(userCanPlay(8, ent), true, 'Level 8 đã phát hành → phải playable với pack_5_10');
+    for (let i = 9; i <= 10; i++) {
       assert.strictEqual(userCanPlay(i, ent), false, `Level ${i} chưa phát hành → không playable`);
     }
     // Level 0 vẫn miễn phí
@@ -309,10 +310,10 @@ describe('computePlayableLevels(entitlements)', () => {
     assert.deepStrictEqual(result, [0]);
   });
 
-  test('premium → toàn bộ level đã phát hành (0..7), KHÔNG bao gồm 8..10', () => {
+  test('premium → toàn bộ level đã phát hành (0..8), KHÔNG bao gồm 9..10', () => {
     const ent = makeEntitlements({ premium: true });
     const result = computePlayableLevels(ent);
-    assert.deepStrictEqual(result, [0, 1, 2, 3, 4, 5, 6, 7]);
+    assert.deepStrictEqual(result, [0, 1, 2, 3, 4, 5, 6, 7, 8]);
   });
 
   test('pack_1_4 → [0, 1, 2, 3, 4] (gộp free level 0)', () => {
@@ -323,15 +324,15 @@ describe('computePlayableLevels(entitlements)', () => {
     assert.deepStrictEqual(result, [0, 1, 2, 3, 4]);
   });
 
-  test('pack_5_10 → [0, 5, 6, 7] (level 5, 6 và 7 đã phát hành trong gói)', () => {
+  test('pack_5_10 → [0, 5, 6, 7, 8] (level 5, 6, 7 và 8 đã phát hành trong gói)', () => {
     const ent = makeEntitlements({
       packages: [{ packageId: 'pack_5_10', levels: [5, 6, 7, 8, 9, 10] }],
     });
     const result = computePlayableLevels(ent);
-    assert.deepStrictEqual(result, [0, 5, 6, 7]);
+    assert.deepStrictEqual(result, [0, 5, 6, 7, 8]);
   });
 
-  test('pack_1_4 + pack_5_10 → [0,1,2,3,4,5,6,7] (level 5, 6 & 7 đã phát hành)', () => {
+  test('pack_1_4 + pack_5_10 → [0,1,2,3,4,5,6,7,8] (level 5, 6, 7 & 8 đã phát hành)', () => {
     const ent = makeEntitlements({
       packages: [
         { packageId: 'pack_1_4', levels: [1, 2, 3, 4] },
@@ -339,7 +340,7 @@ describe('computePlayableLevels(entitlements)', () => {
       ],
     });
     const result = computePlayableLevels(ent);
-    assert.deepStrictEqual(result, [0, 1, 2, 3, 4, 5, 6, 7]);
+    assert.deepStrictEqual(result, [0, 1, 2, 3, 4, 5, 6, 7, 8]);
   });
 
   test('kết quả luôn sorted', () => {
@@ -356,14 +357,14 @@ describe('computePlayableLevels(entitlements)', () => {
 // ============================================================
 
 describe('levelExists(levelId)', () => {
-  test('level 0-7 → true', () => {
-    for (let i = 0; i <= 7; i++) {
+  test('level 0-8 → true', () => {
+    for (let i = 0; i <= 8; i++) {
       assert.ok(levelExists(i), `Level ${i} phải tồn tại`);
     }
   });
 
-  test('level 8-10 → false (chưa phát hành)', () => {
-    for (let i = 8; i <= 10; i++) {
+  test('level 9-10 → false (chưa phát hành)', () => {
+    for (let i = 9; i <= 10; i++) {
       assert.strictEqual(levelExists(i), false, `Level ${i} chưa phát hành`);
     }
   });

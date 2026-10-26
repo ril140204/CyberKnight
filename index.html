@@ -47,7 +47,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/assets/tailwind.css?v=c48bea5e">
+    <link rel="stylesheet" href="/assets/tailwind.css?v=3a831b77">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -1341,7 +1341,7 @@
                             <span class="flex items-center gap-1.5">
                                 <span><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-gamepad-2"></use></svg></span> CHỌN MÀN CHƠI
                             </span>
-                            <span class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full text-[10px] font-bold">6 Cấp độ</span>
+                            <span class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full text-[10px] font-bold">9 Cấp độ</span>
                         </div>
 
                         <!-- Option Level 0 -->
@@ -1368,7 +1368,6 @@
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-center justify-between gap-1">
                                     <span class="text-xs font-black text-gray-800 uppercase tracking-wide">Level 1</span>
-                                    <span class="text-[9px] bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.5 rounded-md">MỚI</span>
                                     <span class="level-badge-area-dd"></span>
                                 </div>
                                 <div class="text-sm font-bold text-gray-900 group-hover/item:text-primary transition-colors truncate">Lớp Trưởng Gửi Link Nhận Quà</div>
@@ -1384,7 +1383,6 @@
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-center justify-between gap-1">
                                     <span class="text-xs font-black text-gray-800 uppercase tracking-wide">Level 2</span>
-                                    <span class="text-[9px] bg-purple-100 text-purple-800 font-bold px-1.5 py-0.5 rounded-md">MỚI</span>
                                     <span class="level-badge-area-dd"></span>
                                 </div>
                                 <div class="text-sm font-bold text-gray-900 group-hover/item:text-primary transition-colors truncate">Kết Bạn Online — Người Bạn Mới</div>
@@ -1400,7 +1398,6 @@
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-center justify-between gap-1">
                                     <span class="text-xs font-black text-gray-800 uppercase tracking-wide">Level 3</span>
-                                    <span class="text-[9px] bg-amber-100 text-amber-800 font-bold px-1.5 py-0.5 rounded-md">MỚI</span>
                                     <span class="level-badge-area-dd"></span>
                                 </div>
                                 <div class="text-sm font-bold text-gray-900 group-hover/item:text-primary transition-colors truncate">Bốn Chìa Khóa Bí Mật</div>
@@ -1416,7 +1413,6 @@
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-center justify-between gap-1">
                                     <span class="text-xs font-black text-gray-800 uppercase tracking-wide">Level 4</span>
-                                    <span class="text-[9px] bg-rose-100 text-rose-800 font-bold px-1.5 py-0.5 rounded-md">MỚI NHẤT</span>
                                     <span class="level-badge-area-dd"></span>
                                 </div>
                                 <div class="text-sm font-bold text-gray-900 group-hover/item:text-primary transition-colors truncate">Bức Ảnh Có Quá Nhiều Bí Mật</div>
@@ -1447,6 +1443,7 @@
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-center justify-between gap-1">
                                     <span class="text-xs font-black text-gray-800 uppercase tracking-wide">Level 6</span>
+                                    <span class="text-[9px] bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.5 rounded-md">MỚI</span>
                                     <span class="level-badge-area-dd"></span>
                                 </div>
                                 <div class="text-sm font-bold text-gray-900 group-hover/item:text-primary transition-colors truncate">Chặn Đứng Bắt Nạt Mạng</div>
@@ -1462,7 +1459,7 @@
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-center justify-between gap-1">
                                     <span class="text-xs font-black text-gray-800 uppercase tracking-wide">Level 7</span>
-                                    <span class="text-[9px] bg-rose-100 text-rose-800 font-bold px-1.5 py-0.5 rounded-md">MỚI NHẤT</span>
+                                    <span class="text-[9px] bg-rose-100 text-rose-800 font-bold px-1.5 py-0.5 rounded-md">MỚI</span>
                                     <span class="level-badge-area-dd"></span>
                                 </div>
                                 <div class="text-sm font-bold text-gray-900 group-hover/item:text-primary transition-colors truncate">Biệt Đội Chống Bẫy Lừa</div>
@@ -1470,10 +1467,26 @@
                             </div>
                         </button>
 
+                        <!-- Option Level 8 -->
+                        <button type="button" data-dd-level="8" onclick="selectAndPlayLevel('/level8/level8.html')" class="w-full text-left p-3 rounded-xl hover:bg-gradient-to-r hover:from-cyan-50 hover:to-blue-50 transition-all border border-transparent hover:border-cyan-300 flex items-center gap-3.5 group/item">
+                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-2xl shadow-md group-hover/item:scale-110 group-hover/item:rotate-3 transition-transform flex-shrink-0">
+                                <svg class="icon text-white" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-crown"></use></svg>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center justify-between gap-1">
+                                    <span class="text-xs font-black text-gray-800 uppercase tracking-wide">Level 8</span>
+                                    <span class="text-[9px] bg-cyan-100 text-cyan-800 font-bold px-1.5 py-0.5 rounded-md">MỚI NHẤT</span>
+                                    <span class="level-badge-area-dd"></span>
+                                </div>
+                                <div class="text-sm font-bold text-gray-900 group-hover/item:text-primary transition-colors truncate">Trận Chiến An Toàn Số</div>
+                                <div class="text-[11px] text-gray-500 line-clamp-1">Thu thập mảnh cầu, phong ấn Vua Độc Hại</div>
+                            </div>
+                        </button>
+
                         <!-- Quick View All -->
-                        <div class="pt-1.5 border-t border-gray-100 text-center">
-                            <button type="button" onclick="openLevelSelectModal()" class="text-xs font-bold text-primary hover:text-blue-700 transition flex items-center justify-center gap-1 w-full py-1">
-                                <span>Xem chi tiết các màn</span>
+                        <div class="pt-2 border-t border-blue-100/80 text-center">
+                            <button type="button" onclick="openLevelSelectModal()" class="w-full py-2.5 px-3 rounded-xl bg-blue-50 hover:bg-blue-100 text-primary font-bold text-xs transition flex items-center justify-center gap-1.5 shadow-sm">
+                                <span>Xem tất cả 9 màn chơi (Level 0 – 8)</span>
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                             </button>
                         </div>
@@ -1777,10 +1790,21 @@
                     <div class="timeline-dot" style="border-color: #F59E0B;"></div>
                     <div class="glass-strong p-5 sm:p-6 rounded-2xl ml-2 sm:ml-4">
                         <div class="flex items-center gap-3 mb-3">
-                            <span class="badge bg-amber-100 text-amber-800">Sắp tới</span>
+                            <span class="badge bg-amber-100 text-amber-800">10/2026</span>
                         </div>
-                        <h3 class="text-lg sm:text-xl font-bold text-gray-800 mb-2">Level 5 – 10 đang được phát triển</h3>
-                        <p class="text-gray-600">Các chủ đề nâng cao như phòng chống bắt nạt trên mạng và bảo vệ tài khoản. Chúng mình sẽ thông báo tại đây khi phát hành.</p>
+                        <h3 class="text-lg sm:text-xl font-bold text-gray-800 mb-2">Ra mắt Level 5 – 7</h3>
+                        <p class="text-gray-600">Thật Hay Giả? Đống Ảnh AI, Chặn Đứng Bắt Nạt Mạng và Biệt Đội Chống Bẫy Lừa — tập trung vào ảnh AI, tin xấu và cạm bẫy lừa đảo trực tuyến.</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item reveal" style="transition-delay: 0.3s">
+                    <div class="timeline-dot" style="border-color: #22D3EE;"></div>
+                    <div class="glass-strong p-5 sm:p-6 rounded-2xl ml-2 sm:ml-4">
+                        <div class="flex items-center gap-3 mb-3">
+                            <span class="badge bg-cyan-100 text-cyan-800">Mới nhất</span>
+                        </div>
+                        <h3 class="text-lg sm:text-xl font-bold text-gray-800 mb-2">Ra mắt Level 8 — Trận Chiến An Toàn Số</h3>
+                        <p class="text-gray-600">Màn tổng hợp: vượt 3 Trạm Thử Thách (mã QR lạ, tin giả & ảnh AI, app nhái độc hại) để thu thập 3 Mảnh Cầu, rồi phong ấn Vua Độc Hại.</p>
                     </div>
                 </div>
             </div>
@@ -2065,329 +2089,294 @@
          LEVEL SELECTION MODAL (BỘ CHỌN CẤP ĐỘ DÀNH CHO TRẺ EM)
          ============================================ -->
     <div id="levelSelectModal" class="modal-overlay">
-        <div class="modal-content level-select-modal-content">
+        <div class="modal-content level-select-modal-content max-w-4xl max-h-[90vh] overflow-y-auto p-4 sm:p-6">
             <!-- Modal Header -->
-            <div class="flex justify-between items-start mb-6 pb-4 border-b border-blue-100">
+            <div class="flex justify-between items-center mb-4 pb-3 border-b border-blue-100">
                 <div>
-                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 text-primary text-xs font-black tracking-wide uppercase mb-2">
-                        <span><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-gamepad-2"></use></svg></span> CHỌN MÀN CHƠI CYBERKNIGHT
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-100 text-primary text-[11px] font-black tracking-wide uppercase">
+                            <svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-gamepad-2"></use></svg> CHỌN MÀN CHƠI
+                        </span>
+                        <span class="text-xs text-gray-500 font-semibold">• 9 cấp độ an toàn mạng</span>
                     </div>
-                    <h3 class="text-xl sm:text-2xl md:text-3xl font-black text-gray-900 font-heading">
+                    <h3 class="text-lg sm:text-xl md:text-2xl font-black text-gray-900 font-heading tracking-tight" id="levelSelectModalTitle">
                         CON MUỐN BẮT ĐẦU VỚI MÀN NÀO?
                     </h3>
-                    <p class="text-gray-600 text-sm mt-1">
-                        Mỗi màn chơi là một chuyến phiêu lưu bảo vệ bản thân và rèn luyện kỹ năng an toàn số!
-                    </p>
-                    <p class="text-xs text-blue-800 bg-blue-50 border border-blue-100 rounded-lg px-3 py-2 mt-3 flex items-start gap-2">
-                        <svg class="icon text-sm mt-px" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-shield-check"></use></svg> <span>Các màn chơi là tình huống <b>mô phỏng</b> để học — không có quà hay phần thưởng thật, game không bao giờ hỏi mật khẩu, OTP hay thông tin ngân hàng.</span>
-                    </p>
                 </div>
-                <button type="button" onclick="closeLevelSelectModal()" class="w-10 h-10 rounded-full bg-gray-100 hover:bg-red-50 hover:text-red-500 text-gray-500 flex items-center justify-center text-xl font-bold transition flex-shrink-0" title="Đóng" aria-label="Đóng"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-x"></use></svg></button>
+                <button type="button" onclick="closeLevelSelectModal()" class="w-9 h-9 rounded-full bg-gray-100 hover:bg-red-50 hover:text-red-500 text-gray-500 flex items-center justify-center text-lg font-bold transition flex-shrink-0" title="Đóng" aria-label="Đóng"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-x"></use></svg></button>
             </div>
 
-            <!-- Grid 2 Level Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mt-2">
+            <!-- Grid 2 Level Cards Compact -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
                 <!-- Card Level 0 -->
-                <div class="level-card level-card-0 level-card p-6 rounded-2xl border-2 border-amber-200 bg-gradient-to-b from-amber-50/70 to-white hover:border-amber-400 hover:shadow-xl transition-all duration-300 flex flex-col justify-between relative overflow-hidden group">
-                    <div class="absolute -top-10 -right-10 w-28 h-28 bg-amber-200/40 rounded-full blur-xl group-hover:scale-150 transition-transform"></div>
+                <div class="level-card level-card-0 group bg-white rounded-xl border-2 border-amber-200 p-4 hover:border-amber-400 hover:shadow-lg transition-all flex flex-col justify-between cursor-pointer">
                     <div>
-                        <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center justify-between mb-2">
                             <div class="flex items-center gap-2">
-                                <span class="px-2.5 py-1 rounded-lg bg-amber-100 text-amber-800 text-xs font-black tracking-wider whitespace-nowrap">LEVEL 0 • CƠ BẢN</span>
+                                <span class="px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 text-[11px] font-black tracking-wider whitespace-nowrap">LEVEL 0 • CƠ BẢN</span>
                                 <span class="level-badge-area"></span>
                             </div>
-                            <span class="text-xs text-gray-500 font-semibold whitespace-nowrap inline-flex items-center gap-1"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-clock"></use></svg> 2–3 phút</span>
+                            <span class="text-[11px] text-gray-500 font-semibold inline-flex items-center gap-1"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-clock"></use></svg> 2–3 phút</span>
                         </div>
-                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-3xl shadow-lg mb-4 group-hover:scale-110 group-hover:rotate-6 transition-transform">
-                            <svg class="icon text-white" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-gift"></use></svg>
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="w-11 h-11 shrink-0 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-2xl text-white shadow-md group-hover:scale-105 transition-transform">
+                                <svg class="icon text-white" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-gift"></use></svg>
+                            </div>
+                            <div class="min-w-0">
+                                <h4 class="text-base font-black text-gray-900 truncate">Hộp Quà Bí Ẩn</h4>
+                                <p class="text-[11px] text-amber-700 font-semibold uppercase tracking-wider truncate">Phát hiện mã độc trong quà lạ</p>
+                            </div>
                         </div>
-                        <h4 class="text-xl font-black text-gray-900 mb-2">Hộp Quà Bí Ẩn</h4>
-                        <p class="text-gray-600 text-sm mb-4 leading-relaxed">
+                        <p class="text-xs text-gray-600 mb-3 line-clamp-2 leading-relaxed">
                             Khám phá món quà bất ngờ trên mạng. Sử dụng kính lúp soi manh mối và đưa ra quyết định thông minh khi phát hiện mã độc!
                         </p>
-                        <div class="space-y-2 mb-6 text-xs text-gray-700">
-                            <div class="flex items-center gap-2">
-                                <svg class="icon text-amber-500 text-base" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-check"></use></svg> Cạo lớp phủ tìm manh mối ẩn
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <svg class="icon text-amber-500 text-base" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-check"></use></svg> Nhận diện cảnh báo mã độc
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <svg class="icon text-amber-500 text-base" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-check"></use></svg> Quyết định Nhận hay Không Nhận
-                            </div>
-                        </div>
                     </div>
-                    <button type="button" onclick="selectAndPlayLevel('/level0/level0.html')" class="level-play-btn w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-black text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 group-hover:translate-y-[-2px]">
+                    <button type="button" onclick="selectAndPlayLevel('/level0/level0.html')" class="level-play-btn w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-black text-xs shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-1.5 group-hover:translate-y-[-1px]">
                         <span>CHƠI LEVEL 0</span>
-                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                     </button>
                 </div>
 
                 <!-- Card Level 1 -->
-                <div class="level-card level-card-1 level-card p-6 rounded-2xl border-2 border-blue-200 bg-gradient-to-b from-blue-50/70 to-white hover:border-blue-400 hover:shadow-xl transition-all duration-300 flex flex-col justify-between relative overflow-hidden group">
-                    <div class="absolute -top-10 -right-10 w-28 h-28 bg-blue-200/40 rounded-full blur-xl group-hover:scale-150 transition-transform"></div>
+                <div class="level-card level-card-1 group bg-white rounded-xl border-2 border-blue-200 p-4 hover:border-blue-400 hover:shadow-lg transition-all flex flex-col justify-between cursor-pointer">
                     <div>
-                        <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center justify-between mb-2">
                             <div class="flex items-center gap-2">
-                                <span class="px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800 text-xs font-black tracking-wider whitespace-nowrap">LEVEL 1 • MỚI</span>
+                                <span class="px-2 py-0.5 rounded-md bg-blue-100 text-blue-800 text-[11px] font-black tracking-wider whitespace-nowrap">LEVEL 1 • MỚI</span>
                                 <span class="level-badge-area"></span>
                             </div>
-                            <span class="text-xs text-gray-500 font-semibold whitespace-nowrap inline-flex items-center gap-1"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-clock"></use></svg> 3–4 phút</span>
+                            <span class="text-[11px] text-gray-500 font-semibold inline-flex items-center gap-1"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-clock"></use></svg> 3–4 phút</span>
                         </div>
-                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-3xl shadow-lg mb-4 group-hover:scale-110 group-hover:-rotate-6 transition-transform">
-                            <svg class="icon text-white" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-shield-check"></use></svg>
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="w-11 h-11 shrink-0 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-2xl text-white shadow-md group-hover:scale-105 transition-transform">
+                                <svg class="icon text-white" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-shield-check"></use></svg>
+                            </div>
+                            <div class="min-w-0">
+                                <h4 class="text-base font-black text-gray-900 truncate">Lớp Trưởng Gửi Link Nhận Quà</h4>
+                                <p class="text-[11px] text-blue-700 font-semibold uppercase tracking-wider truncate">Lưới lọc an toàn & 3 nhánh xử lý</p>
+                            </div>
                         </div>
-                        <h4 class="text-xl font-black text-gray-900 mb-2">Lớp Trưởng Gửi Link Nhận Quà</h4>
-                        <p class="text-gray-600 text-sm mb-4 leading-relaxed">
-                            Tin nhắn từ bạn cùng lớp kèm link tặng quà lạ. Thử thách phản xạ với <strong>Lưới Lọc An Toàn</strong> và tự do chọn 1 trong 3 nhánh xử lý!
+                        <p class="text-xs text-gray-600 mb-3 line-clamp-2 leading-relaxed">
+                            Tin nhắn từ bạn cùng lớp kèm link tặng quà lạ. Thử thách phản xạ với Lưới Lọc An Toàn và chọn nhánh xử lý an toàn!
                         </p>
-                        <div class="space-y-2 mb-6 text-xs text-gray-700">
-                            <div class="flex items-center gap-2">
-                                <svg class="icon text-blue-500 text-base" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-check"></use></svg> Game phân loại vật phẩm rơi vào 2 giỏ
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <svg class="icon text-blue-500 text-base" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-check"></use></svg> Bảo vệ thông tin cá nhân & địa chỉ nhà
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <svg class="icon text-blue-500 text-base" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-check"></use></svg> 3 Nhánh kết cục hậu quả độc lập (A/B/C)
-                            </div>
-                        </div>
                     </div>
-                    <button type="button" onclick="selectAndPlayLevel('/level1/level1.html')" class="level-play-btn w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-black text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 group-hover:translate-y-[-2px]">
+                    <button type="button" onclick="selectAndPlayLevel('/level1/level1.html')" class="level-play-btn w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-black text-xs shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-1.5 group-hover:translate-y-[-1px]">
                         <span>CHƠI LEVEL 1</span>
-                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                     </button>
                 </div>
 
                 <!-- Card Level 2 -->
-                <div class="level-card level-card-2 level-card p-6 rounded-2xl border-2 border-purple-200 bg-gradient-to-b from-purple-50/70 to-white hover:border-purple-400 hover:shadow-xl transition-all duration-300 flex flex-col justify-between relative overflow-hidden group">
-                    <div class="absolute -top-10 -right-10 w-28 h-28 bg-purple-200/40 rounded-full blur-xl group-hover:scale-150 transition-transform"></div>
+                <div class="level-card level-card-2 group bg-white rounded-xl border-2 border-purple-200 p-4 hover:border-purple-400 hover:shadow-lg transition-all flex flex-col justify-between cursor-pointer">
                     <div>
-                        <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center justify-between mb-2">
                             <div class="flex items-center gap-2">
-                                <span class="px-2.5 py-1 rounded-lg bg-purple-100 text-purple-800 text-xs font-black tracking-wider whitespace-nowrap">LEVEL 2 • MỚI</span>
+                                <span class="px-2 py-0.5 rounded-md bg-purple-100 text-purple-800 text-[11px] font-black tracking-wider whitespace-nowrap">LEVEL 2 • MỚI</span>
                                 <span class="level-badge-area"></span>
                             </div>
-                            <span class="text-xs text-gray-500 font-semibold whitespace-nowrap inline-flex items-center gap-1"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-clock"></use></svg> 4–5 phút</span>
+                            <span class="text-[11px] text-gray-500 font-semibold inline-flex items-center gap-1"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-clock"></use></svg> 4–5 phút</span>
                         </div>
-                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-3xl shadow-lg mb-4 group-hover:scale-110 group-hover:rotate-6 transition-transform">
-                            <svg class="icon text-white" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-door-open"></use></svg>
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="w-11 h-11 shrink-0 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-2xl text-white shadow-md group-hover:scale-105 transition-transform">
+                                <svg class="icon text-white" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-door-open"></use></svg>
+                            </div>
+                            <div class="min-w-0">
+                                <h4 class="text-base font-black text-gray-900 truncate">Kết Bạn Online — Người Bạn Mới</h4>
+                                <p class="text-[11px] text-purple-700 font-semibold uppercase tracking-wider truncate">Cửa bảo vệ căn cứ an toàn số</p>
+                            </div>
                         </div>
-                        <h4 class="text-xl font-black text-gray-900 mb-2">Kết Bạn Online — Người Bạn Mới</h4>
-                        <p class="text-gray-600 text-sm mb-4 leading-relaxed">
-                            Cẩn trọng khi kết bạn với người lạ trên mạng. Ghép <strong>Cửa Bảo Vệ Căn Cứ</strong> an toàn số và đưa ra các quyết định sáng suốt!
+                        <p class="text-xs text-gray-600 mb-3 line-clamp-2 leading-relaxed">
+                            Cẩn trọng khi kết bạn với người lạ trên mạng. Ghép Cửa Bảo Vệ Căn Cứ để giữ an toàn và đưa ra các quyết định sáng suốt!
                         </p>
-                        <div class="space-y-2 mb-6 text-xs text-gray-700">
-                            <div class="flex items-center gap-2">
-                                <svg class="icon text-purple-500 text-base" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-check"></use></svg> Nhận diện nguy cơ khi kết bạn online
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <svg class="icon text-purple-500 text-base" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-check"></use></svg> Ghép Cửa Bảo Vệ Căn Cứ an toàn số
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <svg class="icon text-purple-500 text-base" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-check"></use></svg> 2 Nhánh quyết định xử lý tình huống thông minh
-                            </div>
-                        </div>
                     </div>
-                    <button type="button" onclick="selectAndPlayLevel('/level2/level2.html')" class="level-play-btn w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 text-white font-black text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 group-hover:translate-y-[-2px]">
+                    <button type="button" onclick="selectAndPlayLevel('/level2/level2.html')" class="level-play-btn w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 text-white font-black text-xs shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-1.5 group-hover:translate-y-[-1px]">
                         <span>CHƠI LEVEL 2</span>
-                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                     </button>
                 </div>
 
-                <!-- ============================================
-                     LEVEL 3 CARD — BỐN CHÌA KHÓA BÍ MẬT
-                     ============================================ -->
-                <div class="level-card level-card-3 level-card group bg-white rounded-2xl border-2 border-amber-200 p-5 hover:border-amber-400 hover:shadow-xl transition-all cursor-pointer">
+                <!-- Card Level 3 -->
+                <div class="level-card level-card-3 group bg-white rounded-xl border-2 border-amber-200 p-4 hover:border-amber-400 hover:shadow-lg transition-all flex flex-col justify-between cursor-pointer">
                     <div>
-                        <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center justify-between mb-2">
                             <div class="flex items-center gap-2">
-                                <span class="px-2.5 py-1 rounded-lg bg-amber-100 text-amber-800 text-xs font-black tracking-wider whitespace-nowrap">LEVEL 3 • MỚI</span>
+                                <span class="px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 text-[11px] font-black tracking-wider whitespace-nowrap">LEVEL 3 • MỚI</span>
                                 <span class="level-badge-area"></span>
                             </div>
-                            <span class="text-xs text-gray-500 font-semibold whitespace-nowrap inline-flex items-center gap-1"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-clock"></use></svg> 6–8 phút</span>
+                            <span class="text-[11px] text-gray-500 font-semibold inline-flex items-center gap-1"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-clock"></use></svg> 6–8 phút</span>
                         </div>
-                        <div class="flex items-center gap-3 mb-3">
-                            <div class="w-12 h-12 shrink-0 rounded-xl bg-gradient-to-br from-amber-500 to-yellow-500 flex items-center justify-center text-2xl text-white shadow-md"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-key-round"></use></svg></div>
-                            <div>
-                                <h4 class="text-lg font-black text-gray-900">Bốn Chìa Khóa Bí Mật</h4>
-                                <p class="text-xs text-gray-500 font-semibold uppercase tracking-wider">Quyền truy cập thông minh</p>
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="w-11 h-11 shrink-0 rounded-xl bg-gradient-to-br from-amber-500 to-yellow-500 flex items-center justify-center text-2xl text-white shadow-md group-hover:scale-105 transition-transform">
+                                <svg class="icon text-white" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-key-round"></use></svg>
+                            </div>
+                            <div class="min-w-0">
+                                <h4 class="text-base font-black text-gray-900 truncate">Bốn Chìa Khóa Bí Mật</h4>
+                                <p class="text-[11px] text-amber-700 font-semibold uppercase tracking-wider truncate">Quản lý quyền truy cập thông minh</p>
                             </div>
                         </div>
-                        <p class="text-sm text-gray-600 mb-4 leading-relaxed">
-                            Học cách quản lý <strong>4 quyền</strong>: Camera, Micro, Vị trí, Thư viện ảnh — Cho ai, khi nào, lúc nào cần.
+                        <p class="text-xs text-gray-600 mb-3 line-clamp-2 leading-relaxed">
+                            Học cách quản lý 4 quyền thiết bị: Camera, Micro, Vị trí và Thư viện ảnh để bảo vệ quyền riêng tư cá nhân.
                         </p>
-                        <div class="space-y-2 text-sm text-gray-700 mb-4">
-                            <div class="flex items-center gap-2">
-                                <svg class="icon text-amber-500 text-base" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-check"></use></svg> 5 video ngắn + 3 tình huống quyết định trung lập
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <svg class="icon text-amber-500 text-base" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-check"></use></svg> Mini-game kéo-thả 4 chìa × 3 nhân vật
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <svg class="icon text-amber-500 text-base" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-check"></use></svg> Recap an toàn mạng + huy hiệu "Người Giữ Chìa Khóa"
-                            </div>
-                        </div>
                     </div>
-                    <button type="button" onclick="selectAndPlayLevel('/level3/level3.html')" class="level-play-btn w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white font-black text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 group-hover:translate-y-[-2px]">
+                    <button type="button" onclick="selectAndPlayLevel('/level3/level3.html')" class="level-play-btn w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white font-black text-xs shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-1.5 group-hover:translate-y-[-1px]">
                         <span>CHƠI LEVEL 3</span>
-                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                     </button>
                 </div>
 
-                <!-- ============================================
-                     LEVEL 4 CARD — BỨC ẢNH CÓ QUÁ NHIỀU BÍ MẬT
-                     ============================================ -->
-                <div class="level-card level-card-4 level-card group bg-white rounded-2xl border-2 border-rose-200 p-5 hover:border-rose-400 hover:shadow-xl transition-all cursor-pointer">
+                <!-- Card Level 4 -->
+                <div class="level-card level-card-4 group bg-white rounded-xl border-2 border-rose-200 p-4 hover:border-rose-400 hover:shadow-lg transition-all flex flex-col justify-between cursor-pointer">
                     <div>
-                        <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center justify-between mb-2">
                             <div class="flex items-center gap-2">
-                                <span class="px-2.5 py-1 rounded-lg bg-rose-100 text-rose-800 text-xs font-black tracking-wider whitespace-nowrap">LEVEL 4 • MỚI NHẤT</span>
+                                <span class="px-2 py-0.5 rounded-md bg-rose-100 text-rose-800 text-[11px] font-black tracking-wider whitespace-nowrap">LEVEL 4 • MỚI</span>
                                 <span class="level-badge-area"></span>
                             </div>
-                            <span class="text-xs text-gray-500 font-semibold whitespace-nowrap inline-flex items-center gap-1"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-clock"></use></svg> 4–5 phút</span>
+                            <span class="text-[11px] text-gray-500 font-semibold inline-flex items-center gap-1"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-clock"></use></svg> 4–5 phút</span>
                         </div>
-                        <div class="flex items-center gap-3 mb-3">
-                            <div class="w-12 h-12 shrink-0 rounded-xl bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center text-2xl text-white shadow-md"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-camera"></use></svg></div>
-                            <div>
-                                <h4 class="text-lg font-black text-gray-900">Bức Ảnh Có Quá Nhiều Bí Mật</h4>
-                                <p class="text-xs text-gray-500 font-semibold uppercase tracking-wider">An toàn khi chia sẻ ảnh</p>
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="w-11 h-11 shrink-0 rounded-xl bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center text-2xl text-white shadow-md group-hover:scale-105 transition-transform">
+                                <svg class="icon text-white" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-camera"></use></svg>
+                            </div>
+                            <div class="min-w-0">
+                                <h4 class="text-base font-black text-gray-900 truncate">Bức Ảnh Có Quá Nhiều Bí Mật</h4>
+                                <p class="text-[11px] text-rose-700 font-semibold uppercase tracking-wider truncate">An toàn khi chia sẻ ảnh</p>
                             </div>
                         </div>
-                        <p class="text-sm text-gray-600 mb-4 leading-relaxed">
-                            Một bức ảnh có thể tiết lộ <strong>tên trường, tên lớp, địa chỉ, số điện thoại</strong> — Học công thức <strong>NHÌN – CHE – HỎI</strong> trước khi đăng ảnh!
+                        <p class="text-xs text-gray-600 mb-3 line-clamp-2 leading-relaxed">
+                            Một bức ảnh có thể làm lộ địa chỉ hay số điện thoại! Học ngay công thức NHÌN – CHE – HỎI trước khi đăng ảnh.
                         </p>
-                        <div class="space-y-2 text-sm text-gray-700 mb-4">
-                            <div class="flex items-center gap-2">
-                                <svg class="icon text-rose-500 text-base" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-check"></use></svg> 5 video + 1 clip reveal xen kẽ tương tác
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <svg class="icon text-rose-500 text-base" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-check"></use></svg> Tìm 3 thông tin bị lộ trong ảnh (Q1)
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <svg class="icon text-rose-500 text-base" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-check"></use></svg> Mini-game "Thám tử tìm bí mật" + huy hiệu Thám Tử Ảnh An Toàn
-                            </div>
-                        </div>
                     </div>
-                    <button type="button" onclick="selectAndPlayLevel('/level4/level4.html')" class="level-play-btn w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white font-black text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 group-hover:translate-y-[-2px]">
+                    <button type="button" onclick="selectAndPlayLevel('/level4/level4.html')" class="level-play-btn w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white font-black text-xs shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-1.5 group-hover:translate-y-[-1px]">
                         <span>CHƠI LEVEL 4</span>
-                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                     </button>
                 </div>
 
-                <!-- Level 5 -->
-                <div class="level-card level-card-5 level-card group bg-white rounded-2xl border-2 border-indigo-200 p-5 hover:border-indigo-400 hover:shadow-xl transition-all cursor-pointer">
+                <!-- Card Level 5 -->
+                <div class="level-card level-card-5 group bg-white rounded-xl border-2 border-indigo-200 p-4 hover:border-indigo-400 hover:shadow-lg transition-all flex flex-col justify-between cursor-pointer">
                     <div>
-                        <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center justify-between mb-2">
                             <div class="flex items-center gap-2">
-                                <span class="px-2.5 py-1 rounded-lg bg-indigo-100 text-indigo-800 text-xs font-black tracking-wider whitespace-nowrap">LEVEL 5 • MỚI</span>
+                                <span class="px-2 py-0.5 rounded-md bg-indigo-100 text-indigo-800 text-[11px] font-black tracking-wider whitespace-nowrap">LEVEL 5 • MỚI</span>
                                 <span class="level-badge-area"></span>
                             </div>
-                            <span class="text-xs text-gray-500 font-semibold whitespace-nowrap inline-flex items-center gap-1"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-clock"></use></svg> 5–7 phút</span>
+                            <span class="text-[11px] text-gray-500 font-semibold inline-flex items-center gap-1"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-clock"></use></svg> 5–7 phút</span>
                         </div>
-                        <div class="flex items-center gap-3 mb-3">
-                            <div class="w-12 h-12 shrink-0 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center text-2xl text-white shadow-md"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-sparkles"></use></svg></div>
-                            <div>
-                                <h4 class="text-lg font-black text-gray-900">Thật Hay Giả? Đống Ảnh AI</h4>
-                                <p class="text-xs text-gray-500 font-semibold uppercase tracking-wider">Phát hiện ảnh do AI tạo</p>
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="w-11 h-11 shrink-0 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center text-2xl text-white shadow-md group-hover:scale-105 transition-transform">
+                                <svg class="icon text-white" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-sparkles"></use></svg>
+                            </div>
+                            <div class="min-w-0">
+                                <h4 class="text-base font-black text-gray-900 truncate">Thật Hay Giả? Đống Ảnh AI</h4>
+                                <p class="text-[11px] text-indigo-700 font-semibold uppercase tracking-wider truncate">Nhận diện ảnh do AI tạo ra</p>
                             </div>
                         </div>
-                        <p class="text-sm text-gray-600 mb-4 leading-relaxed">
-                            Ảnh đẹp bắt mắt chưa chắc là thật. Học cách soi dấu hiệu <strong>ảnh AI tạo</strong> để không bị lừa khi xem tin tức hoặc tin nhắn.
+                        <p class="text-xs text-gray-600 mb-3 line-clamp-2 leading-relaxed">
+                            Ảnh đẹp chưa chắc là thật! Dùng Bút Thử AI soi kỹ bàn tay, nét chữ và chi tiết lạ để không bị đánh lừa.
                         </p>
-                        <div class="space-y-2 text-sm text-gray-700 mb-4">
-                            <div class="flex items-center gap-2">
-                                <svg class="icon text-indigo-500 text-base" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-check"></use></svg> 3 video tình huống (intro / hậu quả sai / hậu quả đúng)
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <svg class="icon text-indigo-500 text-base" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-check"></use></svg> Soi ảnh thật – giả theo dấu hiệu tay chân, bóng đổ, chi tiết
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <svg class="icon text-indigo-500 text-base" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-check"></use></svg> Minh họa "soi ảnh" — Ảnh AI được đánh dấu vào ảnh hậu quả
-                            </div>
-                        </div>
                     </div>
-                    <button type="button" onclick="selectAndPlayLevel('/level5/level5.html')" class="level-play-btn w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-600 hover:to-violet-600 text-white font-black text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 group-hover:translate-y-[-2px]">
+                    <button type="button" onclick="selectAndPlayLevel('/level5/level5.html')" class="level-play-btn w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-600 hover:to-violet-600 text-white font-black text-xs shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-1.5 group-hover:translate-y-[-1px]">
                         <span>CHƠI LEVEL 5</span>
-                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                     </button>
                 </div>
 
-                <!-- Level 6 -->
-                <div class="level-card level-card-6 level-card group bg-white rounded-2xl border-2 border-emerald-200 p-5 hover:border-emerald-400 hover:shadow-xl transition-all cursor-pointer">
+                <!-- Card Level 6 -->
+                <div class="level-card level-card-6 group bg-white rounded-xl border-2 border-emerald-200 p-4 hover:border-emerald-400 hover:shadow-lg transition-all flex flex-col justify-between cursor-pointer">
                     <div>
-                        <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center justify-between mb-2">
                             <div class="flex items-center gap-2">
-                                <span class="px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-800 text-xs font-black tracking-wider whitespace-nowrap">LEVEL 6 • MỚI NHẤT</span>
+                                <span class="px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 text-[11px] font-black tracking-wider whitespace-nowrap">LEVEL 6 • MỚI</span>
                                 <span class="level-badge-area"></span>
                             </div>
-                            <span class="text-xs text-gray-500 font-semibold whitespace-nowrap inline-flex items-center gap-1"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-clock"></use></svg> 6–8 phút</span>
+                            <span class="text-[11px] text-gray-500 font-semibold inline-flex items-center gap-1"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-clock"></use></svg> 6–8 phút</span>
                         </div>
-                        <div class="flex items-center gap-3 mb-3">
-                            <div class="w-12 h-12 shrink-0 rounded-xl bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center text-2xl text-white shadow-md"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-shield-check"></use></svg></div>
-                            <div>
-                                <h4 class="text-lg font-black text-gray-900">Chặn Đứng Bắt Nạt Mạng</h4>
-                                <p class="text-xs text-gray-500 font-semibold uppercase tracking-wider">Bảo vệ bạn bè trước lời chê bai</p>
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="w-11 h-11 shrink-0 rounded-xl bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center text-2xl text-white shadow-md group-hover:scale-105 transition-transform">
+                                <svg class="icon text-white" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-shield-check"></use></svg>
+                            </div>
+                            <div class="min-w-0">
+                                <h4 class="text-base font-black text-gray-900 truncate">Chặn Đứng Bắt Nạt Mạng</h4>
+                                <p class="text-[11px] text-emerald-700 font-semibold uppercase tracking-wider truncate">Bảo vệ bạn bè khỏi tin xấu độc</p>
                             </div>
                         </div>
-                        <p class="text-sm text-gray-600 mb-4 leading-relaxed">
-                            Có người đang nói xấu bạn trên mạng? Học cách <strong>không hùa theo</strong>, <strong>chặn và báo cáo</strong> tin xấu, và kể với người lớn tin cậy.
+                        <p class="text-xs text-gray-600 mb-3 line-clamp-2 leading-relaxed">
+                            Có kẻ đang nói xấu bạn mình trên mạng? Học cách không hùa theo, dọn dẹp bóng bóng xấu và báo cho người lớn tin cậy!
                         </p>
-                        <div class="space-y-2 text-sm text-gray-700 mb-4">
-                            <div class="flex items-center gap-2">
-                                <svg class="icon text-emerald-500 text-base" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-check"></use></svg> 3 video tình huống (bạn bè bị chê / cách ứng xử / bảo vệ bạn bè)
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <svg class="icon text-emerald-500 text-base" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-check"></use></svg> Câu hỏi chọn phản ứng đúng — chọn lại không giới hạn
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <svg class="icon text-emerald-500 text-base" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-check"></use></svg> Mini-game dọn tin nhắn xấu — bấm hoặc kéo vào thùng Chặn
-                            </div>
-                        </div>
                     </div>
-                    <button type="button" onclick="selectAndPlayLevel('/level6/level6.html')" class="level-play-btn w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-700 hover:to-cyan-600 text-white font-black text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 group-hover:translate-y-[-2px]">
+                    <button type="button" onclick="selectAndPlayLevel('/level6/level6.html')" class="level-play-btn w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white font-black text-xs shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-1.5 group-hover:translate-y-[-1px]">
                         <span>CHƠI LEVEL 6</span>
-                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                     </button>
                 </div>
 
-                <!-- Level 7 -->
-                <div class="level-card level-card-7 level-card group bg-white rounded-2xl border-2 border-rose-200 p-5 hover:border-rose-400 hover:shadow-xl transition-all cursor-pointer">
+                <!-- Card Level 7 -->
+                <div class="level-card level-card-7 group bg-white rounded-xl border-2 border-rose-200 p-4 hover:border-rose-400 hover:shadow-lg transition-all flex flex-col justify-between cursor-pointer">
                     <div>
-                        <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center justify-between mb-2">
                             <div class="flex items-center gap-2">
-                                <span class="px-2.5 py-1 rounded-lg bg-rose-100 text-rose-800 text-xs font-black tracking-wider whitespace-nowrap">LEVEL 7 • MỚI NHẤT</span>
+                                <span class="px-2 py-0.5 rounded-md bg-rose-100 text-rose-800 text-[11px] font-black tracking-wider whitespace-nowrap">LEVEL 7 • MỚI</span>
                                 <span class="level-badge-area"></span>
                             </div>
-                            <span class="text-xs text-gray-500 font-semibold whitespace-nowrap inline-flex items-center gap-1"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-clock"></use></svg> 6–8 phút</span>
+                            <span class="text-[11px] text-gray-500 font-semibold inline-flex items-center gap-1"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-clock"></use></svg> 6–8 phút</span>
                         </div>
-                        <div class="flex items-center gap-3 mb-3">
-                            <div class="w-12 h-12 shrink-0 rounded-xl bg-gradient-to-br from-rose-500 to-amber-500 flex items-center justify-center text-2xl text-white shadow-md"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-shield-check"></use></svg></div>
-                            <div>
-                                <h4 class="text-lg font-black text-gray-900">Biệt Đội Chống Bẫy Lừa</h4>
-                                <p class="text-xs text-gray-500 font-semibold uppercase tracking-wider">Phá tan cạm bẫy lừa đảo trực tuyến</p>
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="w-11 h-11 shrink-0 rounded-xl bg-gradient-to-br from-rose-500 to-amber-500 flex items-center justify-center text-2xl text-white shadow-md group-hover:scale-105 transition-transform">
+                                <svg class="icon text-white" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-shield-check"></use></svg>
+                            </div>
+                            <div class="min-w-0">
+                                <h4 class="text-base font-black text-gray-900 truncate">Biệt Đội Chống Bẫy Lừa</h4>
+                                <p class="text-[11px] text-rose-700 font-semibold uppercase tracking-wider truncate">Phá tan cạm bẫy lừa đảo trực tuyến</p>
                             </div>
                         </div>
-                        <p class="text-sm text-gray-600 mb-4 leading-relaxed">
-                            Quà miễn phí? Link lạ? Đếm ngược đe dọa? Cùng Sóc Đỏ dùng <strong>Búa An Toàn</strong> đập tan cạm bẫy và <strong>báo ngay cho bố mẹ</strong>!
+                        <p class="text-xs text-gray-600 mb-3 line-clamp-2 leading-relaxed">
+                            Quà miễn phí? Link lạ đếm ngược đe dọa? Cùng Sóc Đỏ cầm Búa An Toàn đập tan cạm bẫy và đóng cửa sổ báo cho bố mẹ!
                         </p>
-                        <div class="space-y-2 text-sm text-gray-700 mb-4">
-                            <div class="flex items-center gap-2">
-                                <svg class="icon text-rose-500 text-base" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-check"></use></svg> 3 video tình huống (bẫy quà tặng / giải cứu Sóc / cảnh giác an toàn)
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <svg class="icon text-rose-500 text-base" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-check"></use></svg> Tương tác Phá Bọt Cạm Bẫy — 4 làn rơi riêng biệt
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <svg class="icon text-rose-500 text-base" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-check"></use></svg> Bọt An Toàn ✖ Đóng cửa sổ và báo cho người lớn tin cậy
-                            </div>
-                        </div>
                     </div>
-                    <button type="button" onclick="selectAndPlayLevel('/level7/level7.html')" class="level-play-btn w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-rose-500 to-amber-500 hover:from-rose-600 hover:to-amber-600 text-white font-black text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 group-hover:translate-y-[-2px]">
+                    <button type="button" onclick="selectAndPlayLevel('/level7/level7.html')" class="level-play-btn w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-rose-500 to-amber-500 hover:from-rose-600 hover:to-amber-600 text-white font-black text-xs shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-1.5 group-hover:translate-y-[-1px]">
                         <span>CHƠI LEVEL 7</span>
-                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                     </button>
                 </div>
+
+                <!-- Card Level 8 -->
+                <div class="level-card level-card-8 group bg-white rounded-xl border-2 border-cyan-200 p-4 hover:border-cyan-400 hover:shadow-lg transition-all flex flex-col justify-between cursor-pointer">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="flex items-center gap-2">
+                                <span class="px-2 py-0.5 rounded-md bg-cyan-100 text-cyan-800 text-[11px] font-black tracking-wider whitespace-nowrap">LEVEL 8 • MỚI NHẤT</span>
+                                <span class="level-badge-area"></span>
+                            </div>
+                            <span class="text-[11px] text-gray-500 font-semibold inline-flex items-center gap-1"><svg class="icon" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-clock"></use></svg> 2–3 phút</span>
+                        </div>
+                        <div class="flex items-center gap-3 mb-2">
+                            <div class="w-11 h-11 shrink-0 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-2xl text-white shadow-md group-hover:scale-105 transition-transform">
+                                <svg class="icon text-white" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-crown"></use></svg>
+                            </div>
+                            <div class="min-w-0">
+                                <h4 class="text-base font-black text-gray-900 truncate">Trận Chiến An Toàn Số</h4>
+                                <p class="text-[11px] text-cyan-700 font-semibold uppercase tracking-wider truncate">Thu thập mảnh cầu, phong ấn Vua Độc Hại</p>
+                            </div>
+                        </div>
+                        <p class="text-xs text-gray-600 mb-3 line-clamp-2 leading-relaxed">
+                            Mã QR lạ, tin giả và app độc hại đang âm thầm tấn công! Cùng Sóc Đỏ thu thập 3 Mảnh Cầu, đúc Khiên Ánh Sáng phong ấn Vua Độc Hại nhé!
+                        </p>
+                    </div>
+                    <button type="button" onclick="selectAndPlayLevel('/level8/level8.html')" class="level-play-btn w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-black text-xs shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-1.5 group-hover:translate-y-[-1px]">
+                        <span>CHƠI LEVEL 8</span>
+                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Footer note nhỏ gọn -->
+            <div class="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between text-[11px] text-gray-500">
+                <span class="inline-flex items-center gap-1.5">
+                    <svg class="icon text-emerald-600 text-sm" width="1em" height="1em" aria-hidden="true"><use href="/assets/icons.svg?v=aee0804d#i-shield-check"></use></svg>
+                    Tình huống mô phỏng giáo dục — an toàn tuyệt đối cho trẻ em.
+                </span>
+                <span class="text-gray-400">CyberKnight by Sigmabloom</span>
             </div>
         </div>
     </div>

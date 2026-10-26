@@ -9,11 +9,13 @@
  * (c) User with pack_1_4 → launch → 200 → GET /level1/level1.html (with cookie) → 200, body = level1.html
  *     GET /level1/level1.js, /level1/level1.css → 200 with correct content-types
  * (d) Same cookie → /level5/... → 403 (level 5 cần gói pack_5_10)
- * (d2) /level8/level8.html → 404 (level chưa phát hành)
+ * (d2) /level9/level9.html → 404 (level chưa phát hành)
  * (d3) Level 6: no pack → launch 403 LEVEL_LOCKED · pack_1_4 cookie → 403
      pack_5_10 → launch 200 · serve html/js/css · video /video/level 6/ OK
  * (d4) Level 7: no pack → launch 403 LEVEL_LOCKED · pack_1_4 cookie → 403
      pack_5_10 → launch 200 · serve html/js/css · video /video/level 7/ OK
+ * (d5) Level 8: no pack → launch 403 LEVEL_LOCKED · pack_1_4 cookie → 403
+     pack_5_10 → launch 200 · serve html/js/css · video /video/level 8/ OK
  * (e) Tampered cookie signature → 403
  * (f) /level0/level0.html → 200, no login required
  * (g) /level1/..%2f..%2fbackend/.env → NOT leak .env (403/404, no .env content)
@@ -458,17 +460,17 @@ async function runTests() {
     );
   }
 
-  // ── Test (d2): Level chưa phát hành (8) → 404 ────────────────
-  console.log('\n── TEST (d2): GET /level8/level8.html (chưa phát hành) ──');
+  // ── Test (d2): Level chưa phát hành (9) → 404 ────────────────
+  console.log('\n── TEST (d2): GET /level9/level9.html (chưa phát hành) ──');
   {
     const res = await request({
       method: 'GET',
-      path: '/level8/level8.html',
+      path: '/level9/level9.html',
     });
 
     assert(
       res.status === 404,
-      `(d2) GET /level8/level8.html status = ${res.status} (expect 404 — level8 not in catalog)`
+      `(d2) GET /level9/level9.html status = ${res.status} (expect 404 — level9 not in catalog)`
     );
   }
 
@@ -657,6 +659,100 @@ async function runTests() {
     assert(
       vid7.status === 200,
       `(d4-d) GET /video/level%207/intro.mp4 status = ${vid7.status} (expect 200)`
+    );
+  }
+
+  // ── Test (d5): Level 8 launch rules (pack_5_10) ───────────────
+  console.log('\n── TEST (d5): Level 8 launch rules (pack_5_10) ──');
+  {
+    // (d5-a) noPack user launch level 8 → 403
+    const launchRes = await request({
+      method: 'POST',
+      path: '/api/levels/8/launch',
+      headers: { Authorization: 'Bearer ' + noPackToken },
+    });
+    assert(
+      launchRes.status === 403,
+      `(d5-a) POST /api/levels/8/launch (no pack) status = ${launchRes.status} (expect 403)`
+    );
+    assert(
+      launchRes.json && launchRes.json.error === 'LEVEL_LOCKED',
+      `(d5-a) error = LEVEL_LOCKED (got: ${launchRes.json && launchRes.json.error})`
+    );
+
+    // (d5-b) pack_1_4 cookie KHÔNG mở được level8 → 403
+    await grantPack14ToUser(TEST_USERS.withPack.email);
+    const launch1 = await request({
+      method: 'POST',
+      path: '/api/levels/1/launch',
+      headers: { Authorization: 'Bearer ' + pack14Token },
+    });
+    const cookie14 = parseSetCookie(launch1.headers['set-cookie']).levelAccess;
+    const res8 = await request({
+      method: 'GET',
+      path: '/level8/level8.html',
+      headers: { Cookie: `levelAccess=${cookie14}` },
+    });
+    assert(
+      res8.status === 403,
+      `(d5-b) GET /level8/level8.html with pack_1_4 cookie = ${res8.status} (expect 403)`
+    );
+
+    // (d5-c) Launch level 8 với pack_5_10 → 200 → serve đủ html/js/css
+    const launch8 = await request({
+      method: 'POST',
+      path: '/api/levels/8/launch',
+      headers: { Authorization: 'Bearer ' + pack510Token },
+    });
+    assert(
+      launch8.status === 200,
+      `(d5-c) POST /api/levels/8/launch (pack_5_10) status = ${launch8.status} (expect 200)`
+    );
+    assert(
+      launch8.json && launch8.json.url === '/level8/level8.html',
+      `(d5-c) Launch url = /level8/level8.html`
+    );
+
+    const cookie8 = parseSetCookie(launch8.headers['set-cookie']).levelAccess;
+    const html8 = await request({
+      method: 'GET',
+      path: '/level8/level8.html',
+      headers: { Cookie: `levelAccess=${cookie8}` },
+    });
+    assert(
+      html8.status === 200,
+      `(d5-c) GET /level8/level8.html status = ${html8.status} (expect 200)`
+    );
+    assert(
+      html8.body && html8.body.includes('level8.js'),
+      `(d5-c) Body references level8.js`
+    );
+
+    const js8 = await request({
+      method: 'GET',
+      path: '/level8/level8.js',
+      headers: { Cookie: `levelAccess=${cookie8}` },
+    });
+    assert(
+      js8.status === 200 && js8.headers['content-type'] && js8.headers['content-type'].includes('javascript'),
+      `(d5-c) GET /level8/level8.js status = ${js8.status}, type = ${js8.headers && js8.headers['content-type']}`
+    );
+
+    const css8 = await request({
+      method: 'GET',
+      path: '/level8/level8.css',
+      headers: { Cookie: `levelAccess=${cookie8}` },
+    });
+    assert(
+      css8.status === 200 && css8.headers['content-type'] && css8.headers['content-type'].includes('css'),
+      `(d5-c) GET /level8/level8.css status = ${css8.status}, type = ${css8.headers && css8.headers['content-type']}`
+    );
+
+    // (d5-d) Video của level 8 phải truy cập được qua /video/level 8/
+    const vid8 = await request({ method: 'GET', path: '/video/level%208/intro.mp4' });
+    assert(
+      vid8.status === 200,
+      `(d5-d) GET /video/level%208/intro.mp4 status = ${vid8.status} (expect 200)`
     );
   }
 

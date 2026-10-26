@@ -6,7 +6,7 @@
 
 ## 🌟 Tính Năng Nổi Bật
 
-- **Hành Trình Màn Chơi (Level 0 – 7):**
+- **Hành Trình Màn Chơi (Level 0 – 8):**
   - **Level 0 (Miễn phí):** *Hộp Quà Bí Ẩn* — Nhận diện mã độc và đường link quà tặng khả nghi.
   - **Level 1 (Gói Trả Phí):** *Lớp Trưởng Gửi Link Nhận Quà* — Mini-game Lưới Lọc An Toàn và 3 nhánh kết cục độc lập.
   - **Level 2 (Gói Trả Phí):** *Kết Bạn Online* — Ghép cửa căn cứ, phân loại đối tượng lạ trên không gian mạng.
@@ -15,6 +15,7 @@
   - **Level 5 (Gói Trả Phí):** *Thật Hay Giả? Đống Ảnh AI* — Nhận biết ảnh do AI tạo ra với Bút Thử AI phóng to chi tiết.
   - **Level 6 (Gói Trả Phí):** *Chặn Đứng Bắt Nạt Mạng* — Không hùa theo, chặn & báo cáo tin nhắn xấu, bảo vệ bạn bè.
   - **Level 7 (Gói Trả Phí):** *Biệt Đội Chống Bẫy Lừa* — Dùng Búa An Toàn đập tan 4 cạm bẫy lừa đảo và Bọt An Toàn báo cho bố mẹ.
+  - **Level 8 (Gói Trả Phí):** *Trận Chiến An Toàn Số* — Bản đồ Thành Phố Số với 3 Trạm Thử Thách (mã QR, tin giả & ảnh AI, app nhái) → thu thập 3 Mảnh Cầu → đấu trùm Vua Độc Hại.
 
 - **Thanh Toán Tự Động VietQR & SePay:**
   - Sinh mã đơn hàng ngẫu nhiên 10 ký tự chuẩn **Crockford Base32** (`CK` + 8 ký tự an toàn, loại bỏ triệt để ký tự dễ nhầm lẫn `0, O, 1, I, L`).
